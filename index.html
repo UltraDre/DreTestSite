@@ -355,14 +355,6 @@
             width: 100%;
         }
 
-        .fixture-modern-center {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-            margin: 0 12px;
-        }
-
         .fixture-modern-scorebox {
             width: 48px;
             height: 40px;
@@ -1972,7 +1964,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: SYMMETRIC KNOCKOUT BRACKET (Left & Right Halves)
+        //  RENDER: PERFECTLY ALIGNED SYMMETRIC KNOCKOUT BRACKET
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -1984,12 +1976,20 @@
             const leftRounds = Math.max(0, totalRounds - 2);
 
             const bracketFlex = document.createElement('div');
-            bracketFlex.className = 'flex flex-row items-stretch justify-between w-full h-full relative gap-4';
+            bracketFlex.className = 'flex flex-row items-start justify-between w-full h-full relative gap-4';
             viewport.appendChild(bracketFlex);
+
+            const H = 36, G1 = 2, G2 = 28;
+            const PairHeight = H + G1 + H + G2; // 102px
+            const maxPairs = t.rounds[0].slots.length / 2; // e.g. 16 for 32 players
+            const rightColOffset = maxPairs * PairHeight; // 816
 
             function createCol(slots, rIdx, indices, side, title) {
                 const col = document.createElement('div');
                 const isChampion = (rIdx === totalRounds - 1 && side === 'center');
+                const isFinal = (rIdx === totalRounds - 2 && side === 'center');
+                const half = slots.length / 2;
+
                 if (isChampion) {
                     col.className = 'bracket-col champion-col flex flex-col justify-center items-center h-full relative';
                 } else {
@@ -2005,6 +2005,11 @@
                     div.setAttribute('data-slot', 0);
                     div.setAttribute('data-side', 'center');
                     div.id = 'champion-slot-container';
+
+                    // Champion perfectly centered vertically to Final Pair
+                    div.style.marginTop = '66px'; 
+                    div.style.marginBottom = '0px';
+
                     div.innerHTML = `
                             <div class="flex items-center gap-3">
                                 <input type="text" id="winner-box" value="${slot.name||''}" placeholder="CROWN CHAMPION" class="name-input text-center font-black rounded-full" style="width:160px;height:40px;border:2px solid #e5c122;border-radius:9999px;" readonly />
@@ -2024,8 +2029,8 @@
                     return col;
                 }
 
-                const isFinal = (rIdx === totalRounds - 2 && side === 'center');
-                const isFinals = isFinal;
+                const isRight = (side === 'right');
+                const baseOffset = isRight ? rightColOffset : 0;
 
                 indices.forEach((sIdx) => {
                     const slot = slots[sIdx];
@@ -2035,8 +2040,26 @@
                     else slotClasses += ' slot-pair-second';
                     div.className = slotClasses;
                     div.setAttribute('data-round', rIdx);
-                    div.setAttribute('data-slot', sIdx);
+                    div.setAttribute('data-slot', sIdx); // Absolute slot index
                     div.setAttribute('data-side', side);
+
+                    // Math to perfectly center next round's boxes to the previous round's pairs.
+                    const adjIdx = isRight ? (sIdx - half) : sIdx;
+                    const pairIdx = Math.floor(adjIdx / 2);
+                    const slotInPair = sIdx % 2;
+                    
+                    let marginTop = 0;
+                    if (rIdx === 0) {
+                        // Round 0 aligns to the top of the column.
+                        marginTop = baseOffset + pairIdx * PairHeight + (slotInPair === 1 ? (H + G1) : 0);
+                    } else {
+                        // Subsequent rounds shift by 33px/71px to align the top slot with the center of the previous pair.
+                        marginTop = baseOffset + pairIdx * PairHeight + (slotInPair === 0 ? 33 : 71);
+                    }
+                    
+                    // Override CSS default margins
+                    div.style.marginTop = marginTop + 'px';
+                    div.style.marginBottom = '0px';
 
                     const nameInput = document.createElement('input');
                     nameInput.type = 'text';
@@ -2070,7 +2093,7 @@
                     });
 
                     let score2 = null;
-                    if (!isFinals) {
+                    if (!isFinal) {
                         score2 = document.createElement('input');
                         score2.type = 'text';
                         score2.inputMode = 'numeric';
@@ -2103,7 +2126,7 @@
                 return col;
             }
 
-            // Left Columns
+            // Render Left Columns (Round of 32 to Semi-finals)
             for (let r = 0; r < leftRounds; r++) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2112,13 +2135,13 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'left', t.rounds[r].title));
             }
 
-            // Center Columns
+            // Render Center Columns (Final & Champion)
             const finalR = t.rounds[totalRounds - 2];
             const championR = t.rounds[totalRounds - 1];
             bracketFlex.appendChild(createCol(finalR.slots, totalRounds - 2, [0, 1], 'center', finalR.title));
             bracketFlex.appendChild(createCol(championR.slots, totalRounds - 1, [0], 'center', championR.title));
 
-            // Right Columns
+            // Render Right Columns (Semi-finals to Round of 32)
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2224,6 +2247,9 @@
             }
 
             // Left side connections
+            const pairsLeft = t.rounds[0].slots.length / 2;
+            const leftPairs = pairsLeft / 2;
+
             for (let r = 0; r < leftRounds; r++) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
@@ -2236,8 +2262,12 @@
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
-                for (let m = halfPairs; m < pairs; m++) {
-                    drawConnection(m * 2, m * 2 + 1, r, m, r + 1, 'right');
+                const offsetPairs = halfPairs; // e.g., 4 for 16 players, 8 for 32 players
+                for (let m = 0; m < halfPairs; m++) {
+                    const absoluteSlotA = offsetPairs * 2 + m * 2;
+                    const absoluteSlotB = offsetPairs * 2 + m * 2 + 1;
+                    const targetSlot = offsetPairs + m; // Absolute index in next round
+                    drawConnection(absoluteSlotA, absoluteSlotB, r, targetSlot, r + 1, 'right');
                 }
             }
 
