@@ -2407,7 +2407,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  ALIGN + CENTER ENTIRE BRACKET VERTICALLY
+        //  FIXED ALIGNMENT: V-SHAPE PYRAMID (LEFT TOP HALF, RIGHT BOTTOM HALF)
         // ──────────────────────────────────────────────────────────────
         function alignBracketCentered(columns, leftRounds) {
             const container = document.getElementById('bracket-container');
@@ -2415,140 +2415,40 @@
             const containerRect = container.getBoundingClientRect();
             const containerHeight = containerRect.height;
 
-            // Group columns by round
-            const roundMap = {};
-            columns.forEach(({ col, round, side }) => {
-                if (!roundMap[round]) roundMap[round] = {};
-                roundMap[round][side] = col;
-            });
+            const leftCols = columns.filter(c => c.side === 'left');
+            const rightCols = columns.filter(c => c.side === 'right');
+            const centerCols = columns.filter(c => c.side === 'center');
 
-            const roundData = {};
-            const roundKeys = Object.keys(roundMap).map(Number).sort((a, b) => a - b);
-
-            // 1. Compute positions and align left/right pairs
-            roundKeys.forEach(r => {
-                const sides = roundMap[r];
-                const leftCol = sides['left'] || null;
-                const rightCol = sides['right'] || null;
-                const centerCol = sides['center'] || null;
-                let top, bottom, center;
-                if (centerCol) {
-                    const rect = centerCol.getBoundingClientRect();
-                    top = rect.top - containerRect.top;
-                    bottom = rect.bottom - containerRect.top;
-                    center = (top + bottom) / 2;
-                } else if (leftCol && rightCol) {
-                    const rectL = leftCol.getBoundingClientRect();
-                    const rectR = rightCol.getBoundingClientRect();
-                    const topL = rectL.top - containerRect.top;
-                    const topR = rectR.top - containerRect.top;
-                    const avgTop = (topL + topR) / 2;
-                    const offsetL = avgTop - topL;
-                    const offsetR = avgTop - topR;
-                    if (Math.abs(offsetL) > 0.5) leftCol.style.marginTop = offsetL + 'px';
-                    else leftCol.style.marginTop = '0px';
-                    if (Math.abs(offsetR) > 0.5) rightCol.style.marginTop = offsetR + 'px';
-                    else rightCol.style.marginTop = '0px';
-                    const rectL2 = leftCol.getBoundingClientRect();
-                    const rectR2 = rightCol.getBoundingClientRect();
-                    top = Math.min(rectL2.top, rectR2.top) - containerRect.top;
-                    bottom = Math.max(rectL2.bottom, rectR2.bottom) - containerRect.top;
-                    center = (top + bottom) / 2;
-                } else {
-                    return;
-                }
-                roundData[r] = { top, bottom, center, leftCol, rightCol, centerCol };
-            });
-
-            // 2. Pyramid: center each round on the previous round's center
-            const sorted = Object.keys(roundData).map(Number).sort((a, b) => a - b);
-            if (sorted.length > 0) {
-                // First, center round 0 in the container
-                const r0 = sorted[0];
-                if (roundData[r0]) {
-                    const targetCenter = containerHeight / 2;
-                    const currentCenter = roundData[r0].center;
-                    const delta = targetCenter - currentCenter;
-                    if (roundData[r0].leftCol) {
-                        roundData[r0].leftCol.style.marginTop = (parseFloat(roundData[r0].leftCol.style.marginTop) || 0) +
-                            delta + 'px';
-                    }
-                    if (roundData[r0].rightCol) {
-                        roundData[r0].rightCol.style.marginTop = (parseFloat(roundData[r0].rightCol.style.marginTop) || 0) +
-                            delta + 'px';
-                    }
-                    // Recompute center after shift
-                    const rectL = roundData[r0].leftCol ? roundData[r0].leftCol.getBoundingClientRect() : null;
-                    const rectR = roundData[r0].rightCol ? roundData[r0].rightCol.getBoundingClientRect() : null;
-                    if (rectL && rectR) {
-                        const top = Math.min(rectL.top, rectR.top) - containerRect.top;
-                        const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
-                        roundData[r0].center = (top + bottom) / 2;
-                    }
-                }
-
-                // Cascade: center each subsequent round on previous
-                for (let i = 1; i < sorted.length; i++) {
-                    const r = sorted[i];
-                    const prev = sorted[i - 1];
-                    if (!roundData[prev] || !roundData[r]) continue;
-                    const targetCenter = roundData[prev].center;
-                    const currentCenter = roundData[r].center;
-                    const delta = targetCenter - currentCenter;
-                    if (roundData[r].leftCol) {
-                        roundData[r].leftCol.style.marginTop = (parseFloat(roundData[r].leftCol.style.marginTop) || 0) +
-                            delta + 'px';
-                    }
-                    if (roundData[r].rightCol) {
-                        roundData[r].rightCol.style.marginTop = (parseFloat(roundData[r].rightCol.style.marginTop) || 0) +
-                            delta + 'px';
-                    }
-                    if (roundData[r].centerCol) {
-                        roundData[r].centerCol.style.marginTop = (parseFloat(roundData[r].centerCol.style.marginTop) || 0) +
-                            delta + 'px';
-                    }
-                    // Recompute
-                    const rectL = roundData[r].leftCol ? roundData[r].leftCol.getBoundingClientRect() : null;
-                    const rectR = roundData[r].rightCol ? roundData[r].rightCol.getBoundingClientRect() : null;
-                    const rectC = roundData[r].centerCol ? roundData[r].centerCol.getBoundingClientRect() : null;
-                    if (rectC) {
-                        roundData[r].center = (rectC.top + rectC.height / 2) - containerRect.top;
-                    } else if (rectL && rectR) {
-                        const top = Math.min(rectL.top, rectR.top) - containerRect.top;
-                        const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
-                        roundData[r].center = (top + bottom) / 2;
-                    }
-                }
+            function getBoundingBox(cols, rect) {
+                let minTop = Infinity, maxBottom = -Infinity;
+                cols.forEach(({ col }) => {
+                    const cRect = col.getBoundingClientRect();
+                    const top = cRect.top - rect.top;
+                    const bottom = cRect.bottom - rect.top;
+                    if (top < minTop) minTop = top;
+                    if (bottom > maxBottom) maxBottom = bottom;
+                });
+                return { minTop, maxBottom };
             }
 
-            // 3. Final centering pass: shift entire bracket to center
-            // Gather all column elements
-            const allCols = [];
-            columns.forEach(({ col }) => allCols.push(col));
-
-            // Compute bounding box of all columns
-            let minTop = Infinity;
-            let maxBottom = -Infinity;
-            allCols.forEach(col => {
-                const rect = col.getBoundingClientRect();
-                const top = rect.top - containerRect.top;
-                const bottom = rect.bottom - containerRect.top;
-                if (top < minTop) minTop = top;
-                if (bottom > maxBottom) maxBottom = bottom;
-            });
-
-            if (isFinite(minTop) && isFinite(maxBottom)) {
-                const bracketHeight = maxBottom - minTop;
-                const bracketCenter = (minTop + maxBottom) / 2;
-                const containerCenter = containerHeight / 2;
-                const offset = containerCenter - bracketCenter;
-
-                // Apply offset to all columns (preserve existing margin-top)
-                allCols.forEach(col => {
-                    const current = parseFloat(col.style.marginTop) || 0;
-                    col.style.marginTop = (current + offset) + 'px';
+            function centerGroup(cols, targetCenter, containerRect) {
+                if (cols.length === 0) return;
+                const box = getBoundingBox(cols, containerRect);
+                const currentCenter = (box.minTop + box.maxBottom) / 2;
+                const delta = targetCenter - currentCenter;
+                cols.forEach(({ col }) => {
+                    const currentMargin = parseFloat(col.style.marginTop) || 0;
+                    col.style.marginTop = (currentMargin + delta) + 'px';
                 });
             }
+
+            const topHalfCenter = containerHeight / 4;
+            const bottomHalfCenter = containerHeight * 3 / 4;
+            const fullCenter = containerHeight / 2;
+
+            centerGroup(leftCols, topHalfCenter, containerRect);
+            centerGroup(rightCols, bottomHalfCenter, containerRect);
+            centerGroup(centerCols, fullCenter, containerRect);
         }
 
         // ──────────────────────────────────────────────────────────────
