@@ -697,15 +697,19 @@
             margin-right: auto;
             padding: 0 6px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
         }
 
         .bracket-viewport {
             display: flex !important;
             flex-direction: row !important;
-            align-items: stretch !important;
+            align-items: center !important;
             justify-content: center !important;
             width: 100% !important;
-            min-height: 700px !important;
+            min-height: 500px !important;
             position: relative !important;
             gap: 2px !important;
             flex-wrap: nowrap !important;
@@ -718,6 +722,7 @@
             padding: 0 3px !important;
             flex-shrink: 0 !important;
             align-items: center !important;
+            margin-top: 0 !important;
         }
 
         .bracket-viewport .bracket-col.champion-col {
@@ -774,7 +779,6 @@
             padding: 1px 0 !important;
         }
 
-        /* ── FINAL SIDE-BY-SIDE ── */
         .final-slot-wrapper {
             display: flex;
             flex-direction: row;
@@ -811,7 +815,6 @@
             flex-shrink: 0;
         }
 
-        /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
             .bracket-viewport .bracket-col {
                 min-width: 80px !important;
@@ -1325,9 +1328,9 @@
                     <p class="text-xs text-gray-400 max-w-md">Complete Group Matches and click "Generate Knockout Phase" to seed the top qualifying contenders into the final elimination bracket.</p>
                     <button onclick="advanceGroupQualifiers()" class="gradient-btn px-6 py-2.5 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5"><i class="fa-solid fa-forward-fast"></i> Seed Knockout Stage Now</button>
                 </div>
-                <div id="bracket-container" class="relative w-full max-w-7xl mx-auto px-1 md:px-2">
+                <div id="bracket-container" class="relative w-full max-w-7xl mx-auto px-1 md:px-2 flex items-center justify-center">
                     <svg id="connector-svg" class="absolute inset-0 w-full h-full pointer-events-none z-5"></svg>
-                    <div id="bracket-viewport" class="bracket-viewport flex items-stretch justify-center w-full min-h-[600px] md:min-h-[800px] relative gap-1 md:gap-2"></div>
+                    <div id="bracket-viewport" class="bracket-viewport flex items-center justify-center w-full min-h-[500px] md:min-h-[700px] relative gap-1 md:gap-2"></div>
                 </div>
             </main>
 
@@ -2117,12 +2120,8 @@
             const isChampionRound = (roundIdx === totalRounds - 1);
             if (isChampionRound) return;
 
-            // Check if this is the final round (totalRounds - 2)
-            // In the final, slots are paired differently: slot 0 is left finalist, slot 1 is right finalist
-            // They both feed into champion slot 0
+            // Final round handling (totalRounds - 2)
             if (roundIdx === totalRounds - 2) {
-                // Final round: slot 0 and slot 1 are the two finalists
-                // The winner advances to champion slot 0
                 const championSlot = t.rounds[totalRounds - 1].slots[0];
                 if (slot.isWinner) {
                     slot.isWinner = false;
@@ -2135,11 +2134,9 @@
                     updateConnectors();
                     return;
                 }
-                // Set this slot as winner, clear the other
                 const otherIdx = slotIdx === 0 ? 1 : 0;
                 const otherSlot = round.slots[otherIdx];
                 if (otherSlot) otherSlot.isWinner = false;
-                // Clear all winners in this round first
                 round.slots.forEach(s => s.isWinner = false);
                 slot.isWinner = true;
                 championSlot.name = slot.name;
@@ -2147,14 +2144,13 @@
                 saveTournamentsToStorage();
                 renderActiveBracket();
                 updateConnectors();
-                // Celebrate if champion slot has a name
                 if (championSlot.name && championSlot.name !== '') {
                     celebrate();
                 }
                 return;
             }
 
-            // For non-final rounds: standard pairing
+            // Regular rounds
             const matchIdx = Math.floor(slotIdx / 2);
             const slotInMatch = slotIdx % 2;
             const otherSlotIdx = (slotInMatch === 0) ? slotIdx + 1 : slotIdx - 1;
@@ -2204,7 +2200,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: BRACKET WITH FINAL SIDE-BY-SIDE + CHAMPION ABOVE
+        //  RENDER: BRACKET — FULLY CENTERED VERTICALLY
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -2213,9 +2209,6 @@
             viewport.innerHTML = '';
 
             const totalRounds = t.rounds.length;
-            // leftRounds = number of rounds on each side before the final
-            // For a 16-player bracket: rounds 0,1,2 on each side, final at index 3, champion at index 4
-            // So leftRounds = totalRounds - 2 (since final + champion are in the center)
             const leftRounds = Math.max(0, totalRounds - 2);
 
             const bracketFlex = document.createElement('div');
@@ -2223,7 +2216,6 @@
                 'flex flex-row items-stretch justify-center w-full h-full relative gap-1 md:gap-2 flex-nowrap';
             viewport.appendChild(bracketFlex);
 
-            // We'll store references to columns with their round and side for alignment
             const columns = [];
 
             function createCol(slots, rIdx, indices, side, title) {
@@ -2266,37 +2258,26 @@
                     return col;
                 }
 
-                // For non-champion rounds
                 const isFinal = (rIdx === totalRounds - 2 && side === 'center');
 
                 if (isFinal) {
-                    // Final round: render two slots side by side
-                    // slots[0] = left finalist, slots[1] = right finalist
                     const wrapper = document.createElement('div');
                     wrapper.className = 'final-slot-wrapper';
-
-                    // Slot 0 (left finalist)
                     const slotL = slots[0];
                     const divL = createSlotElement(slotL, rIdx, 0, 'final-left');
                     wrapper.appendChild(divL);
-
-                    // VS
                     const vs = document.createElement('div');
                     vs.className = 'final-vs';
                     vs.textContent = '⚔';
                     wrapper.appendChild(vs);
-
-                    // Slot 1 (right finalist)
                     const slotR = slots[1];
                     const divR = createSlotElement(slotR, rIdx, 1, 'final-right');
                     wrapper.appendChild(divR);
-
                     col.appendChild(wrapper);
                     columns.push({ col, round: rIdx, side: 'center' });
                     return col;
                 }
 
-                // Regular round (non-final, non-champion)
                 indices.forEach((sIdx) => {
                     const slot = slots[sIdx];
                     const div = createSlotElement(slot, rIdx, sIdx, side);
@@ -2348,7 +2329,6 @@
                     }
                 });
 
-                // Check if this is the final round (no leg2)
                 const isFinalRound = (rIdx === (tournaments.find(x => x.id === activeTournamentId)?.rounds?.length || 0) - 2);
                 let score2 = null;
                 if (!isFinalRound) {
@@ -2381,9 +2361,8 @@
                 return div;
             }
 
-            // ── BUILD COLUMNS ──
-
-            // 1. Left columns (rounds 0 to leftRounds-1)
+            // ── BUILD ──
+            // Left
             for (let r = 0; r < leftRounds; r++) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2392,20 +2371,16 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'left', t.rounds[r].title));
             }
 
-            // 2. Center: Final + Champion
-            //    We need to render the final (totalRounds-2) and champion (totalRounds-1)
-            //    But we want champion ABOVE the final, so we wrap them in a flex column container
+            // Center: champion above final
             const centerWrapper = document.createElement('div');
             centerWrapper.className = 'flex flex-col items-center justify-center gap-2 flex-shrink-0';
             centerWrapper.style.minWidth = '120px';
 
-            // Champion on top (totalRounds-1)
             const championR = t.rounds[totalRounds - 1];
             const championCol = createCol(championR.slots, totalRounds - 1, [0], 'center', championR.title);
             championCol.className = 'bracket-col champion-col flex flex-col justify-center items-center';
             championCol.style.marginBottom = '0px';
 
-            // Final below (totalRounds-2)
             const finalR = t.rounds[totalRounds - 2];
             const finalCol = createCol(finalR.slots, totalRounds - 2, [0, 1], 'center', finalR.title);
             finalCol.className = 'bracket-col flex flex-col justify-center items-center';
@@ -2415,7 +2390,7 @@
             centerWrapper.appendChild(finalCol);
             bracketFlex.appendChild(centerWrapper);
 
-            // 3. Right columns (rounds leftRounds-1 down to 0, mirrored)
+            // Right
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2424,17 +2399,17 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'right', t.rounds[r].title));
             }
 
-            // ── ALIGN COLUMNS ──
+            // ── ALIGN & CENTER ──
             requestAnimationFrame(() => {
-                alignBracketColumns(columns, leftRounds);
+                alignBracketCentered(columns, leftRounds);
                 updateConnectors();
             });
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  ALIGN LEFT/RIGHT ROUNDS + PYRAMID CENTERING
+        //  ALIGN + CENTER ENTIRE BRACKET VERTICALLY
         // ──────────────────────────────────────────────────────────────
-        function alignBracketColumns(columns, leftRounds) {
+        function alignBracketCentered(columns, leftRounds) {
             const container = document.getElementById('bracket-container');
             if (!container) return;
             const containerRect = container.getBoundingClientRect();
@@ -2447,9 +2422,10 @@
                 roundMap[round][side] = col;
             });
 
-            // For each round, get its bounding rect
             const roundData = {};
             const roundKeys = Object.keys(roundMap).map(Number).sort((a, b) => a - b);
+
+            // 1. Compute positions and align left/right pairs
             roundKeys.forEach(r => {
                 const sides = roundMap[r];
                 const leftCol = sides['left'] || null;
@@ -2464,9 +2440,6 @@
                 } else if (leftCol && rightCol) {
                     const rectL = leftCol.getBoundingClientRect();
                     const rectR = rightCol.getBoundingClientRect();
-                    top = Math.min(rectL.top, rectR.top) - containerRect.top;
-                    bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
-                    center = (top + bottom) / 2;
                     const topL = rectL.top - containerRect.top;
                     const topR = rectR.top - containerRect.top;
                     const avgTop = (topL + topR) / 2;
@@ -2487,57 +2460,99 @@
                 roundData[r] = { top, bottom, center, leftCol, rightCol, centerCol };
             });
 
-            // Now apply pyramid centering
-            const sortedRounds = Object.keys(roundData).map(Number).sort((a, b) => a - b);
+            // 2. Pyramid: center each round on the previous round's center
+            const sorted = Object.keys(roundData).map(Number).sort((a, b) => a - b);
+            if (sorted.length > 0) {
+                // First, center round 0 in the container
+                const r0 = sorted[0];
+                if (roundData[r0]) {
+                    const targetCenter = containerHeight / 2;
+                    const currentCenter = roundData[r0].center;
+                    const delta = targetCenter - currentCenter;
+                    if (roundData[r0].leftCol) {
+                        roundData[r0].leftCol.style.marginTop = (parseFloat(roundData[r0].leftCol.style.marginTop) || 0) +
+                            delta + 'px';
+                    }
+                    if (roundData[r0].rightCol) {
+                        roundData[r0].rightCol.style.marginTop = (parseFloat(roundData[r0].rightCol.style.marginTop) || 0) +
+                            delta + 'px';
+                    }
+                    // Recompute center after shift
+                    const rectL = roundData[r0].leftCol ? roundData[r0].leftCol.getBoundingClientRect() : null;
+                    const rectR = roundData[r0].rightCol ? roundData[r0].rightCol.getBoundingClientRect() : null;
+                    if (rectL && rectR) {
+                        const top = Math.min(rectL.top, rectR.top) - containerRect.top;
+                        const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
+                        roundData[r0].center = (top + bottom) / 2;
+                    }
+                }
 
-            // First, set round 0 to be centered vertically in the container
-            if (roundData[0]) {
-                const targetCenter = containerHeight / 2;
-                const currentCenter = roundData[0].center;
-                const delta = targetCenter - currentCenter;
-                if (roundData[0].leftCol) roundData[0].leftCol.style.marginTop = (parseFloat(roundData[0].leftCol.style
-                    .marginTop) || 0) + delta + 'px';
-                if (roundData[0].rightCol) roundData[0].rightCol.style.marginTop = (parseFloat(roundData[0].rightCol.style
-                    .marginTop) || 0) + delta + 'px';
-                const rectL = roundData[0].leftCol ? roundData[0].leftCol.getBoundingClientRect() : null;
-                const rectR = roundData[0].rightCol ? roundData[0].rightCol.getBoundingClientRect() : null;
-                if (rectL && rectR) {
-                    const top = Math.min(rectL.top, rectR.top) - containerRect.top;
-                    const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
-                    roundData[0].center = (top + bottom) / 2;
+                // Cascade: center each subsequent round on previous
+                for (let i = 1; i < sorted.length; i++) {
+                    const r = sorted[i];
+                    const prev = sorted[i - 1];
+                    if (!roundData[prev] || !roundData[r]) continue;
+                    const targetCenter = roundData[prev].center;
+                    const currentCenter = roundData[r].center;
+                    const delta = targetCenter - currentCenter;
+                    if (roundData[r].leftCol) {
+                        roundData[r].leftCol.style.marginTop = (parseFloat(roundData[r].leftCol.style.marginTop) || 0) +
+                            delta + 'px';
+                    }
+                    if (roundData[r].rightCol) {
+                        roundData[r].rightCol.style.marginTop = (parseFloat(roundData[r].rightCol.style.marginTop) || 0) +
+                            delta + 'px';
+                    }
+                    if (roundData[r].centerCol) {
+                        roundData[r].centerCol.style.marginTop = (parseFloat(roundData[r].centerCol.style.marginTop) || 0) +
+                            delta + 'px';
+                    }
+                    // Recompute
+                    const rectL = roundData[r].leftCol ? roundData[r].leftCol.getBoundingClientRect() : null;
+                    const rectR = roundData[r].rightCol ? roundData[r].rightCol.getBoundingClientRect() : null;
+                    const rectC = roundData[r].centerCol ? roundData[r].centerCol.getBoundingClientRect() : null;
+                    if (rectC) {
+                        roundData[r].center = (rectC.top + rectC.height / 2) - containerRect.top;
+                    } else if (rectL && rectR) {
+                        const top = Math.min(rectL.top, rectR.top) - containerRect.top;
+                        const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
+                        roundData[r].center = (top + bottom) / 2;
+                    }
                 }
             }
 
-            // For each subsequent round (r > 0), center it on the previous round's box
-            for (let i = 1; i < sortedRounds.length; i++) {
-                const r = sortedRounds[i];
-                const prev = sortedRounds[i - 1];
-                if (!roundData[prev] || !roundData[r]) continue;
-                const prevBox = roundData[prev];
-                const targetCenter = prevBox.center;
-                const currentCenter = roundData[r].center;
-                const delta = targetCenter - currentCenter;
-                if (roundData[r].leftCol) roundData[r].leftCol.style.marginTop = (parseFloat(roundData[r].leftCol.style
-                    .marginTop) || 0) + delta + 'px';
-                if (roundData[r].rightCol) roundData[r].rightCol.style.marginTop = (parseFloat(roundData[r].rightCol.style
-                    .marginTop) || 0) + delta + 'px';
-                if (roundData[r].centerCol) roundData[r].centerCol.style.marginTop = (parseFloat(roundData[r].centerCol
-                    .style.marginTop) || 0) + delta + 'px';
-                const rectL = roundData[r].leftCol ? roundData[r].leftCol.getBoundingClientRect() : null;
-                const rectR = roundData[r].rightCol ? roundData[r].rightCol.getBoundingClientRect() : null;
-                const rectC = roundData[r].centerCol ? roundData[r].centerCol.getBoundingClientRect() : null;
-                if (rectC) {
-                    roundData[r].center = (rectC.top + rectC.height / 2) - containerRect.top;
-                } else if (rectL && rectR) {
-                    const top = Math.min(rectL.top, rectR.top) - containerRect.top;
-                    const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
-                    roundData[r].center = (top + bottom) / 2;
-                }
+            // 3. Final centering pass: shift entire bracket to center
+            // Gather all column elements
+            const allCols = [];
+            columns.forEach(({ col }) => allCols.push(col));
+
+            // Compute bounding box of all columns
+            let minTop = Infinity;
+            let maxBottom = -Infinity;
+            allCols.forEach(col => {
+                const rect = col.getBoundingClientRect();
+                const top = rect.top - containerRect.top;
+                const bottom = rect.bottom - containerRect.top;
+                if (top < minTop) minTop = top;
+                if (bottom > maxBottom) maxBottom = bottom;
+            });
+
+            if (isFinite(minTop) && isFinite(maxBottom)) {
+                const bracketHeight = maxBottom - minTop;
+                const bracketCenter = (minTop + maxBottom) / 2;
+                const containerCenter = containerHeight / 2;
+                const offset = containerCenter - bracketCenter;
+
+                // Apply offset to all columns (preserve existing margin-top)
+                allCols.forEach(col => {
+                    const current = parseFloat(col.style.marginTop) || 0;
+                    col.style.marginTop = (current + offset) + 'px';
+                });
             }
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  CONNECTOR LINES — updated for final side-by-side
+        //  CONNECTOR LINES
         // ──────────────────────────────────────────────────────────────
         function updateConnectors() {
             const svg = document.getElementById('connector-svg');
@@ -2556,39 +2571,27 @@
             const totalRounds = t.rounds.length;
             if (totalRounds < 2) return;
             const leftRounds = totalRounds - 2;
-
             const gap = 6;
 
             function drawConnection(slotAIdx, slotBIdx, roundIdx, targetSlotIdx, targetRoundIdx, side) {
                 let targetSide = side;
                 if (targetRoundIdx === totalRounds - 2 || targetRoundIdx === totalRounds - 1) targetSide = 'center';
 
-                // Determine the actual side for the target based on the target round
-                // For final and champion, targetSide is 'center'
-                // But we need to find the correct element
                 const elA = document.querySelector(
                     `[data-round="${roundIdx}"][data-slot="${slotAIdx}"][data-side="${side}"]`);
                 const elB = document.querySelector(
                     `[data-round="${roundIdx}"][data-slot="${slotBIdx}"][data-side="${side}"]`);
 
-                // For the final, slots are in a wrapper with data-side="final-left" and "final-right"
-                // But we set data-side to the side passed in (which is 'center' for final)
-                // Actually, in createSlotElement for final, we set side to 'final-left' and 'final-right'
-                // Let's handle this differently: find by round and slot regardless of side
-
-                // For the target, find by round and slot
                 let elTarget = null;
                 if (targetRoundIdx === totalRounds - 1) {
-                    // Champion
-                    elTarget = document.querySelector(`[data-round="${targetRoundIdx}"][data-slot="0"][data-side="center"]`);
+                    elTarget = document.getElementById('champion-slot-container');
                     if (!elTarget) {
-                        // Try to find champion slot container
-                        elTarget = document.getElementById('champion-slot-container');
+                        elTarget = document.querySelector(
+                            `[data-round="${targetRoundIdx}"][data-slot="0"][data-side="center"]`);
                     }
                 } else if (targetRoundIdx === totalRounds - 2) {
-                    // Final - target is the champion (slot 0)
-                    elTarget = document.querySelector(`[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"]`);
-                    // If not found, try with data-side="center"
+                    elTarget = document.querySelector(
+                        `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"]`);
                     if (!elTarget) {
                         elTarget = document.querySelector(
                             `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"][data-side="center"]`);
@@ -2626,7 +2629,6 @@
                 const isWinner = isAWinner || isBWinner;
 
                 const mergeX = (Math.max(xA, xB) + xT) / 2;
-
                 const winColor = '#ffd13b';
                 const normColor = 'rgba(255,255,255,0.35)';
                 const winW = 3;
@@ -2654,7 +2656,7 @@
                     isWinner);
             }
 
-            // Left side connections
+            // Left side
             for (let r = 0; r < leftRounds; r++) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
@@ -2663,7 +2665,7 @@
                 }
             }
 
-            // Right side connections
+            // Right side
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
@@ -2672,88 +2674,18 @@
                 }
             }
 
-            // Final to Champion: two separate connections from final slots to champion
+            // Final → Champion (curved connections)
             if (leftRounds >= 0) {
                 const finalR = totalRounds - 2;
                 const championR = totalRounds - 1;
-                // Connect final slot 0 (left finalist) to champion
-                // Connect final slot 1 (right finalist) to champion
-                // We need to use the final round's slots
                 const finalSlots = t.rounds[finalR].slots;
                 if (finalSlots.length >= 2) {
                     const champSlot = t.rounds[championR].slots[0];
-                    // For each finalist, draw a line to the champion
-                    // We'll use a custom connection function for this
                     const elFinal0 = document.querySelector(`[data-round="${finalR}"][data-slot="0"]`);
                     const elFinal1 = document.querySelector(`[data-round="${finalR}"][data-slot="1"]`);
-                    const elChamp = document.querySelector(`[data-round="${championR}"][data-slot="0"][data-side="center"]`);
-                    if (!elChamp) {
-                        // Try to find champion slot container
-                        const champContainer = document.getElementById('champion-slot-container');
-                        if (champContainer) {
-                            const nameInput = champContainer.querySelector('.name-input');
-                            if (nameInput) {
-                                const rT = nameInput.getBoundingClientRect();
-                                const rect2 = container.getBoundingClientRect();
-                                const xT = rT.left - rect2.left - gap;
-                                const yT = rT.top + rT.height / 2 - rect2.top;
+                    const elChamp = document.getElementById('champion-slot-container') ||
+                        document.querySelector(`[data-round="${championR}"][data-slot="0"][data-side="center"]`);
 
-                                // Draw from final slot 0
-                                if (elFinal0) {
-                                    const nameA = elFinal0.querySelector('.name-input');
-                                    if (nameA) {
-                                        const rA = nameA.getBoundingClientRect();
-                                        const xA = rA.right - rect2.left + gap;
-                                        const yA = rA.top + rA.height / 2 - rect2.top;
-                                        const slotA = finalSlots[0];
-                                        const isAWinner = champSlot.name && slotA.name && champSlot.name === slotA.name;
-                                        const winColor = '#ffd13b';
-                                        const normColor = 'rgba(255,255,255,0.35)';
-                                        const winW = 3;
-                                        const normW = 1.5;
-                                        const midX = (xA + xT) / 2;
-                                        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                                        p.setAttribute('d', `M ${xA} ${yA} C ${midX} ${yA}, ${midX} ${yT}, ${xT} ${yT}`);
-                                        p.setAttribute('stroke', isAWinner ? winColor : normColor);
-                                        p.setAttribute('stroke-width', isAWinner ? winW : normW);
-                                        p.setAttribute('fill', 'none');
-                                        p.setAttribute('stroke-linecap', 'round');
-                                        if (isAWinner) p.classList.add('winner-path');
-                                        else p.classList.add('default-path');
-                                        svg.appendChild(p);
-                                    }
-                                }
-                                // Draw from final slot 1
-                                if (elFinal1) {
-                                    const nameB = elFinal1.querySelector('.name-input');
-                                    if (nameB) {
-                                        const rB = nameB.getBoundingClientRect();
-                                        const xB = rB.right - rect2.left + gap;
-                                        const yB = rB.top + rB.height / 2 - rect2.top;
-                                        const slotB = finalSlots[1];
-                                        const isBWinner = champSlot.name && slotB.name && champSlot.name === slotB.name;
-                                        const winColor = '#ffd13b';
-                                        const normColor = 'rgba(255,255,255,0.35)';
-                                        const winW = 3;
-                                        const normW = 1.5;
-                                        const midX = (xB + xT) / 2;
-                                        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                                        p.setAttribute('d', `M ${xB} ${yB} C ${midX} ${yB}, ${midX} ${yT}, ${xT} ${yT}`);
-                                        p.setAttribute('stroke', isBWinner ? winColor : normColor);
-                                        p.setAttribute('stroke-width', isBWinner ? winW : normW);
-                                        p.setAttribute('fill', 'none');
-                                        p.setAttribute('stroke-linecap', 'round');
-                                        if (isBWinner) p.classList.add('winner-path');
-                                        else p.classList.add('default-path');
-                                        svg.appendChild(p);
-                                    }
-                                }
-                            }
-                        }
-                        return;
-                    }
-
-                    // If we have both elements, draw normally
                     if (elFinal0 && elFinal1 && elChamp) {
                         const nameA = elFinal0.querySelector('.name-input');
                         const nameB = elFinal1.querySelector('.name-input');
@@ -2762,19 +2694,17 @@
                             const rA = nameA.getBoundingClientRect();
                             const rB = nameB.getBoundingClientRect();
                             const rT = nameT.getBoundingClientRect();
-                            const rect2 = container.getBoundingClientRect();
-                            const xA = rA.right - rect2.left + gap;
-                            const xB = rB.right - rect2.left + gap;
-                            const xT = rT.left - rect2.left - gap;
-                            const yA = rA.top + rA.height / 2 - rect2.top;
-                            const yB = rB.top + rB.height / 2 - rect2.top;
-                            const yT = rT.top + rT.height / 2 - rect2.top;
+                            const xA = rA.right - rect.left + gap;
+                            const xB = rB.right - rect.left + gap;
+                            const xT = rT.left - rect.left - gap;
+                            const yA = rA.top + rA.height / 2 - rect.top;
+                            const yB = rB.top + rB.height / 2 - rect.top;
+                            const yT = rT.top + rT.height / 2 - rect.top;
 
                             const slotA = finalSlots[0];
                             const slotB = finalSlots[1];
-                            const champSlot2 = t.rounds[championR].slots[0];
-                            const isAWinner = champSlot2.name && slotA.name && champSlot2.name === slotA.name;
-                            const isBWinner = champSlot2.name && slotB.name && champSlot2.name === slotB.name;
+                            const isAWinner = champSlot.name && slotA.name && champSlot.name === slotA.name;
+                            const isBWinner = champSlot.name && slotB.name && champSlot.name === slotB.name;
                             const winColor = '#ffd13b';
                             const normColor = 'rgba(255,255,255,0.35)';
                             const winW = 3;
@@ -2962,20 +2892,6 @@
             };
             reader.readAsText(file);
             event.target.value = '';
-        }
-
-        // ──────────────────────────────────────────────────────────────
-        //  SCHEDULE UPDATE
-        // ──────────────────────────────────────────────────────────────
-        let updatePending = false;
-
-        function scheduleUpdate() {
-            if (updatePending) return;
-            updatePending = true;
-            requestAnimationFrame(() => {
-                updateConnectors();
-                updatePending = false;
-            });
         }
 
         // ──────────────────────────────────────────────────────────────
