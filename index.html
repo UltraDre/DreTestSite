@@ -335,7 +335,8 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .fixture-modern-left, .fixture-modern-right {
+        .fixture-modern-left,
+        .fixture-modern-right {
             flex: 1;
             display: flex;
             justify-content: center;
@@ -355,6 +356,14 @@
             width: 100%;
         }
 
+        .fixture-modern-center {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            margin: 0 12px;
+        }
+
         .fixture-modern-scorebox {
             width: 48px;
             height: 40px;
@@ -367,7 +376,7 @@
             font-weight: 900;
             outline: none;
             transition: border-color 0.2s, background-color 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .fixture-modern-scorebox:focus {
@@ -668,197 +677,288 @@
             touch-action: manipulation;
         }
 
-        @media (max-width: 640px) {
-            .floating-controls {
-                padding: 8px 10px;
-                flex-wrap: wrap;
-                gap: 4px;
+        /* ── BRACKET CENTERING ── */
+        #tab-view-knockout {
+            align-items: center !important;
+        }
+
+        #bracket-container {
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 8px;
+        }
+
+        .bracket-viewport {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: stretch !important;
+            justify-content: center !important;
+            width: 100% !important;
+            min-height: 800px !important;
+            position: relative !important;
+            gap: 4px !important;
+            flex-wrap: nowrap !important;
+        }
+
+        .bracket-viewport .bracket-col {
+            flex: 0 1 auto !important;
+            min-width: 140px !important;
+            max-width: 260px !important;
+            padding: 0 6px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .bracket-viewport .bracket-col.champion-col {
+            flex: 0 0 180px !important;
+            min-width: 160px !important;
+            max-width: 220px !important;
+        }
+
+        .bracket-viewport .bracket-col .col-title {
+            font-size: 9px !important;
+            margin-bottom: 16px !important;
+            padding-bottom: 6px !important;
+            white-space: nowrap;
+        }
+
+        .bracket-viewport .slot .name-input {
+            width: 100px !important;
+            height: 30px !important;
+            font-size: 8px !important;
+            padding: 0 8px !important;
+            border-radius: 9999px 0 0 9999px !important;
+        }
+
+        .bracket-viewport .slot .score-input {
+            width: 26px !important;
+            height: 30px !important;
+            font-size: 11px !important;
+        }
+
+        .bracket-viewport .champion-slot .name-input {
+            width: 120px !important;
+            height: 34px !important;
+            font-size: 10px !important;
+            border-radius: 9999px !important;
+        }
+
+        .bracket-viewport .trophy-svg {
+            width: 30px !important;
+            height: 30px !important;
+        }
+
+        .bracket-viewport .slot-pair-second {
+            margin-bottom: 18px !important;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .bracket-viewport .bracket-col {
+                min-width: 100px !important;
+                max-width: 200px !important;
+                padding: 0 4px !important;
             }
-            .floating-controls .center-tabs {
-                min-width: 140px;
-                order: 3;
-                flex-basis: 100%;
-                justify-content: center;
+            .bracket-viewport .bracket-col.champion-col {
+                flex: 0 0 140px !important;
+                min-width: 120px !important;
+                max-width: 180px !important;
             }
-            .floating-controls .pill-btn {
-                font-size: 9px;
-                padding: 4px 10px;
+            .bracket-viewport .slot .name-input {
+                width: 80px !important;
+                height: 26px !important;
+                font-size: 7px !important;
+                padding: 0 6px !important;
             }
-            .floating-controls .icon-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 12px;
-            }
-            .bracket-full-page .bracket-col {
-                min-width: 120px;
-                padding: 0 4px;
-            }
-            .bracket-full-page .name-input {
-                width: 80px;
-                height: 28px;
-                font-size: 8px;
-                padding: 0 8px;
-            }
-            .bracket-full-page .score-input {
-                width: 24px;
-                height: 28px;
-                font-size: 10px;
-            }
-            .bracket-full-page .champion-slot .name-input {
-                width: 100px;
-                height: 30px;
-                font-size: 9px;
-            }
-            .bracket-full-page .trophy-svg {
-                width: 24px;
-                height: 24px;
-            }
-            .bracket-full-page .slot-pair-second {
-                margin-bottom: 14px;
-            }
-            
-            .name-input {
-                width: 100px;
-                height: 30px;
-                font-size: 9px;
-                padding: 0 10px;
-            }
-            .score-input {
-                width: 28px;
-                height: 30px;
-                font-size: 12px;
-            }
-            .champion-slot .name-input {
-                width: 120px !important;
-                height: 34px !important;
+            .bracket-viewport .slot .score-input {
+                width: 22px !important;
+                height: 26px !important;
                 font-size: 10px !important;
             }
-            .trophy-svg {
-                width: 30px !important;
+            .bracket-viewport .champion-slot .name-input {
+                width: 100px !important;
                 height: 30px !important;
+                font-size: 9px !important;
+            }
+            .bracket-viewport .trophy-svg {
+                width: 26px !important;
+                height: 26px !important;
+            }
+            .bracket-viewport .slot-pair-second {
+                margin-bottom: 14px !important;
+            }
+            .bracket-viewport .bracket-col .col-title {
+                font-size: 8px !important;
+                margin-bottom: 12px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bracket-viewport {
+                gap: 2px !important;
+                min-height: 600px !important;
+                padding: 0 4px !important;
+            }
+            .bracket-viewport .bracket-col {
+                min-width: 72px !important;
+                max-width: 150px !important;
+                padding: 0 2px !important;
+            }
+            .bracket-viewport .bracket-col.champion-col {
+                flex: 0 0 100px !important;
+                min-width: 80px !important;
+                max-width: 140px !important;
+            }
+            .bracket-viewport .slot .name-input {
+                width: 56px !important;
+                height: 22px !important;
+                font-size: 6px !important;
+                padding: 0 4px !important;
+            }
+            .bracket-viewport .slot .score-input {
+                width: 18px !important;
+                height: 22px !important;
+                font-size: 8px !important;
+            }
+            .bracket-viewport .champion-slot .name-input {
+                width: 76px !important;
+                height: 26px !important;
+                font-size: 8px !important;
+            }
+            .bracket-viewport .trophy-svg {
+                width: 20px !important;
+                height: 20px !important;
+            }
+            .bracket-viewport .slot-pair-second {
+                margin-bottom: 10px !important;
+            }
+            .bracket-viewport .bracket-col .col-title {
+                font-size: 6px !important;
+                margin-bottom: 8px !important;
+                letter-spacing: 0.15em !important;
+            }
+            .bracket-viewport .champion-slot {
+                gap: 6px !important;
+            }
+            .bracket-viewport .slot {
+                padding: 1px 0 !important;
+            }
+
+            .fixture-row-modern {
+                padding: 6px 10px !important;
+                max-width: 100% !important;
+            }
+            .fixture-modern-name {
+                font-size: 8px !important;
+                max-width: 80px !important;
+            }
+            .fixture-modern-scorebox {
+                width: 32px !important;
+                height: 28px !important;
+                font-size: 12px !important;
+            }
+            .fixture-modern-center {
+                margin: 0 6px !important;
+                gap: 6px !important;
+            }
+            .fixture-modern-vs {
+                font-size: 8px !important;
             }
             #groups-standings-grid td,
             #groups-standings-grid th {
                 padding: 4px 3px !important;
                 font-size: 9px !important;
             }
-            #groups-standings-grid .glass-card {
-                padding: 10px !important;
+            .floating-controls .pill-btn {
+                font-size: 9px !important;
+                padding: 4px 10px !important;
             }
-
-            .fixture-row-modern {
-                padding: 6px 12px;
-                max-width: 100%;
-                margin-bottom: 2px;
-            }
-            .fixture-modern-name {
-                font-size: 9px;
-                max-width: 100px;
-            }
-            .fixture-modern-scorebox {
-                width: 36px;
-                height: 32px;
-                font-size: 14px;
-            }
-            .fixture-modern-center {
-                margin: 0 6px;
-                gap: 8px;
-            }
-            .fixture-modern-vs {
-                font-size: 9px;
+            .floating-controls .icon-btn {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 12px !important;
             }
         }
 
         @media (max-width: 480px) {
-            .bracket-full-page .bracket-col {
-                min-width: 90px;
-                padding: 0 2px;
+            .bracket-viewport .bracket-col {
+                min-width: 54px !important;
+                max-width: 110px !important;
+                padding: 0 1px !important;
             }
-            .bracket-full-page .name-input {
-                width: 60px;
-                height: 24px;
-                font-size: 7px;
-                padding: 0 4px;
+            .bracket-viewport .bracket-col.champion-col {
+                flex: 0 0 72px !important;
+                min-width: 60px !important;
+                max-width: 100px !important;
             }
-            .bracket-full-page .score-input {
-                width: 20px;
-                height: 24px;
-                font-size: 9px;
+            .bracket-viewport .slot .name-input {
+                width: 40px !important;
+                height: 18px !important;
+                font-size: 5px !important;
+                padding: 0 2px !important;
             }
-            .bracket-full-page .champion-slot .name-input {
-                width: 80px !important;
-                height: 26px !important;
-                font-size: 8px !important;
-            }
-            .bracket-full-page .trophy-svg {
-                width: 20px !important;
-                height: 20px !important;
-            }
-            .bracket-full-page .slot-pair-second {
-                margin-bottom: 10px;
-            }
-            .bracket-full-page .bracket-col .col-title {
-                font-size: 8px;
-                margin-bottom: 10px;
-            }
-            .bracket-col {
-                padding: 0 4px !important;
-            }
-            .slot {
-                padding: 1px 0 !important;
-            }
-            .name-input {
-                width: 70px !important;
-                height: 24px !important;
+            .bracket-viewport .slot .score-input {
+                width: 14px !important;
+                height: 18px !important;
                 font-size: 7px !important;
-                padding: 0 6px !important;
             }
-            .score-input {
-                width: 22px !important;
-                height: 24px !important;
-                font-size: 9px !important;
+            .bracket-viewport .champion-slot .name-input {
+                width: 58px !important;
+                height: 22px !important;
+                font-size: 7px !important;
             }
-            .champion-slot .name-input {
-                width: 90px !important;
-                height: 28px !important;
-                font-size: 8px !important;
+            .bracket-viewport .trophy-svg {
+                width: 16px !important;
+                height: 16px !important;
             }
-            .trophy-svg {
-                width: 24px !important;
-                height: 24px !important;
+            .bracket-viewport .slot-pair-second {
+                margin-bottom: 6px !important;
             }
-            
+            .bracket-viewport .bracket-col .col-title {
+                font-size: 5px !important;
+                margin-bottom: 4px !important;
+                padding-bottom: 3px !important;
+            }
+            .bracket-viewport .champion-slot {
+                gap: 4px !important;
+            }
+            .bracket-viewport .slot {
+                padding: 0 !important;
+            }
+
             #groups-standings-grid td,
             #groups-standings-grid th {
                 padding: 2px 2px !important;
                 font-size: 7px !important;
             }
             .floating-controls .pill-btn {
-                font-size: 8px;
-                padding: 3px 8px;
+                font-size: 8px !important;
+                padding: 3px 8px !important;
             }
             .floating-controls .icon-btn {
-                width: 26px;
-                height: 26px;
-                font-size: 10px;
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 10px !important;
             }
-
             .fixture-row-modern {
-                padding: 6px 6px;
-                margin-bottom: 2px;
+                padding: 4px 6px !important;
             }
             .fixture-modern-name {
-                font-size: 8px;
-                max-width: 70px;
+                font-size: 7px !important;
+                max-width: 56px !important;
             }
             .fixture-modern-scorebox {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
+                width: 26px !important;
+                height: 24px !important;
+                font-size: 10px !important;
             }
             .fixture-modern-center {
-                margin: 0 2px;
-                gap: 6px;
+                margin: 0 4px !important;
+                gap: 4px !important;
+            }
+            .fixture-modern-vs {
+                font-size: 7px !important;
             }
         }
     </style>
@@ -1113,8 +1213,8 @@
                 <div id="fixtures-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
             </main>
 
-            <!-- KNOCKOUT -->
-            <main id="tab-view-knockout" class="hidden flex-grow w-full flex items-start justify-center bracket-wrapper bracket-full-page">
+            <!-- KNOCKOUT — CENTERED -->
+            <main id="tab-view-knockout" class="hidden flex-grow w-full flex items-center justify-center p-2 md:p-4">
                 <div id="knockout-guard-overlay" class="absolute inset-0 z-40 bg-[#0d0f1a]/95 flex flex-col items-center justify-center text-center p-6 gap-4 rounded-2xl">
                     <div class="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-2xl">
                         <i class="fa-solid fa-lock"></i>
@@ -1123,9 +1223,9 @@
                     <p class="text-xs text-gray-400 max-w-md">Complete Group Matches and click "Generate Knockout Phase" to seed the top qualifying contenders into the final elimination bracket.</p>
                     <button onclick="advanceGroupQualifiers()" class="gradient-btn px-6 py-2.5 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5"><i class="fa-solid fa-forward-fast"></i> Seed Knockout Stage Now</button>
                 </div>
-                <div id="bracket-container" class="relative w-full max-w-full">
-                    <svg id="connector-svg"></svg>
-                    <div id="bracket-viewport" class="bracket-viewport flex items-start justify-between w-full min-h-[800px] relative gap-1"></div>
+                <div id="bracket-container" class="relative w-full max-w-7xl mx-auto px-1 md:px-2">
+                    <svg id="connector-svg" class="absolute inset-0 w-full h-full pointer-events-none z-5"></svg>
+                    <div id="bracket-viewport" class="bracket-viewport flex items-stretch justify-center w-full min-h-[600px] md:min-h-[800px] relative gap-1 md:gap-2"></div>
                 </div>
             </main>
 
@@ -1964,7 +2064,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: PERFECTLY ALIGNED SYMMETRIC KNOCKOUT BRACKET
+        //  RENDER: SYMMETRIC KNOCKOUT BRACKET (Centered)
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -1975,21 +2075,15 @@
             const totalRounds = t.rounds.length;
             const leftRounds = Math.max(0, totalRounds - 2);
 
+            // Create a flex container for columns — justified center
             const bracketFlex = document.createElement('div');
-            bracketFlex.className = 'flex flex-row items-start justify-between w-full h-full relative gap-4';
+            bracketFlex.className =
+            'flex flex-row items-stretch justify-center w-full h-full relative gap-1 md:gap-2 flex-nowrap';
             viewport.appendChild(bracketFlex);
-
-            const H = 36, G1 = 2, G2 = 28;
-            const PairHeight = H + G1 + H + G2; // 102px
-            const maxPairs = t.rounds[0].slots.length / 2; // e.g. 16 for 32 players
-            const rightColOffset = maxPairs * PairHeight; // 816
 
             function createCol(slots, rIdx, indices, side, title) {
                 const col = document.createElement('div');
                 const isChampion = (rIdx === totalRounds - 1 && side === 'center');
-                const isFinal = (rIdx === totalRounds - 2 && side === 'center');
-                const half = slots.length / 2;
-
                 if (isChampion) {
                     col.className = 'bracket-col champion-col flex flex-col justify-center items-center h-full relative';
                 } else {
@@ -2005,11 +2099,6 @@
                     div.setAttribute('data-slot', 0);
                     div.setAttribute('data-side', 'center');
                     div.id = 'champion-slot-container';
-
-                    // Champion perfectly centered vertically to Final Pair
-                    div.style.marginTop = '66px'; 
-                    div.style.marginBottom = '0px';
-
                     div.innerHTML = `
                             <div class="flex items-center gap-3">
                                 <input type="text" id="winner-box" value="${slot.name||''}" placeholder="CROWN CHAMPION" class="name-input text-center font-black rounded-full" style="width:160px;height:40px;border:2px solid #e5c122;border-radius:9999px;" readonly />
@@ -2029,8 +2118,8 @@
                     return col;
                 }
 
-                const isRight = (side === 'right');
-                const baseOffset = isRight ? rightColOffset : 0;
+                const isFinal = (rIdx === totalRounds - 2 && side === 'center');
+                const isFinals = isFinal;
 
                 indices.forEach((sIdx) => {
                     const slot = slots[sIdx];
@@ -2040,26 +2129,8 @@
                     else slotClasses += ' slot-pair-second';
                     div.className = slotClasses;
                     div.setAttribute('data-round', rIdx);
-                    div.setAttribute('data-slot', sIdx); // Absolute slot index
+                    div.setAttribute('data-slot', sIdx);
                     div.setAttribute('data-side', side);
-
-                    // Math to perfectly center next round's boxes to the previous round's pairs.
-                    const adjIdx = isRight ? (sIdx - half) : sIdx;
-                    const pairIdx = Math.floor(adjIdx / 2);
-                    const slotInPair = sIdx % 2;
-                    
-                    let marginTop = 0;
-                    if (rIdx === 0) {
-                        // Round 0 aligns to the top of the column.
-                        marginTop = baseOffset + pairIdx * PairHeight + (slotInPair === 1 ? (H + G1) : 0);
-                    } else {
-                        // Subsequent rounds shift by 33px/71px to align the top slot with the center of the previous pair.
-                        marginTop = baseOffset + pairIdx * PairHeight + (slotInPair === 0 ? 33 : 71);
-                    }
-                    
-                    // Override CSS default margins
-                    div.style.marginTop = marginTop + 'px';
-                    div.style.marginBottom = '0px';
 
                     const nameInput = document.createElement('input');
                     nameInput.type = 'text';
@@ -2093,7 +2164,7 @@
                     });
 
                     let score2 = null;
-                    if (!isFinal) {
+                    if (!isFinals) {
                         score2 = document.createElement('input');
                         score2.type = 'text';
                         score2.inputMode = 'numeric';
@@ -2126,7 +2197,7 @@
                 return col;
             }
 
-            // Render Left Columns (Round of 32 to Semi-finals)
+            // Left Columns (round 0 .. leftRounds-1)
             for (let r = 0; r < leftRounds; r++) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2135,13 +2206,13 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'left', t.rounds[r].title));
             }
 
-            // Render Center Columns (Final & Champion)
+            // Center Columns: Final + Champion
             const finalR = t.rounds[totalRounds - 2];
             const championR = t.rounds[totalRounds - 1];
             bracketFlex.appendChild(createCol(finalR.slots, totalRounds - 2, [0, 1], 'center', finalR.title));
             bracketFlex.appendChild(createCol(championR.slots, totalRounds - 1, [0], 'center', championR.title));
 
-            // Render Right Columns (Semi-finals to Round of 32)
+            // Right Columns (mirrored: leftRounds-1 down to 0)
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2181,10 +2252,13 @@
             function drawConnection(slotAIdx, slotBIdx, roundIdx, targetSlotIdx, targetRoundIdx, side) {
                 let targetSide = side;
                 if (targetRoundIdx === totalRounds - 2 || targetRoundIdx === totalRounds - 1) targetSide = 'center';
-                
-                const elA = document.querySelector(`[data-round="${roundIdx}"][data-slot="${slotAIdx}"][data-side="${side}"]`);
-                const elB = document.querySelector(`[data-round="${roundIdx}"][data-slot="${slotBIdx}"][data-side="${side}"]`);
-                const elTarget = document.querySelector(`[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"][data-side="${targetSide}"]`);
+
+                const elA = document.querySelector(
+                    `[data-round="${roundIdx}"][data-slot="${slotAIdx}"][data-side="${side}"]`);
+                const elB = document.querySelector(
+                    `[data-round="${roundIdx}"][data-slot="${slotBIdx}"][data-side="${side}"]`);
+                const elTarget = document.querySelector(
+                    `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"][data-side="${targetSide}"]`);
 
                 if (!elA || !elB || !elTarget) return;
 
@@ -2243,13 +2317,11 @@
                 const botY = Math.max(yA, yB);
                 addPath(`M ${mergeX} ${topY} V ${botY}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
 
-                addPath(`M ${mergeX} ${(yA + yB) / 2} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
+                addPath(`M ${mergeX} ${(yA + yB) / 2} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW : normW,
+                    isWinner);
             }
 
             // Left side connections
-            const pairsLeft = t.rounds[0].slots.length / 2;
-            const leftPairs = pairsLeft / 2;
-
             for (let r = 0; r < leftRounds; r++) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
@@ -2262,12 +2334,8 @@
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const pairs = t.rounds[r].slots.length / 2;
                 const halfPairs = pairs / 2;
-                const offsetPairs = halfPairs; // e.g., 4 for 16 players, 8 for 32 players
-                for (let m = 0; m < halfPairs; m++) {
-                    const absoluteSlotA = offsetPairs * 2 + m * 2;
-                    const absoluteSlotB = offsetPairs * 2 + m * 2 + 1;
-                    const targetSlot = offsetPairs + m; // Absolute index in next round
-                    drawConnection(absoluteSlotA, absoluteSlotB, r, targetSlot, r + 1, 'right');
+                for (let m = halfPairs; m < pairs; m++) {
+                    drawConnection(m * 2, m * 2 + 1, r, m, r + 1, 'right');
                 }
             }
 
