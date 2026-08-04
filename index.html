@@ -2084,7 +2084,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: SYMMETRIC BRACKET WITH VERTICAL CENTERING
+        //  RENDER: BRACKET WITH ALIGNED ROUNDS (Left/Right same row)
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -2100,7 +2100,7 @@
                 'flex flex-row items-stretch justify-center w-full h-full relative gap-1 md:gap-2 flex-nowrap';
             viewport.appendChild(bracketFlex);
 
-            // Store columns for later centering
+            // We'll store references to columns with their round and side
             const columns = [];
 
             function createCol(slots, rIdx, indices, side, title) {
@@ -2111,6 +2111,8 @@
                 } else {
                     col.className = 'bracket-col flex flex-col flex-1 relative';
                 }
+                col.setAttribute('data-round', rIdx);
+                col.setAttribute('data-side', side);
                 col.innerHTML = `<div class="col-title">${title}</div>`;
 
                 if (isChampion) {
@@ -2137,7 +2139,7 @@
                             </div>
                         `;
                     col.appendChild(div);
-                    columns.push(col);
+                    columns.push({ col, round: rIdx, side: 'center' });
                     return col;
                 }
 
@@ -2155,7 +2157,6 @@
                     div.setAttribute('data-slot', sIdx);
                     div.setAttribute('data-side', side);
 
-                    // Name input (left rounded)
                     const nameInput = document.createElement('input');
                     nameInput.type = 'text';
                     nameInput.value = slot.name || '';
@@ -2168,7 +2169,6 @@
                         toggleWinner(rIdx, sIdx);
                     };
 
-                    // Score 1 (gold)
                     const score1 = document.createElement('input');
                     score1.type = 'text';
                     score1.inputMode = 'numeric';
@@ -2188,7 +2188,6 @@
                         }
                     });
 
-                    // Score 2 (dark) only for non-final
                     let score2 = null;
                     if (!isFinals) {
                         score2 = document.createElement('input');
@@ -2214,18 +2213,17 @@
                         score1.style.borderRadius = '0 9999px 9999px 0';
                     }
 
-                    // Assemble: name, score1, score2
                     div.appendChild(nameInput);
                     div.appendChild(score1);
                     if (score2) div.appendChild(score2);
                     col.appendChild(div);
                 });
 
-                columns.push(col);
+                columns.push({ col, round: rIdx, side });
                 return col;
             }
 
-            // Left Columns (round 0 .. leftRounds-1)
+            // Left Columns
             for (let r = 0; r < leftRounds; r++) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2234,13 +2232,13 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'left', t.rounds[r].title));
             }
 
-            // Center Columns: Final + Champion
+            // Center: Final + Champion
             const finalR = t.rounds[totalRounds - 2];
             const championR = t.rounds[totalRounds - 1];
             bracketFlex.appendChild(createCol(finalR.slots, totalRounds - 2, [0, 1], 'center', finalR.title));
             bracketFlex.appendChild(createCol(championR.slots, totalRounds - 1, [0], 'center', championR.title));
 
-            // Right Columns (mirrored: leftRounds-1 down to 0)
+            // Right Columns (mirrored)
             for (let r = leftRounds - 1; r >= 0; r--) {
                 const slots = t.rounds[r].slots;
                 const totalSlots = slots.length;
@@ -2249,102 +2247,127 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'right', t.rounds[r].title));
             }
 
-            // ── Apply vertical centering to each column ──
+            // ── ALIGN LEFT & RIGHT ROUNDS ──
             requestAnimationFrame(() => {
-                centerBracketColumns(columns);
+                alignBracketColumns(columns, leftRounds);
                 updateConnectors();
             });
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  CENTER EACH COLUMN RELATIVE TO ITS PARENT
+        //  ALIGN LEFT/RIGHT ROUNDS + PYRAMID CENTERING
         // ──────────────────────────────────────────────────────────────
-        function centerBracketColumns(columns) {
-            if (columns.length === 0) return;
-
-            // Get all slot elements within each column
-            const colData = columns.map((col, idx) => {
-                const slots = col.querySelectorAll('.slot');
-                if (slots.length === 0) return { col, slots: [], top: 0, bottom: 0, height: 0 };
-                let minTop = Infinity,
-                    maxBottom = -Infinity;
-                slots.forEach(slot => {
-                    const rect = slot.getBoundingClientRect();
-                    // relative to the viewport, we'll compute relative to the parent container later
-                    // For now, we store the bounding rects; we need to compute relative to the column's parent.
-                });
-                // We'll compute positions after layout using getBoundingClientRect relative to the bracket container.
-                return { col, slots: Array.from(slots) };
-            });
-
-            // Wait for layout, then compute
+        function alignBracketColumns(columns, leftRounds) {
             const container = document.getElementById('bracket-container');
             if (!container) return;
             const containerRect = container.getBoundingClientRect();
+            const containerHeight = containerRect.height;
 
-            // Compute each column's top and bottom (relative to container)
-            const colPositions = colData.map((data, idx) => {
-                let top = Infinity,
-                    bottom = -Infinity;
-                data.slots.forEach(slot => {
-                    const rect = slot.getBoundingClientRect();
-                    const relTop = rect.top - containerRect.top;
-                    const relBottom = rect.bottom - containerRect.top;
-                    if (relTop < top) top = relTop;
-                    if (relBottom > bottom) bottom = relBottom;
-                });
-                // If no slots, use the column's own top/bottom
-                if (data.slots.length === 0) {
-                    const rect = data.col.getBoundingClientRect();
-                    top = rect.top - containerRect.top;
-                    bottom = rect.bottom - containerRect.top;
-                }
-                return { top, bottom, center: (top + bottom) / 2, height: bottom - top };
+            // Group columns by round
+            const roundMap = {};
+            columns.forEach(({ col, round, side }) => {
+                if (!roundMap[round]) roundMap[round] = {};
+                roundMap[round][side] = col;
             });
 
-            // For each column (except the first and last?), set margin-top to align its center with the parent's center.
-            // Parent is the column to the left for left side, or to the right for right side.
-            // We need to map each column to its side and order.
-            // We have left columns (indices 0..leftRounds-1), then final, champion, then right columns reversed.
-            // We'll compute based on index.
+            // For each round, get its bounding rect
+            const roundData = {};
+            const roundKeys = Object.keys(roundMap).map(Number).sort((a, b) => a - b);
+            roundKeys.forEach(r => {
+                const sides = roundMap[r];
+                const leftCol = sides['left'] || null;
+                const rightCol = sides['right'] || null;
+                const centerCol = sides['center'] || null;
+                let top, bottom, center;
+                if (centerCol) {
+                    const rect = centerCol.getBoundingClientRect();
+                    top = rect.top - containerRect.top;
+                    bottom = rect.bottom - containerRect.top;
+                    center = (top + bottom) / 2;
+                } else if (leftCol && rightCol) {
+                    const rectL = leftCol.getBoundingClientRect();
+                    const rectR = rightCol.getBoundingClientRect();
+                    top = Math.min(rectL.top, rectR.top) - containerRect.top;
+                    bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
+                    center = (top + bottom) / 2;
+                    // Align left and right tops to the same value (average)
+                    const topL = rectL.top - containerRect.top;
+                    const topR = rectR.top - containerRect.top;
+                    const avgTop = (topL + topR) / 2;
+                    // Apply margin-top to both to align tops
+                    const offsetL = avgTop - topL;
+                    const offsetR = avgTop - topR;
+                    if (Math.abs(offsetL) > 0.5) leftCol.style.marginTop = offsetL + 'px';
+                    else leftCol.style.marginTop = '0px';
+                    if (Math.abs(offsetR) > 0.5) rightCol.style.marginTop = offsetR + 'px';
+                    else rightCol.style.marginTop = '0px';
+                    // Recalculate after alignment
+                    const rectL2 = leftCol.getBoundingClientRect();
+                    const rectR2 = rightCol.getBoundingClientRect();
+                    top = Math.min(rectL2.top, rectR2.top) - containerRect.top;
+                    bottom = Math.max(rectL2.bottom, rectR2.bottom) - containerRect.top;
+                    center = (top + bottom) / 2;
+                } else {
+                    return;
+                }
+                roundData[r] = { top, bottom, center, leftCol, rightCol, centerCol };
+            });
 
-            // Since we don't have side info easily, we'll just align each column (except first) to the previous column's center.
-            // That creates a pyramid effect where each column is centered under the previous.
-            // The first column (round 0) stays at top (margin-top: 0).
-            // The champion column should be centered with the final.
+            // Now apply pyramid centering: each round (except first) centered on previous round's bounding box
+            const sortedRounds = Object.keys(roundData).map(Number).sort((a, b) => a - b);
+            // We have leftRounds rounds (0..leftRounds-1) and then final and champion.
+            // For the pyramid, we want to center each round relative to the previous round's combined box.
 
-            // Simple approach: for i from 1 to len-1, set margin-top so that center of column i aligns with center of column i-1.
-            // But the champion column (last) should be centered with the final (previous).
-            // This will create the desired pyramid.
+            // First, set round 0 to be centered vertically in the container
+            if (roundData[0]) {
+                const targetCenter = containerHeight / 2;
+                const currentCenter = roundData[0].center;
+                const delta = targetCenter - currentCenter;
+                if (roundData[0].leftCol) roundData[0].leftCol.style.marginTop = (parseFloat(roundData[0].leftCol.style
+                    .marginTop) || 0) + delta + 'px';
+                if (roundData[0].rightCol) roundData[0].rightCol.style.marginTop = (parseFloat(roundData[0].rightCol.style
+                    .marginTop) || 0) + delta + 'px';
+                // Recompute after shift
+                const rectL = roundData[0].leftCol ? roundData[0].leftCol.getBoundingClientRect() : null;
+                const rectR = roundData[0].rightCol ? roundData[0].rightCol.getBoundingClientRect() : null;
+                if (rectL && rectR) {
+                    const top = Math.min(rectL.top, rectR.top) - containerRect.top;
+                    const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
+                    roundData[0].center = (top + bottom) / 2;
+                }
+            }
 
-            // We'll apply margin-top to each column relative to its parent's center.
-            // We need the height of each column to compute the offset.
-            // margin-top = parentCenter - childCenter + parentTop? Actually, we want the child's center to equal parent's center.
-            // The child's current center is at its top + childHeight/2. We want to shift it so that new center = parentCenter.
-            // So shift = parentCenter - childCenter. The child's margin-top will be shift.
-
-            // But we must also consider that the column may have a title which adds height; we already included slots.
-
-            // We'll compute for each column i (i>0): 
-            // parentCenter = colPositions[i-1].center
-            // childCenter = colPositions[i].center
-            // delta = parentCenter - childCenter
-            // Apply delta as margin-top (or transform)
-
-            for (let i = 1; i < colPositions.length; i++) {
-                const parentCenter = colPositions[i - 1].center;
-                const childCenter = colPositions[i].center;
-                const delta = parentCenter - childCenter;
-                // Apply to the column element
-                const colElem = columns[i];
-                if (colElem) {
-                    colElem.style.marginTop = delta + 'px';
+            // For each subsequent round (r > 0), center it on the previous round's box
+            for (let i = 1; i < sortedRounds.length; i++) {
+                const r = sortedRounds[i];
+                const prev = sortedRounds[i - 1];
+                if (!roundData[prev] || !roundData[r]) continue;
+                const prevBox = roundData[prev];
+                const targetCenter = prevBox.center;
+                const currentCenter = roundData[r].center;
+                const delta = targetCenter - currentCenter;
+                if (roundData[r].leftCol) roundData[r].leftCol.style.marginTop = (parseFloat(roundData[r].leftCol.style
+                    .marginTop) || 0) + delta + 'px';
+                if (roundData[r].rightCol) roundData[r].rightCol.style.marginTop = (parseFloat(roundData[r].rightCol.style
+                    .marginTop) || 0) + delta + 'px';
+                if (roundData[r].centerCol) roundData[r].centerCol.style.marginTop = (parseFloat(roundData[r].centerCol
+                    .style.marginTop) || 0) + delta + 'px';
+                // Recompute center after shift
+                const rectL = roundData[r].leftCol ? roundData[r].leftCol.getBoundingClientRect() : null;
+                const rectR = roundData[r].rightCol ? roundData[r].rightCol.getBoundingClientRect() : null;
+                const rectC = roundData[r].centerCol ? roundData[r].centerCol.getBoundingClientRect() : null;
+                if (rectC) {
+                    roundData[r].center = (rectC.top + rectC.height / 2) - containerRect.top;
+                } else if (rectL && rectR) {
+                    const top = Math.min(rectL.top, rectR.top) - containerRect.top;
+                    const bottom = Math.max(rectL.bottom, rectR.bottom) - containerRect.top;
+                    roundData[r].center = (top + bottom) / 2;
                 }
             }
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  CONNECTOR LINES – from name right edge to next left edge
+        //  CONNECTOR LINES
         // ──────────────────────────────────────────────────────────────
         function updateConnectors() {
             const svg = document.getElementById('connector-svg');
@@ -2388,7 +2411,6 @@
                 const rB = nameB.getBoundingClientRect();
                 const rT = nameTarget.getBoundingClientRect();
 
-                // Use right edge of nameA and nameB, and left edge of target
                 const xA = rA.right - rect.left + gap;
                 const xB = rB.right - rect.left + gap;
                 const xT = rT.left - rect.left - gap;
@@ -2699,19 +2721,13 @@
         //  OBSERVERS
         // ──────────────────────────────────────────────────────────────
         const ro = new ResizeObserver(() => {
-            // Re-center columns on resize
-            const cols = document.querySelectorAll('.bracket-col:not(.champion-col)');
-            if (cols.length) {
-                // We'll just refresh the bracket
-                if (activeTournamentId) {
-                    const t = tournaments.find(x => x.id === activeTournamentId);
-                    if (t && t.rounds) {
-                        renderActiveBracket();
-                        updateConnectors();
-                    }
+            if (activeTournamentId) {
+                const t = tournaments.find(x => x.id === activeTournamentId);
+                if (t && t.rounds) {
+                    renderActiveBracket();
+                    updateConnectors();
                 }
             }
-            scheduleUpdate();
         });
         const viewport = document.getElementById('bracket-viewport');
         if (viewport) ro.observe(viewport);
