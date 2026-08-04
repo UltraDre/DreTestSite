@@ -89,12 +89,10 @@
             stroke-width: 1.5px;
         }
 
-        /* ── SLOT – FULLY CENTERED ── */
         .slot {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 2px;
+            gap: 0px;
             flex-shrink: 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -116,11 +114,10 @@
             margin-bottom: 0;
         }
 
-        /* ── NAME INPUT – CENTERED TEXT ── */
         .name-input {
             width: 110px;
             height: 36px;
-            padding: 0 6px;
+            padding: 0 14px;
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
@@ -135,9 +132,8 @@
             flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
             cursor: pointer;
-            text-align: center;
-            border-radius: 4px;
-            margin: 0 1px;
+            text-align: left;
+            border-radius: 9999px 0 0 9999px;
         }
 
         .name-input::placeholder {
@@ -159,11 +155,10 @@
             cursor: pointer;
         }
 
-        /* ── SCORE INPUTS – ON BOTH SIDES ── */
         .score-input {
-            width: 30px;
+            width: 32px;
             height: 36px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 900;
             text-align: center;
             border: none;
@@ -172,7 +167,6 @@
             flex-shrink: 0;
             transition: all 0.2s ease;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
         }
 
         .score-input:focus {
@@ -190,16 +184,8 @@
             color: #0d0f1a;
         }
 
-        .score-input.score-left {
-            border-radius: 9999px 0 0 9999px;
-        }
-
-        .score-input.score-right {
-            border-radius: 0 9999px 9999px 0;
-        }
-
         .score-input.score-single {
-            border-radius: 9999px;
+            border-radius: 0 9999px 9999px 0;
         }
 
         .slot.winner-slot .name-input {
@@ -207,17 +193,16 @@
             border: 2px solid #e5c122;
         }
 
-        /* ── CHAMPION SLOT – FULLY CENTERED ── */
         .champion-slot {
             flex-direction: row;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
+            gap: 12px;
             padding-top: 6px;
             padding-bottom: 6px;
             margin: 0 auto;
             position: relative;
             width: 100%;
+            justify-content: center;
         }
 
         .champion-slot .name-input {
@@ -232,7 +217,6 @@
             color: #0d0f1a;
             box-shadow: 0 0 20px rgba(229, 193, 34, 0.3);
             cursor: default;
-            margin: 0;
         }
 
         .trophy-svg {
@@ -319,6 +303,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: margin-top 0.3s ease;
         }
 
         .bracket-col .col-title {
@@ -752,27 +737,18 @@
             width: 92px !important;
             height: 28px !important;
             font-size: 8px !important;
-            padding: 0 4px !important;
-            border-radius: 4px !important;
-            margin: 0 1px !important;
-            flex: 0 1 auto !important;
+            padding: 0 8px !important;
+            border-radius: 9999px 0 0 9999px !important;
         }
 
         .bracket-viewport .slot .score-input {
             width: 26px !important;
             height: 28px !important;
             font-size: 11px !important;
-            border-radius: 4px !important;
         }
 
-        .bracket-viewport .slot .score-input.score-left {
-            border-radius: 9999px 0 0 9999px !important;
-        }
-        .bracket-viewport .slot .score-input.score-right {
-            border-radius: 0 9999px 9999px 0 !important;
-        }
         .bracket-viewport .slot .score-input.score-single {
-            border-radius: 9999px !important;
+            border-radius: 0 9999px 9999px 0 !important;
         }
 
         .bracket-viewport .champion-slot .name-input {
@@ -792,7 +768,7 @@
         }
 
         .bracket-viewport .slot {
-            gap: 1px !important;
+            gap: 0px !important;
             max-width: 100% !important;
             padding: 1px 0 !important;
         }
@@ -813,7 +789,7 @@
                 width: 72px !important;
                 height: 24px !important;
                 font-size: 7px !important;
-                padding: 0 3px !important;
+                padding: 0 6px !important;
             }
             .bracket-viewport .slot .score-input {
                 width: 22px !important;
@@ -858,7 +834,7 @@
                 width: 50px !important;
                 height: 20px !important;
                 font-size: 6px !important;
-                padding: 0 2px !important;
+                padding: 0 4px !important;
             }
             .bracket-viewport .slot .score-input {
                 width: 18px !important;
@@ -887,7 +863,6 @@
             }
             .bracket-viewport .slot {
                 padding: 0 !important;
-                gap: 0 !important;
             }
 
             .fixture-row-modern {
@@ -941,7 +916,7 @@
                 width: 36px !important;
                 height: 16px !important;
                 font-size: 5px !important;
-                padding: 0 1px !important;
+                padding: 0 2px !important;
             }
             .bracket-viewport .slot .score-input {
                 width: 14px !important;
@@ -970,7 +945,6 @@
             }
             .bracket-viewport .slot {
                 padding: 0 !important;
-                gap: 0 !important;
             }
 
             #groups-standings-grid td,
@@ -2110,7 +2084,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: CENTERED BRACKET (Left & Right face center)
+        //  RENDER: SYMMETRIC BRACKET WITH VERTICAL CENTERING
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -2126,7 +2100,9 @@
                 'flex flex-row items-stretch justify-center w-full h-full relative gap-1 md:gap-2 flex-nowrap';
             viewport.appendChild(bracketFlex);
 
-            // Helper: build a column
+            // Store columns for later centering
+            const columns = [];
+
             function createCol(slots, rIdx, indices, side, title) {
                 const col = document.createElement('div');
                 const isChampion = (rIdx === totalRounds - 1 && side === 'center');
@@ -2161,16 +2137,12 @@
                             </div>
                         `;
                     col.appendChild(div);
+                    columns.push(col);
                     return col;
                 }
 
                 const isFinal = (rIdx === totalRounds - 2 && side === 'center');
                 const isFinals = isFinal;
-
-                // For left side: name is on the right (right-aligned), scores on left
-                // For right side: name is on the left (left-aligned), scores on right
-                const isLeftSide = (side === 'left');
-                const isRightSide = (side === 'right');
 
                 indices.forEach((sIdx) => {
                     const slot = slots[sIdx];
@@ -2183,21 +2155,20 @@
                     div.setAttribute('data-slot', sIdx);
                     div.setAttribute('data-side', side);
 
-                    // Name input – centered text, no side-specific border-radius
+                    // Name input (left rounded)
                     const nameInput = document.createElement('input');
                     nameInput.type = 'text';
                     nameInput.value = slot.name || '';
                     nameInput.placeholder = 'Undecided';
                     nameInput.className = `name-input ${slot.isWinner ? 'winner-name' : ''}`;
-                    nameInput.style.borderRadius = '4px';
-                    nameInput.style.textAlign = 'center';
+                    nameInput.style.borderRadius = '9999px 0 0 9999px';
                     nameInput.readOnly = true;
                     nameInput.onclick = function(e) {
                         e.stopPropagation();
                         toggleWinner(rIdx, sIdx);
                     };
 
-                    // Score 1
+                    // Score 1 (gold)
                     const score1 = document.createElement('input');
                     score1.type = 'text';
                     score1.inputMode = 'numeric';
@@ -2217,7 +2188,7 @@
                         }
                     });
 
-                    // Score 2 (only for non-final rounds)
+                    // Score 2 (dark) only for non-final
                     let score2 = null;
                     if (!isFinals) {
                         score2 = document.createElement('input');
@@ -2227,6 +2198,7 @@
                         score2.placeholder = '-';
                         score2.maxLength = 2;
                         score2.className = 'score-input score-dark';
+                        score2.style.borderRadius = '0 9999px 9999px 0';
                         score2.autocomplete = 'off';
                         score2.addEventListener('change', function() {
                             handleScoreChange(rIdx, sIdx, 'scoreLeg2', this.value);
@@ -2238,43 +2210,18 @@
                                 saveTournamentsToStorage();
                             }
                         });
-                    }
-
-                    // ── ASSEMBLE SLOT ──
-                    // Left side: score1, score2 (if any), name (name on right)
-                    // Right side: name, score1, score2 (if any) (name on left)
-                    // Center (final): score1, name (name centered with score on left)
-                    if (isLeftSide) {
-                        // Scores on left, name on right → name is right-aligned toward center
-                        div.appendChild(score1);
-                        if (score2) div.appendChild(score2);
-                        div.appendChild(nameInput);
-                    } else if (isRightSide) {
-                        // Name on left, scores on right → name is left-aligned toward center
-                        div.appendChild(nameInput);
-                        div.appendChild(score1);
-                        if (score2) div.appendChild(score2);
                     } else {
-                        // Center: name in middle, score on left (for final)
-                        if (isFinals) {
-                            div.appendChild(score1);
-                            div.appendChild(nameInput);
-                        } else {
-                            // Should not happen
-                            div.appendChild(score1);
-                            if (score2) div.appendChild(score2);
-                            div.appendChild(nameInput);
-                        }
+                        score1.style.borderRadius = '0 9999px 9999px 0';
                     }
 
-                    // For final (center), we want score on left, name centered
-                    if (isFinals) {
-                        // already handled above
-                    }
-
+                    // Assemble: name, score1, score2
+                    div.appendChild(nameInput);
+                    div.appendChild(score1);
+                    if (score2) div.appendChild(score2);
                     col.appendChild(div);
                 });
 
+                columns.push(col);
                 return col;
             }
 
@@ -2302,13 +2249,102 @@
                 bracketFlex.appendChild(createCol(slots, r, indices, 'right', t.rounds[r].title));
             }
 
+            // ── Apply vertical centering to each column ──
             requestAnimationFrame(() => {
+                centerBracketColumns(columns);
                 updateConnectors();
             });
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  CONNECTOR LINES – draw from name edges toward center
+        //  CENTER EACH COLUMN RELATIVE TO ITS PARENT
+        // ──────────────────────────────────────────────────────────────
+        function centerBracketColumns(columns) {
+            if (columns.length === 0) return;
+
+            // Get all slot elements within each column
+            const colData = columns.map((col, idx) => {
+                const slots = col.querySelectorAll('.slot');
+                if (slots.length === 0) return { col, slots: [], top: 0, bottom: 0, height: 0 };
+                let minTop = Infinity,
+                    maxBottom = -Infinity;
+                slots.forEach(slot => {
+                    const rect = slot.getBoundingClientRect();
+                    // relative to the viewport, we'll compute relative to the parent container later
+                    // For now, we store the bounding rects; we need to compute relative to the column's parent.
+                });
+                // We'll compute positions after layout using getBoundingClientRect relative to the bracket container.
+                return { col, slots: Array.from(slots) };
+            });
+
+            // Wait for layout, then compute
+            const container = document.getElementById('bracket-container');
+            if (!container) return;
+            const containerRect = container.getBoundingClientRect();
+
+            // Compute each column's top and bottom (relative to container)
+            const colPositions = colData.map((data, idx) => {
+                let top = Infinity,
+                    bottom = -Infinity;
+                data.slots.forEach(slot => {
+                    const rect = slot.getBoundingClientRect();
+                    const relTop = rect.top - containerRect.top;
+                    const relBottom = rect.bottom - containerRect.top;
+                    if (relTop < top) top = relTop;
+                    if (relBottom > bottom) bottom = relBottom;
+                });
+                // If no slots, use the column's own top/bottom
+                if (data.slots.length === 0) {
+                    const rect = data.col.getBoundingClientRect();
+                    top = rect.top - containerRect.top;
+                    bottom = rect.bottom - containerRect.top;
+                }
+                return { top, bottom, center: (top + bottom) / 2, height: bottom - top };
+            });
+
+            // For each column (except the first and last?), set margin-top to align its center with the parent's center.
+            // Parent is the column to the left for left side, or to the right for right side.
+            // We need to map each column to its side and order.
+            // We have left columns (indices 0..leftRounds-1), then final, champion, then right columns reversed.
+            // We'll compute based on index.
+
+            // Since we don't have side info easily, we'll just align each column (except first) to the previous column's center.
+            // That creates a pyramid effect where each column is centered under the previous.
+            // The first column (round 0) stays at top (margin-top: 0).
+            // The champion column should be centered with the final.
+
+            // Simple approach: for i from 1 to len-1, set margin-top so that center of column i aligns with center of column i-1.
+            // But the champion column (last) should be centered with the final (previous).
+            // This will create the desired pyramid.
+
+            // We'll apply margin-top to each column relative to its parent's center.
+            // We need the height of each column to compute the offset.
+            // margin-top = parentCenter - childCenter + parentTop? Actually, we want the child's center to equal parent's center.
+            // The child's current center is at its top + childHeight/2. We want to shift it so that new center = parentCenter.
+            // So shift = parentCenter - childCenter. The child's margin-top will be shift.
+
+            // But we must also consider that the column may have a title which adds height; we already included slots.
+
+            // We'll compute for each column i (i>0): 
+            // parentCenter = colPositions[i-1].center
+            // childCenter = colPositions[i].center
+            // delta = parentCenter - childCenter
+            // Apply delta as margin-top (or transform)
+
+            for (let i = 1; i < colPositions.length; i++) {
+                const parentCenter = colPositions[i - 1].center;
+                const childCenter = colPositions[i].center;
+                const delta = parentCenter - childCenter;
+                // Apply to the column element
+                const colElem = columns[i];
+                if (colElem) {
+                    colElem.style.marginTop = delta + 'px';
+                }
+            }
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        //  CONNECTOR LINES – from name right edge to next left edge
         // ──────────────────────────────────────────────────────────────
         function updateConnectors() {
             const svg = document.getElementById('connector-svg');
@@ -2352,30 +2388,10 @@
                 const rB = nameB.getBoundingClientRect();
                 const rT = nameTarget.getBoundingClientRect();
 
-                // For left side: draw from right edge of name (toward center)
-                // For right side: draw from left edge of name (toward center)
-                // For center: draw from right edge
-                let xA, xB, xT;
-                if (side === 'left') {
-                    xA = rA.right - rect.left + gap;
-                    xB = rB.right - rect.left + gap;
-                } else if (side === 'right') {
-                    xA = rA.left - rect.left - gap;
-                    xB = rB.left - rect.left - gap;
-                } else {
-                    // center: use right edge
-                    xA = rA.right - rect.left + gap;
-                    xB = rB.right - rect.left + gap;
-                }
-
-                // Target side: if target is center, use left edge of target (from both sides)
-                if (targetSide === 'center') {
-                    xT = rT.left - rect.left - gap;
-                } else if (targetSide === 'left') {
-                    xT = rT.right - rect.left + gap;
-                } else {
-                    xT = rT.left - rect.left - gap;
-                }
+                // Use right edge of nameA and nameB, and left edge of target
+                const xA = rA.right - rect.left + gap;
+                const xB = rB.right - rect.left + gap;
+                const xT = rT.left - rect.left - gap;
 
                 const yA = rA.top + rA.height / 2 - rect.top;
                 const yB = rB.top + rB.height / 2 - rect.top;
@@ -2409,16 +2425,11 @@
                     svg.appendChild(p);
                 }
 
-                // Draw from each slot to merge point
                 addPath(`M ${xA} ${yA} H ${mergeX}`, isAWinner ? winColor : normColor, isAWinner ? winW : normW, isAWinner);
                 addPath(`M ${xB} ${yB} H ${mergeX}`, isBWinner ? winColor : normColor, isBWinner ? winW : normW, isBWinner);
-
-                // Vertical merge
                 const topY = Math.min(yA, yB);
                 const botY = Math.max(yA, yB);
                 addPath(`M ${mergeX} ${topY} V ${botY}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
-
-                // To target
                 addPath(`M ${mergeX} ${(yA + yB) / 2} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW : normW,
                     isWinner);
             }
@@ -2441,7 +2452,7 @@
                 }
             }
 
-            // Final to Champion connection
+            // Final to Champion
             if (leftRounds >= 0) {
                 const finalR = totalRounds - 2;
                 drawConnection(0, 1, finalR, 0, finalR + 1, 'center');
@@ -2687,10 +2698,32 @@
         // ──────────────────────────────────────────────────────────────
         //  OBSERVERS
         // ──────────────────────────────────────────────────────────────
-        const ro = new ResizeObserver(() => scheduleUpdate());
+        const ro = new ResizeObserver(() => {
+            // Re-center columns on resize
+            const cols = document.querySelectorAll('.bracket-col:not(.champion-col)');
+            if (cols.length) {
+                // We'll just refresh the bracket
+                if (activeTournamentId) {
+                    const t = tournaments.find(x => x.id === activeTournamentId);
+                    if (t && t.rounds) {
+                        renderActiveBracket();
+                        updateConnectors();
+                    }
+                }
+            }
+            scheduleUpdate();
+        });
         const viewport = document.getElementById('bracket-viewport');
         if (viewport) ro.observe(viewport);
-        window.addEventListener('resize', scheduleUpdate);
+        window.addEventListener('resize', () => {
+            if (activeTournamentId) {
+                const t = tournaments.find(x => x.id === activeTournamentId);
+                if (t && t.rounds) {
+                    renderActiveBracket();
+                    updateConnectors();
+                }
+            }
+        });
 
         // ──────────────────────────────────────────────────────────────
         //  INIT
