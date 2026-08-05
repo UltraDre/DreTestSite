@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Monarchs Tournament Engine</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
@@ -89,6 +88,64 @@
             stroke-width: 1.5px;
         }
 
+        .bracket-wrapper {
+            position: relative;
+            width: 100%;
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+
+        .bracket-viewport {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            min-width: 1100px;
+            min-height: 750px;
+            position: relative;
+            gap: 12px;
+        }
+
+        .bracket-col {
+            flex: 1 1 0;
+            position: relative;
+            padding: 0 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bracket-col .col-title {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.25em;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
+        }
+
+        .champion-col {
+            flex: 0 0 190px !important;
+            min-width: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 12;
+        }
+
+        .match-pair {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: auto 0;
+        }
+
         .slot {
             display: flex;
             align-items: center;
@@ -98,26 +155,20 @@
             position: relative;
             z-index: 10;
             cursor: default;
-            margin: 0 auto;
-            padding: 2px 0;
-            width: 100%;
-            max-width: 260px;
         }
 
-        .slot-pair-first {
-            margin-bottom: 2px;
+        .slot-left {
+            flex-direction: row;
         }
-        .slot-pair-second {
-            margin-bottom: 28px;
-        }
-        .slot-pair-second:last-child {
-            margin-bottom: 0;
+
+        .slot-right {
+            flex-direction: row-reverse;
         }
 
         .name-input {
-            width: 110px;
-            height: 36px;
-            padding: 0 14px;
+            width: 130px;
+            height: 34px;
+            padding: 0 12px;
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
@@ -132,8 +183,16 @@
             flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
             cursor: pointer;
-            text-align: left;
+        }
+
+        .slot-left .name-input {
             border-radius: 9999px 0 0 9999px;
+            text-align: left;
+        }
+
+        .slot-right .name-input {
+            border-radius: 0 9999px 9999px 0;
+            text-align: right;
         }
 
         .name-input::placeholder {
@@ -156,9 +215,9 @@
         }
 
         .score-input {
-            width: 32px;
-            height: 36px;
-            font-size: 14px;
+            width: 30px;
+            height: 34px;
+            font-size: 13px;
             font-weight: 900;
             text-align: center;
             border: none;
@@ -184,8 +243,12 @@
             color: #0d0f1a;
         }
 
-        .score-input.score-single {
+        .slot-left .score-last {
             border-radius: 0 9999px 9999px 0;
+        }
+
+        .slot-right .score-last {
+            border-radius: 9999px 0 0 9999px;
         }
 
         .slot.winner-slot .name-input {
@@ -194,15 +257,18 @@
         }
 
         .champion-slot {
-            flex-direction: row;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            padding-top: 6px;
-            padding-bottom: 6px;
-            margin: 0 auto;
-            position: relative;
-            width: 100%;
             justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            margin: auto;
+            position: relative;
+            background: rgba(20, 24, 43, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 209, 59, 0.15);
         }
 
         .champion-slot .name-input {
@@ -220,21 +286,15 @@
         }
 
         .trophy-svg {
-            width: 40px;
-            height: 40px;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.35));
+            width: 44px;
+            height: 44px;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
             animation: float 4s ease-in-out infinite;
-            flex-shrink: 0;
         }
 
         @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-            }
-            50% {
-                transform: translateY(-5px) scale(1.05);
-            }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.05); }
         }
 
         #confetti-canvas {
@@ -285,48 +345,10 @@
             outline: none;
         }
 
-        .pill-btn {
-            transition: all 0.3s ease;
-        }
-
         #groups-standings-grid td,
         #groups-standings-grid th {
             padding: 8px 6px !important;
             font-size: 11px !important;
-        }
-
-        .bracket-col {
-            flex: 1 1 0;
-            min-width: 130px;
-            position: relative;
-            padding: 0 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: margin-top 0.3s ease;
-        }
-
-        .bracket-col .col-title {
-            text-align: center;
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            margin-bottom: 14px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            flex-shrink: 0;
-            width: 100%;
-            white-space: nowrap;
-        }
-
-        .champion-col {
-            flex: 0 0 auto !important;
-            min-width: 140px !important;
-            justify-content: center;
-            align-items: center;
-            position: relative;
         }
 
         .fixture-row-modern {
@@ -352,7 +374,7 @@
         }
 
         .fixture-modern-name {
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 800;
             color: #ffffff;
             white-space: nowrap;
@@ -373,31 +395,27 @@
         }
 
         .fixture-modern-scorebox {
-            width: 48px;
-            height: 40px;
-            background: #151b2c;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #fff;
+            width: 60px;
+            height: 48px;
+            background: #ffd13b;
+            border-radius: 8px;
+            border: 1px solid rgba(180, 150, 30, 0.25);
+            color: #0d0f1a;
             text-align: center;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 900;
             outline: none;
-            transition: border-color 0.2s, background-color 0.2s;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
         }
 
         .fixture-modern-scorebox:focus {
-            border-color: #ffd13b;
-        }
-
-        .fixture-modern-scorebox::placeholder {
-            color: rgba(255, 255, 255, 0.1);
-            font-weight: 400;
+            border-color: #a07d0f;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.12);
         }
 
         .fixture-modern-vs {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             color: rgba(255, 255, 255, 0.3);
             letter-spacing: 0.1em;
@@ -423,7 +441,7 @@
             padding-left: 16px;
             padding-right: 16px;
         }
-        .floating-controls>* {
+        .floating-controls > * {
             pointer-events: auto;
         }
         .floating-controls .left-buttons,
@@ -498,27 +516,15 @@
             border-color: rgba(34, 197, 94, 0.2);
             color: #4ade80;
         }
-        .floating-controls .icon-btn.green:hover {
-            background: rgba(34, 197, 94, 0.25);
-            border-color: rgba(34, 197, 94, 0.4);
-        }
         .floating-controls .icon-btn.blue {
             background: rgba(59, 130, 246, 0.15);
             border-color: rgba(59, 130, 246, 0.2);
             color: #60a5fa;
         }
-        .floating-controls .icon-btn.blue:hover {
-            background: rgba(59, 130, 246, 0.25);
-            border-color: rgba(59, 130, 246, 0.4);
-        }
         .floating-controls .icon-btn.amber {
             background: rgba(255, 215, 0, 0.12);
             border-color: rgba(255, 215, 0, 0.2);
             color: #ffd13b;
-        }
-        .floating-controls .icon-btn.amber:hover {
-            background: rgba(255, 215, 0, 0.22);
-            border-color: rgba(255, 215, 0, 0.35);
         }
 
         .main-content {
@@ -529,15 +535,7 @@
             min-height: 100vh;
         }
 
-        #active-nav-tabs .pill-nav {
-            display: flex;
-        }
-        #active-nav-tabs.hidden .pill-nav {
-            display: none;
-        }
-
-        #home-view,
-        #create-view {
+        #home-view, #create-view {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -545,18 +543,11 @@
             justify-content: center;
             min-height: 80vh;
         }
-        #home-view.hidden,
-        #create-view.hidden {
+        #home-view.hidden, #create-view.hidden,
+        #tab-view-groups.hidden, #tab-view-fixtures.hidden, #tab-view-knockout.hidden {
             display: none !important;
         }
-        #tab-view-groups.hidden,
-        #tab-view-fixtures.hidden,
-        #tab-view-knockout.hidden {
-            display: none !important;
-        }
-        #tab-view-groups,
-        #tab-view-fixtures,
-        #tab-view-knockout {
+        #tab-view-groups, #tab-view-fixtures, #tab-view-knockout {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -577,17 +568,6 @@
             cursor: pointer;
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            white-space: nowrap;
-        }
-        .sort-dropdown-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
-            color: #fff;
-        }
-        .sort-dropdown-btn .sort-label {
-            max-width: 90px;
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
         }
         .sort-menu {
@@ -625,36 +605,11 @@
             border: none;
             width: 100%;
             text-align: left;
-            letter-spacing: 0.02em;
             text-transform: uppercase;
-        }
-        .sort-menu .sort-option:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: #fff;
         }
         .sort-menu .sort-option.active {
             color: #ffd13b;
             background: rgba(255, 215, 0, 0.08);
-        }
-        .sort-menu .sort-option i {
-            width: 16px;
-            font-size: 12px;
-            color: inherit;
-        }
-        .sort-menu .sort-option .check {
-            margin-left: auto;
-            opacity: 0;
-            transition: opacity 0.2s;
-            color: #ffd13b;
-            font-size: 12px;
-        }
-        .sort-menu .sort-option.active .check {
-            opacity: 1;
-        }
-        .sort-menu .sort-divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.05);
-            margin: 4px 8px;
         }
         .sort-wrapper {
             position: relative;
@@ -677,393 +632,28 @@
             letter-spacing: 0.2em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.35);
-            margin: 0;
         }
 
-        .score-input,
-        .score-box {
-            touch-action: manipulation;
-        }
-
-        /* ── BRACKET CENTERING ── */
-        #tab-view-knockout {
-            align-items: center !important;
-        }
-
-        #bracket-container {
-            width: 100%;
-            max-width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0 6px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 600px;
-        }
-
-        .bracket-viewport {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: center !important;
-            width: 100% !important;
-            min-height: 500px !important;
-            position: relative !important;
-            gap: 2px !important;
-            flex-wrap: nowrap !important;
-        }
-
-        .bracket-viewport .bracket-col {
-            flex: 0 1 auto !important;
-            min-width: 100px !important;
-            max-width: 200px !important;
-            padding: 0 3px !important;
-            flex-shrink: 0 !important;
-            align-items: center !important;
-            margin-top: 0 !important;
-        }
-
-        .bracket-viewport .bracket-col.champion-col {
-            flex: 0 0 150px !important;
-            min-width: 130px !important;
-            max-width: 200px !important;
-        }
-
-        .bracket-viewport .bracket-col .col-title {
-            font-size: 8px !important;
-            margin-bottom: 10px !important;
-            padding-bottom: 5px !important;
-            white-space: nowrap;
-            text-align: center !important;
-        }
-
-        .bracket-viewport .slot .name-input {
-            width: 80px !important;
-            height: 26px !important;
-            font-size: 8px !important;
-            padding: 0 6px !important;
-            border-radius: 9999px 0 0 9999px !important;
-        }
-
-        .bracket-viewport .slot .score-input {
-            width: 24px !important;
-            height: 26px !important;
-            font-size: 10px !important;
-        }
-
-        .bracket-viewport .slot .score-input.score-single {
-            border-radius: 0 9999px 9999px 0 !important;
-        }
-
-        .bracket-viewport .champion-slot .name-input {
-            width: 120px !important;
-            height: 34px !important;
-            font-size: 10px !important;
-            border-radius: 9999px !important;
-        }
-
-        .bracket-viewport .trophy-svg {
-            width: 30px !important;
-            height: 30px !important;
-        }
-
-        .bracket-viewport .slot-pair-second {
-            margin-bottom: 18px !important;
-        }
-
-        .bracket-viewport .slot {
-            gap: 0px !important;
-            max-width: 100% !important;
-            padding: 1px 0 !important;
-        }
-
-        .final-slot-wrapper {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            width: 100%;
-        }
-        .final-slot-wrapper .slot {
-            max-width: 100%;
-            padding: 1px 0;
-        }
-        .final-slot-wrapper .slot .name-input {
-            width: 76px !important;
-            height: 26px !important;
-            font-size: 8px !important;
-            padding: 0 6px !important;
-            border-radius: 9999px 0 0 9999px !important;
-        }
-        .final-slot-wrapper .slot .score-input {
-            width: 24px !important;
-            height: 26px !important;
-            font-size: 10px !important;
-        }
-        .final-slot-wrapper .slot .score-input.score-single {
-            border-radius: 0 9999px 9999px 0 !important;
-        }
-        .final-slot-wrapper .final-vs {
-            font-size: 8px;
-            font-weight: 900;
-            color: rgba(255, 255, 255, 0.25);
-            letter-spacing: 0.1em;
-            padding: 0 4px;
-            flex-shrink: 0;
-        }
-
-        @media (max-width: 1024px) {
-            .bracket-viewport .bracket-col {
-                min-width: 80px !important;
-                max-width: 160px !important;
-                padding: 0 2px !important;
+        @media (max-width: 640px) {
+            .name-input {
+                width: 90px;
+                height: 28px;
+                font-size: 8px;
+                padding: 0 6px;
             }
-            .bracket-viewport .bracket-col.champion-col {
-                flex: 0 0 120px !important;
-                min-width: 100px !important;
-                max-width: 150px !important;
+            .score-input {
+                width: 24px;
+                height: 28px;
+                font-size: 10px;
             }
-            .bracket-viewport .slot .name-input {
-                width: 64px !important;
-                height: 22px !important;
-                font-size: 7px !important;
-                padding: 0 4px !important;
-            }
-            .bracket-viewport .slot .score-input {
-                width: 20px !important;
-                height: 22px !important;
-                font-size: 9px !important;
-            }
-            .bracket-viewport .champion-slot .name-input {
-                width: 100px !important;
-                height: 30px !important;
-                font-size: 9px !important;
-            }
-            .bracket-viewport .trophy-svg {
-                width: 26px !important;
-                height: 26px !important;
-            }
-            .bracket-viewport .slot-pair-second {
-                margin-bottom: 14px !important;
-            }
-            .bracket-viewport .bracket-col .col-title {
-                font-size: 7px !important;
-                margin-bottom: 8px !important;
-            }
-            .final-slot-wrapper .slot .name-input {
-                width: 60px !important;
-                height: 22px !important;
-                font-size: 7px !important;
-                padding: 0 4px !important;
-            }
-            .final-slot-wrapper .slot .score-input {
-                width: 20px !important;
-                height: 22px !important;
-                font-size: 9px !important;
-            }
-            .final-slot-wrapper .final-vs {
-                font-size: 7px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .bracket-viewport {
-                gap: 1px !important;
-                min-height: 400px !important;
-                padding: 0 2px !important;
-            }
-            .bracket-viewport .bracket-col {
-                min-width: 56px !important;
-                max-width: 120px !important;
-                padding: 0 1px !important;
-            }
-            .bracket-viewport .bracket-col.champion-col {
-                flex: 0 0 90px !important;
-                min-width: 70px !important;
-                max-width: 110px !important;
-            }
-            .bracket-viewport .slot .name-input {
-                width: 42px !important;
-                height: 18px !important;
-                font-size: 6px !important;
-                padding: 0 3px !important;
-            }
-            .bracket-viewport .slot .score-input {
-                width: 16px !important;
-                height: 18px !important;
-                font-size: 7px !important;
-            }
-            .bracket-viewport .champion-slot .name-input {
-                width: 76px !important;
-                height: 26px !important;
-                font-size: 8px !important;
-            }
-            .bracket-viewport .trophy-svg {
-                width: 20px !important;
-                height: 20px !important;
-            }
-            .bracket-viewport .slot-pair-second {
-                margin-bottom: 10px !important;
-            }
-            .bracket-viewport .bracket-col .col-title {
-                font-size: 6px !important;
-                margin-bottom: 6px !important;
-                letter-spacing: 0.15em !important;
-            }
-            .bracket-viewport .champion-slot {
-                gap: 4px !important;
-            }
-            .bracket-viewport .slot {
-                padding: 0 !important;
-            }
-            .final-slot-wrapper .slot .name-input {
-                width: 38px !important;
-                height: 18px !important;
-                font-size: 6px !important;
-                padding: 0 3px !important;
-            }
-            .final-slot-wrapper .slot .score-input {
-                width: 16px !important;
-                height: 18px !important;
-                font-size: 7px !important;
-            }
-            .final-slot-wrapper .final-vs {
-                font-size: 6px;
-                padding: 0 2px;
-            }
-
-            .fixture-row-modern {
-                padding: 6px 10px !important;
-                max-width: 100% !important;
-            }
-            .fixture-modern-name {
-                font-size: 8px !important;
-                max-width: 80px !important;
-            }
-            .fixture-modern-scorebox {
-                width: 32px !important;
-                height: 28px !important;
-                font-size: 12px !important;
-            }
-            .fixture-modern-center {
-                margin: 0 6px !important;
-                gap: 6px !important;
-            }
-            .fixture-modern-vs {
-                font-size: 8px !important;
-            }
-            #groups-standings-grid td,
-            #groups-standings-grid th {
-                padding: 4px 3px !important;
-                font-size: 9px !important;
-            }
-            .floating-controls .pill-btn {
-                font-size: 9px !important;
-                padding: 4px 10px !important;
-            }
-            .floating-controls .icon-btn {
-                width: 30px !important;
-                height: 30px !important;
-                font-size: 12px !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .bracket-viewport .bracket-col {
-                min-width: 42px !important;
-                max-width: 90px !important;
-                padding: 0 1px !important;
-            }
-            .bracket-viewport .bracket-col.champion-col {
-                flex: 0 0 64px !important;
-                min-width: 54px !important;
-                max-width: 80px !important;
-            }
-            .bracket-viewport .slot .name-input {
-                width: 32px !important;
-                height: 14px !important;
-                font-size: 5px !important;
-                padding: 0 2px !important;
-            }
-            .bracket-viewport .slot .score-input {
-                width: 12px !important;
-                height: 14px !important;
-                font-size: 6px !important;
-            }
-            .bracket-viewport .champion-slot .name-input {
-                width: 50px !important;
-                height: 20px !important;
-                font-size: 7px !important;
-            }
-            .bracket-viewport .trophy-svg {
-                width: 16px !important;
-                height: 16px !important;
-            }
-            .bracket-viewport .slot-pair-second {
-                margin-bottom: 6px !important;
-            }
-            .bracket-viewport .bracket-col .col-title {
-                font-size: 5px !important;
-                margin-bottom: 4px !important;
-                padding-bottom: 3px !important;
-            }
-            .bracket-viewport .champion-slot {
-                gap: 3px !important;
-            }
-            .bracket-viewport .slot {
-                padding: 0 !important;
-            }
-            .final-slot-wrapper .slot .name-input {
-                width: 28px !important;
-                height: 14px !important;
-                font-size: 5px !important;
-                padding: 0 2px !important;
-            }
-            .final-slot-wrapper .slot .score-input {
-                width: 12px !important;
-                height: 14px !important;
-                font-size: 6px !important;
-            }
-            .final-slot-wrapper .final-vs {
-                font-size: 5px;
-                padding: 0 1px;
-            }
-
-            #groups-standings-grid td,
-            #groups-standings-grid th {
-                padding: 2px 2px !important;
-                font-size: 7px !important;
-            }
-            .floating-controls .pill-btn {
-                font-size: 8px !important;
-                padding: 3px 8px !important;
-            }
-            .floating-controls .icon-btn {
-                width: 26px !important;
-                height: 26px !important;
+            .champion-slot .name-input {
+                width: 120px !important;
+                height: 34px !important;
                 font-size: 10px !important;
             }
-            .fixture-row-modern {
-                padding: 4px 6px !important;
-            }
-            .fixture-modern-name {
-                font-size: 7px !important;
-                max-width: 56px !important;
-            }
-            .fixture-modern-scorebox {
-                width: 26px !important;
-                height: 24px !important;
-                font-size: 10px !important;
-            }
-            .fixture-modern-center {
-                margin: 0 4px !important;
-                gap: 4px !important;
-            }
-            .fixture-modern-vs {
-                font-size: 7px !important;
+            .trophy-svg {
+                width: 32px !important;
+                height: 32px !important;
             }
         }
     </style>
@@ -1162,20 +752,15 @@
                             <div class="sort-menu" id="sortMenu">
                                 <button class="sort-option" data-sort="date-desc" onclick="setSort('date-desc')">
                                     <i class="fa-solid fa-clock"></i> Newest First
-                                    <span class="check"><i class="fa-solid fa-check"></i></span>
                                 </button>
                                 <button class="sort-option" data-sort="date-asc" onclick="setSort('date-asc')">
                                     <i class="fa-solid fa-clock-rotate-left"></i> Oldest First
-                                    <span class="check"><i class="fa-solid fa-check"></i></span>
                                 </button>
-                                <div class="sort-divider"></div>
                                 <button class="sort-option" data-sort="name-asc" onclick="setSort('name-asc')">
                                     <i class="fa-solid fa-arrow-down-a-z"></i> Name A → Z
-                                    <span class="check"><i class="fa-solid fa-check"></i></span>
                                 </button>
                                 <button class="sort-option" data-sort="name-desc" onclick="setSort('name-desc')">
                                     <i class="fa-solid fa-arrow-up-a-z"></i> Name Z → A
-                                    <span class="check"><i class="fa-solid fa-check"></i></span>
                                 </button>
                             </div>
                         </div>
@@ -1207,7 +792,7 @@
                                 <button id="tab-group" onclick="setFormFormat('group')" class="py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-900/30 border border-purple-500/35 text-white text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-cubes"></i> Group Stage &amp; Bracket
                                 </button>
-                                <button id="tab-knockout" onclick="setFormFormat('knockout')" class="py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2">
+                                <button id="tab-knockout-form" onclick="setFormFormat('knockout')" class="py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2">
                                     <i class="fa-solid fa-sitemap"></i> Direct Knockout Bracket
                                 </button>
                             </div>
@@ -1318,8 +903,8 @@
                 <div id="fixtures-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
             </main>
 
-            <!-- KNOCKOUT — CENTERED -->
-            <main id="tab-view-knockout" class="hidden flex-grow w-full flex items-center justify-center p-2 md:p-4">
+            <!-- KNOCKOUT (SPLIT SYMMETRICAL INWARD BRACKET) -->
+            <main id="tab-view-knockout" class="hidden flex-grow w-full flex items-start justify-center bracket-wrapper">
                 <div id="knockout-guard-overlay" class="absolute inset-0 z-40 bg-[#0d0f1a]/95 flex flex-col items-center justify-center text-center p-6 gap-4 rounded-2xl">
                     <div class="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-2xl">
                         <i class="fa-solid fa-lock"></i>
@@ -1328,9 +913,9 @@
                     <p class="text-xs text-gray-400 max-w-md">Complete Group Matches and click "Generate Knockout Phase" to seed the top qualifying contenders into the final elimination bracket.</p>
                     <button onclick="advanceGroupQualifiers()" class="gradient-btn px-6 py-2.5 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5"><i class="fa-solid fa-forward-fast"></i> Seed Knockout Stage Now</button>
                 </div>
-                <div id="bracket-container" class="relative w-full max-w-7xl mx-auto px-1 md:px-2 flex items-center justify-center">
-                    <svg id="connector-svg" class="absolute inset-0 w-full h-full pointer-events-none z-5"></svg>
-                    <div id="bracket-viewport" class="bracket-viewport flex items-center justify-center w-full min-h-[500px] md:min-h-[700px] relative gap-1 md:gap-2"></div>
+                <div id="bracket-container" class="relative w-full max-w-full">
+                    <svg id="connector-svg"></svg>
+                    <div id="bracket-viewport" class="bracket-viewport"></div>
                 </div>
             </main>
 
@@ -1370,10 +955,6 @@
         let currentFormDist = 'random';
         let currentWorkspaceTab = 'groups';
         let editingTournamentId = null;
-        let _skipRender = false;
-        let _pendingStandingsUpdate = null;
-
-        // ── SORT STATE ──
         let currentSort = 'date-desc';
         let sortMenuOpen = false;
 
@@ -1381,12 +962,20 @@
             "Bigimachine", "Desmond", "Elona", "Mattys", "Abusiwan",
             "Bigagold", "Bright", "Samuel", "Chris_Bicho", "Praise",
             "Ruona", "Innocent", "Ultimatetee", "Adex", "Colepalmer",
-            "ToxicT", "Bayern-Munich", "AS-Roma", "Aston-villa", "PSG"
+            "ToxicT", "Bayern-Munich", "AS-Roma", "Aston-villa", "PSG",
+            "Real-Madrid", "Barcelona", "Man-City", "Arsenal", "Inter-Milan",
+            "Juventus", "Dortmund", "Leverkusen", "AC-Milan", "Napoli",
+            "Benfica", "Porto"
         ];
 
         // ──────────────────────────────────────────────────────────────
-        //  STORAGE
+        //  INITIALIZATION & STORAGE
         // ──────────────────────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTournamentsFromStorage();
+            window.addEventListener('resize', updateConnectors);
+        });
+
         function loadTournamentsFromStorage() {
             const data = localStorage.getItem('arena_tournaments');
             try { tournaments = data ? JSON.parse(data) : []; } catch (_) { tournaments = []; }
@@ -1397,10 +986,6 @@
             localStorage.setItem('arena_tournaments', JSON.stringify(tournaments));
             renderTournamentListings();
         }
-
-        window.addEventListener('beforeunload', function() {
-            saveTournamentsToStorage();
-        });
 
         // ──────────────────────────────────────────────────────────────
         //  SORT LOGIC
@@ -1414,7 +999,6 @@
             currentSort = sortKey;
             sortMenuOpen = false;
             document.getElementById('sortMenu').classList.remove('open');
-
             const labels = {
                 'date-desc': 'Newest',
                 'date-asc': 'Oldest',
@@ -1422,30 +1006,17 @@
                 'name-desc': 'Z → A'
             };
             document.getElementById('sortLabel').textContent = labels[sortKey] || 'Sort';
-
-            document.querySelectorAll('.sort-option').forEach(el => {
-                el.classList.toggle('active', el.dataset.sort === sortKey);
-            });
-
             renderTournamentListings();
         }
 
         function getSortedTournaments() {
             const arr = [...tournaments];
             switch (currentSort) {
-                case 'name-asc':
-                    arr.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'name-desc':
-                    arr.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'date-asc':
-                    arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    break;
+                case 'name-asc': arr.sort((a, b) => a.name.localeCompare(b.name)); break;
+                case 'name-desc': arr.sort((a, b) => b.name.localeCompare(a.name)); break;
+                case 'date-asc': arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); break;
                 case 'date-desc':
-                default:
-                    arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    break;
+                default: arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); break;
             }
             return arr;
         }
@@ -1482,9 +1053,6 @@
             document.getElementById('tournament-listings').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  TAB SWITCHER
-        // ──────────────────────────────────────────────────────────────
         function switchActiveTab(tab) {
             currentWorkspaceTab = tab;
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -1494,10 +1062,7 @@
             const btnGroups = document.getElementById('tab-groups');
             const btnFixtures = document.getElementById('tab-fixtures');
             const btnKnockout = document.getElementById('tab-knockout');
-            [btnGroups, btnFixtures, btnKnockout].forEach(btn => {
-                btn.className = "pill-btn";
-                btn.classList.remove('active');
-            });
+            [btnGroups, btnFixtures, btnKnockout].forEach(btn => btn.classList.remove('active'));
 
             if (tab === 'groups') {
                 document.getElementById('tab-view-groups').classList.remove('hidden');
@@ -1514,7 +1079,6 @@
                 if (t.rounds && t.rounds.length > 0) {
                     guard.classList.add('hidden');
                     renderActiveBracket();
-                    updateConnectors();
                 } else {
                     guard.classList.remove('hidden');
                 }
@@ -1523,64 +1087,55 @@
 
         function refreshCurrentView() {
             if (!activeTournamentId) return;
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t) return;
-            if (currentWorkspaceTab === 'groups') {
-                renderActiveGroupStandings();
-            } else if (currentWorkspaceTab === 'fixtures') {
-                renderActiveFixturesGrid();
-            } else if (currentWorkspaceTab === 'knockout') {
+            if (currentWorkspaceTab === 'groups') renderActiveGroupStandings();
+            else if (currentWorkspaceTab === 'fixtures') renderActiveFixturesGrid();
+            else if (currentWorkspaceTab === 'knockout') {
                 renderActiveBracket();
-                updateConnectors();
             }
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  TOURNAMENT LISTINGS (with sort)
+        //  TOURNAMENT LISTINGS
         // ──────────────────────────────────────────────────────────────
         function renderTournamentListings() {
             const grid = document.getElementById('tournament-cards-grid');
             grid.innerHTML = '';
-
             const sorted = getSortedTournaments();
 
             if (sorted.length === 0) {
                 grid.innerHTML = `
-                        <div class="col-span-1 md:col-span-2 glass-card p-8 rounded-xl text-center space-y-2">
-                            <p class="text-sm text-gray-400 font-medium">No tournament brackets generated yet.</p>
-                            <button onclick="showCreateView()" class="inline-flex items-center gap-1.5 text-xs text-[#ffd13b] font-bold hover:underline">Create a tournament <i class="fa-solid fa-arrow-right"></i></button>
-                        </div>
-                    `;
+                    <div class="col-span-1 md:col-span-2 glass-card p-8 rounded-xl text-center space-y-2">
+                        <p class="text-sm text-gray-400 font-medium">No tournament brackets generated yet.</p>
+                        <button onclick="showCreateView()" class="inline-flex items-center gap-1.5 text-xs text-[#ffd13b] font-bold hover:underline">Create a tournament <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                `;
                 return;
             }
 
             sorted.forEach(t => {
                 const card = document.createElement('div');
-                card.className =
-                    "glass-card p-5 rounded-xl hover:border-[#ffd13b]/30 hover:-translate-y-0.5 transition-all flex flex-col justify-between";
-                let statsText = t.format === 'knockout' ?
-                    `${t.entrants.length} Entrants · Direct Elimination Bracket` :
-                    `${t.entrants.length} Entrants · ${t.groups.length} Groups · Group & Knockout`;
+                card.className = "glass-card p-5 rounded-xl hover:border-[#ffd13b]/30 hover:-translate-y-0.5 transition-all flex flex-col justify-between";
+                const statsText = t.format === 'knockout' ? `${t.entrants.length} Entrants · Direct Elimination Bracket` : `${t.entrants.length} Entrants · ${t.groups ? t.groups.length : 0} Groups · Group & Knockout`;
                 const dateStr = t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '';
                 card.innerHTML = `
-                        <div class="space-y-1.5 mb-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[9px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider ${t.format === 'knockout' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}">
-                                    ${t.format === 'knockout' ? 'Knockout' : 'Groups + KO'}
-                                </span>
-                                <div class="flex items-center gap-2">
-                                    <button onclick="openEditPlayersModal('${t.id}', event)" class="text-gray-400 hover:text-[#ffd13b] p-1.5 transition" title="Edit Players"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button onclick="deleteTournament('${t.id}', event)" class="text-gray-400 hover:text-rose-400 p-1.5 transition" title="Delete Tournament"><i class="fa-solid fa-trash-can"></i></button>
-                                </div>
+                    <div class="space-y-1.5 mb-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider ${t.format === 'knockout' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}">
+                                ${t.format === 'knockout' ? 'Knockout' : 'Groups + KO'}
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openEditPlayersModal('${t.id}', event)" class="text-gray-400 hover:text-[#ffd13b] p-1.5 transition" title="Edit Players"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteTournament('${t.id}', event)" class="text-gray-400 hover:text-rose-400 p-1.5 transition" title="Delete Tournament"><i class="fa-solid fa-trash-can"></i></button>
                             </div>
-                            <h4 class="text-sm font-black text-white uppercase tracking-wide truncate max-w-[250px]">${t.name}</h4>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${statsText}</p>
-                            ${dateStr ? `<p class="text-[9px] text-gray-500 font-medium">${dateStr}</p>` : ''}
                         </div>
-                        <button onclick="launchTournament('${t.id}')" class="w-full py-2.5 rounded-lg secondary-btn text-[10px] font-black uppercase tracking-widest text-center flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-circle-play text-xs text-[#ffd13b]"></i> Launch Match
-                        </button>
-                    `;
+                        <h4 class="text-sm font-black text-white uppercase tracking-wide truncate max-w-[250px]">${t.name}</h4>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${statsText}</p>
+                        ${dateStr ? `<p class="text-[9px] text-gray-500 font-medium">${dateStr}</p>` : ''}
+                    </div>
+                    <button onclick="launchTournament('${t.id}')" class="w-full py-2.5 rounded-lg secondary-btn text-[10px] font-black uppercase tracking-widest text-center flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-circle-play text-xs text-[#ffd13b]"></i> Launch Match
+                    </button>
+                `;
                 grid.appendChild(card);
             });
         }
@@ -1607,9 +1162,9 @@
                 const div = document.createElement('div');
                 div.className = "flex items-center gap-3";
                 div.innerHTML = `
-                        <span class="text-xs font-black text-gray-500 w-8 text-right">#${index+1}</span>
-                        <input type="text" value="${entrant}" class="flex-grow px-3 py-2 rounded bg-[#0b0e1a] border border-white/10 text-white font-semibold text-xs tracking-wide focus:outline-none focus:border-[#ffd13b]" data-index="${index}" />
-                    `;
+                    <span class="text-xs font-black text-gray-500 w-8 text-right">#${index+1}</span>
+                    <input type="text" value="${entrant}" class="flex-grow px-3 py-2 rounded bg-[#0b0e1a] border border-white/10 text-white font-semibold text-xs tracking-wide focus:outline-none focus:border-[#ffd13b]" data-index="${index}" />
+                `;
                 container.appendChild(div);
             });
             document.getElementById('edit-players-modal').classList.remove('hidden');
@@ -1657,57 +1212,31 @@
         // ──────────────────────────────────────────────────────────────
         function setFormFormat(fmt) {
             currentFormFormat = fmt;
-            const tabKO = document.getElementById('tab-knockout');
+            const tabKO = document.getElementById('tab-knockout-form');
             const tabGP = document.getElementById('tab-group');
             const optKO = document.getElementById('options-knockout');
             const optGP = document.getElementById('options-group');
             if (fmt === 'knockout') {
-                tabKO.className =
-                    "py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-900/30 border border-blue-500/35 text-white text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-2";
-                tabGP.className =
-                    "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2";
+                tabKO.className = "py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-900/30 border border-blue-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
+                tabGP.className = "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
                 optKO.classList.remove('hidden');
                 optGP.classList.add('hidden');
-                updateDistButtons();
             } else {
-                tabGP.className =
-                    "py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-900/30 border border-purple-500/35 text-white text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-2";
-                tabKO.className =
-                    "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2";
+                tabGP.className = "py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-900/30 border border-purple-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
+                tabKO.className = "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
                 optGP.classList.remove('hidden');
                 optKO.classList.add('hidden');
-                updateDistButtons();
             }
             adjustContendersPlaceholder();
         }
 
         function setFormDist(dist) {
             currentFormDist = dist;
-            updateDistButtons();
-        }
-
-        function updateDistButtons() {
-            const drs = document.querySelectorAll('#dist-random, #dist-random-ko');
-            const dcs = document.querySelectorAll('#dist-custom, #dist-custom-ko');
-
-            drs.forEach(btn => {
-                if (currentFormDist === 'random') {
-                    btn.className =
-                        "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
-                } else {
-                    btn.className =
-                        "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-                }
+            document.querySelectorAll('#dist-random, #dist-random-ko').forEach(b => {
+                b.className = dist === 'random' ? "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2" : "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
             });
-
-            dcs.forEach(btn => {
-                if (currentFormDist === 'custom') {
-                    btn.className =
-                        "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
-                } else {
-                    btn.className =
-                        "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-                }
+            document.querySelectorAll('#dist-custom, #dist-custom-ko').forEach(b => {
+                b.className = dist === 'custom' ? "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2" : "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
             });
         }
 
@@ -1727,15 +1256,15 @@
             const req = getRequiredEntrantCount();
             const counter = document.getElementById('contenders-counter');
             counter.innerText = `${lines.length} / ${req} Contenders`;
-            counter.className = `text-[10px] font-black ${lines.length===req?'text-emerald-400':'text-[#ffd13b]'} uppercase`;
+            counter.className = `text-[10px] font-black ${lines.length === req ? 'text-emerald-400' : 'text-[#ffd13b]'} uppercase`;
         }
 
         function autoSuggestGroupStructure() { adjustContendersPlaceholder(); }
 
         function autofillSampleTeams() {
             const req = getRequiredEntrantCount();
-            let selection = req === 20 ? [...SAMPLE_CROWN_TEAMS] : [...SAMPLE_CROWN_TEAMS].sort(() => 0.5 - Math.random()).slice(0,
-                req);
+            let selection = [...SAMPLE_CROWN_TEAMS].slice(0, req);
+            if (currentFormDist === 'random') selection = selection.sort(() => 0.5 - Math.random());
             document.getElementById('form-contenders').value = selection.join('\n');
             updateContendersCount();
         }
@@ -1746,64 +1275,28 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  BALANCED ROUND-ROBIN FIXTURE GENERATOR
+        //  ROUND ROBIN GENERATOR
         // ──────────────────────────────────────────────────────────────
         function generateRoundRobinFixtures(teams) {
             if (teams.length < 2) return [];
-            const n = teams.length;
             let allTeams = [...teams];
-            let dummy = null;
-            if (n % 2 !== 0) {
-                dummy = 'BYE';
-                allTeams.push(dummy);
-            }
+            if (allTeams.length % 2 !== 0) allTeams.push('BYE');
             const m = allTeams.length;
             const numRounds = m - 1;
             const half = m / 2;
             let fixtures = [];
-
             let indices = Array.from({ length: m }, (_, i) => i);
 
             for (let round = 0; round < numRounds; round++) {
                 for (let i = 0; i < half; i++) {
                     const idx1 = indices[i];
                     const idx2 = indices[m - 1 - i];
-                    if (idx1 !== idx2) {
-                        const team1 = allTeams[idx1];
-                        const team2 = allTeams[idx2];
-                        if (team1 !== dummy && team2 !== dummy) {
-                            fixtures.push({ home: team1, away: team2, homeScore: "", awayScore: "", played: false });
-                        }
+                    if (idx1 !== idx2 && allTeams[idx1] !== 'BYE' && allTeams[idx2] !== 'BYE') {
+                        fixtures.push({ home: allTeams[idx1], away: allTeams[idx2], homeScore: "", awayScore: "", played: false });
                     }
                 }
-                const last = indices.pop();
-                indices.splice(1, 0, last);
+                indices.splice(1, 0, indices.pop());
             }
-
-            const homeCount = {};
-            const awayCount = {};
-            teams.forEach(t => { homeCount[t] = 0;
-                awayCount[t] = 0; });
-
-            for (let i = 0; i < fixtures.length; i++) {
-                const f = fixtures[i];
-                const t1 = f.home;
-                const t2 = f.away;
-                const diff1 = homeCount[t1] - awayCount[t1];
-                const diff2 = homeCount[t2] - awayCount[t2];
-                if (diff1 <= diff2) {
-                    f.home = t1;
-                    f.away = t2;
-                    homeCount[t1]++;
-                    awayCount[t2]++;
-                } else {
-                    f.home = t2;
-                    f.away = t1;
-                    homeCount[t2]++;
-                    awayCount[t1]++;
-                }
-            }
-
             return fixtures;
         }
 
@@ -1816,15 +1309,13 @@
             let rawLines = document.getElementById('form-contenders').value.split('\n').map(l => l.trim()).filter(l => l !== "");
             while (rawLines.length < req) rawLines.push(`Contender ${rawLines.length+1}`);
             if (rawLines.length > req) rawLines = rawLines.slice(0, req);
+
             const id = 'tour-' + Date.now();
-            let newTournament = { id, name, format: currentFormFormat, entrants: [...rawLines], createdAt: new Date()
-                    .toISOString() };
+            let newTournament = { id, name, format: currentFormFormat, entrants: [...rawLines], createdAt: new Date().toISOString() };
 
             if (currentFormFormat === 'knockout') {
                 let orderedLines = [...rawLines];
-                if (currentFormDist === 'random') {
-                    orderedLines = orderedLines.sort(() => 0.5 - Math.random());
-                }
+                if (currentFormDist === 'random') orderedLines.sort(() => 0.5 - Math.random());
                 newTournament.rounds = buildInitialKnockoutRounds(orderedLines);
                 newTournament.champion = "";
             } else {
@@ -1845,43 +1336,13 @@
             for (let g = 0; g < numGroups; g++) {
                 const groupName = String.fromCharCode(65 + g);
                 const groupTeams = teams.slice(g * groupSize, (g + 1) * groupSize);
-                let matches = generateRoundRobinFixtures(groupTeams);
-                matches = matches.map((m, idx) => {
+                let matches = generateRoundRobinFixtures(groupTeams).map((m, idx) => {
                     m.id = `${groupName}-${idx}`;
                     return m;
                 });
                 groups.push({ name: `Group ${groupName}`, teams: groupTeams, matches });
             }
             return groups;
-        }
-
-        // ──────────────────────────────────────────────────────────────
-        //  BUILD INITIAL KNOCKOUT ROUNDS
-        // ──────────────────────────────────────────────────────────────
-        function buildKnockoutRoundsFromOrder(orderedTeams) {
-            const count = orderedTeams.length;
-            if ((count & (count - 1)) !== 0) {
-                alert("Number of teams must be a power of 2 for a balanced bracket.");
-                return null;
-            }
-            const roundsCount = Math.log2(count);
-            let rounds = [];
-            let slots = [];
-            for (let s = 0; s < count; s++) {
-                slots.push({ name: orderedTeams[s] || "", scoreLeg1: "", scoreLeg2: "", isWinner: false });
-            }
-            rounds.push({ roundIndex: 0, title: getRoundTitle(0, roundsCount), slots: slots });
-
-            for (let r = 1; r <= roundsCount; r++) {
-                const slotsInRound = count / Math.pow(2, r);
-                let roundSlots = [];
-                for (let s = 0; s < slotsInRound; s++) {
-                    roundSlots.push({ name: "", scoreLeg1: "", scoreLeg2: "", isWinner: false });
-                }
-                let title = (r === roundsCount) ? "Champion" : getRoundTitle(r, roundsCount);
-                rounds.push({ roundIndex: r, title: title, slots: roundSlots });
-            }
-            return rounds;
         }
 
         function getRoundTitle(rIndex, total) {
@@ -1894,9 +1355,22 @@
             return `Round ${rIndex+1}`;
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  LAUNCH TOURNAMENT
-        // ──────────────────────────────────────────────────────────────
+        function buildInitialKnockoutRounds(contenders) {
+            const count = contenders.length;
+            const roundsCount = Math.log2(count);
+            let rounds = [];
+            for (let r = 0; r < roundsCount; r++) {
+                const slotsInRound = count / Math.pow(2, r);
+                let roundSlots = [];
+                for (let s = 0; s < slotsInRound; s++) {
+                    roundSlots.push({ name: r === 0 ? contenders[s] : "", scoreLeg1: "", scoreLeg2: "", isWinner: false });
+                }
+                rounds.push({ roundIndex: r, title: getRoundTitle(r, roundsCount), slots: roundSlots });
+            }
+            rounds.push({ roundIndex: roundsCount, title: "Champion", slots: [{ name: "", isWinner: false }] });
+            return rounds;
+        }
+
         function launchTournament(id) {
             activeTournamentId = id;
             const t = tournaments.find(x => x.id === id);
@@ -1913,11 +1387,6 @@
                 document.getElementById('tab-view-knockout').classList.remove('hidden');
                 document.getElementById('knockout-guard-overlay').classList.add('hidden');
                 renderActiveBracket();
-                updateConnectors();
-                const btnKnockout = document.getElementById('tab-knockout');
-                [document.getElementById('tab-groups'), document.getElementById('tab-fixtures'), btnKnockout].forEach(b => b
-                    .classList.remove('active'));
-                btnKnockout.classList.add('active');
                 currentWorkspaceTab = 'knockout';
             } else {
                 document.getElementById('active-nav-tabs').classList.remove('hidden');
@@ -1926,7 +1395,7 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: GROUP STANDINGS
+        //  RENDER: GROUP STANDINGS & FIXTURES
         // ──────────────────────────────────────────────────────────────
         function renderActiveGroupStandings() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -1942,75 +1411,62 @@
                     const isQual = pos < t.groupSettings.qualifiersPerGroup;
                     const badge = isQual ? 'bg-[#27ae60]' : 'bg-[#e74c3c]';
                     rows += `
-                            <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-all font-bold text-gray-300">
-                                <td class="py-2 text-center"><span class="inline-block w-5 py-0.5 rounded text-white font-black text-[9px] ${badge}">${pos+1}</span></td>
-                                <td class="py-2 font-semibold text-white tracking-wide truncate max-w-[130px]">${s.team}</td>
-                                <td class="py-2 text-center text-gray-400">${s.played}</td>
-                                <td class="py-2 text-center text-gray-400">${s.wins}</td>
-                                <td class="py-2 text-center text-gray-400">${s.draws}</td>
-                                <td class="py-2 text-center text-gray-400">${s.losses}</td>
-                                <td class="py-2 text-center text-gray-400">${s.gf}</td>
-                                <td class="py-2 text-center text-gray-400">${s.ga}</td>
-                                <td class="py-2 text-center text-blue-400">${s.gd>0?'+':''}${s.gd}</td>
-                                <td class="py-2 text-center font-black text-[#ffd13b]">${s.pts}</td>
-                            </tr>
-                        `;
+                        <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-all font-bold text-gray-300">
+                            <td class="py-2 text-center"><span class="inline-block w-5 py-0.5 rounded text-white font-black text-[9px] ${badge}">${pos+1}</span></td>
+                            <td class="py-2 font-semibold text-white tracking-wide truncate max-w-[130px]">${s.team}</td>
+                            <td class="py-2 text-center text-gray-400">${s.played}</td>
+                            <td class="py-2 text-center text-gray-400">${s.wins}</td>
+                            <td class="py-2 text-center text-gray-400">${s.draws}</td>
+                            <td class="py-2 text-center text-gray-400">${s.losses}</td>
+                            <td class="py-2 text-center text-gray-400">${s.gf}</td>
+                            <td class="py-2 text-center text-gray-400">${s.ga}</td>
+                            <td class="py-2 text-center text-blue-400">${s.gd>0?'+':''}${s.gd}</td>
+                            <td class="py-2 text-center font-black text-[#ffd13b]">${s.pts}</td>
+                        </tr>
+                    `;
                 });
                 card.innerHTML = `
-                        <div class="border-b border-white/5 pb-2"><h3 class="text-xs font-black text-[#ffd13b] tracking-[0.2em] uppercase text-center">${group.name}</h3></div>
-                        <div class="w-full">
-                            <table class="w-full text-left border-collapse table-fixed">
-                                <thead><tr class="font-black text-gray-400 tracking-wider uppercase border-b border-white/5">
-                                    <th class="py-2 text-center w-[10%]">S/N</th>
-                                    <th class="py-2 text-left w-[30%]">Team</th>
-                                    <th class="py-2 text-center w-[7%]">MP</th>
-                                    <th class="py-2 text-center w-[7%]">W</th>
-                                    <th class="py-2 text-center w-[7%]">D</th>
-                                    <th class="py-2 text-center w-[7%]">L</th>
-                                    <th class="py-2 text-center w-[7%]">GF</th>
-                                    <th class="py-2 text-center w-[7%]">GA</th>
-                                    <th class="py-2 text-center w-[8%]">GD</th>
-                                    <th class="py-2 text-center w-[10%]">Pts</th>
-                                </tr></thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                        </div>
-                    `;
+                    <div class="border-b border-white/5 pb-2"><h3 class="text-xs font-black text-[#ffd13b] tracking-[0.2em] uppercase text-center">${group.name}</h3></div>
+                    <div class="w-full">
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <thead><tr class="font-black text-gray-400 tracking-wider uppercase border-b border-white/5">
+                                <th class="py-2 text-center w-[10%]">S/N</th>
+                                <th class="py-2 text-left w-[30%]">Team</th>
+                                <th class="py-2 text-center w-[7%]">MP</th>
+                                <th class="py-2 text-center w-[7%]">W</th>
+                                <th class="py-2 text-center w-[7%]">D</th>
+                                <th class="py-2 text-center w-[7%]">L</th>
+                                <th class="py-2 text-center w-[7%]">GF</th>
+                                <th class="py-2 text-center w-[7%]">GA</th>
+                                <th class="py-2 text-center w-[8%]">GD</th>
+                                <th class="py-2 text-center w-[10%]">Pts</th>
+                            </tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
                 grid.appendChild(card);
             });
         }
 
         function getGroupStandings(group) {
             let map = {};
-            group.teams.forEach(t => { map[t] = { team: t, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, gd: 0,
-                    pts: 0 }; });
+            group.teams.forEach(t => { map[t] = { team: t, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, gd: 0, pts: 0 }; });
             group.matches.forEach(m => {
-                const hs = parseInt(m.homeScore),
-                    as = parseInt(m.awayScore);
+                const hs = parseInt(m.homeScore), as = parseInt(m.awayScore);
                 if (!isNaN(hs) && !isNaN(as)) {
-                    map[m.home].played++;
-                    map[m.away].played++;
-                    map[m.home].gf += hs;
-                    map[m.home].ga += as;
-                    map[m.away].gf += as;
-                    map[m.away].ga += hs;
-                    if (hs > as) { map[m.home].wins++;
-                        map[m.home].pts += 3;
-                        map[m.away].losses++; } else if (hs < as) { map[m.away].wins++;
-                        map[m.away].pts += 3;
-                        map[m.home].losses++; } else { map[m.home].draws++;
-                        map[m.home].pts += 1;
-                        map[m.away].draws++;
-                        map[m.away].pts += 1; }
+                    map[m.home].played++; map[m.away].played++;
+                    map[m.home].gf += hs; map[m.home].ga += as;
+                    map[m.away].gf += as; map[m.away].ga += hs;
+                    if (hs > as) { map[m.home].wins++; map[m.home].pts += 3; map[m.away].losses++; }
+                    else if (hs < as) { map[m.away].wins++; map[m.away].pts += 3; map[m.home].losses++; }
+                    else { map[m.home].draws++; map[m.home].pts += 1; map[m.away].draws++; map[m.away].pts += 1; }
                 }
             });
             Object.keys(map).forEach(t => { map[t].gd = map[t].gf - map[t].ga; });
-            return Object.values(map).sort((a, b) => b.pts - a.pts || b.gd - b.gd || b.gf - b.gf);
+            return Object.values(map).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  RENDER: FIXTURES
-        // ──────────────────────────────────────────────────────────────
         function renderActiveFixturesGrid() {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.groups) return;
@@ -2021,42 +1477,26 @@
                 container.className = "flex flex-col gap-4 mb-8";
                 let html = '';
                 group.matches.forEach(m => {
-                    const hs = (m.homeScore ?? '').toString();
-                    const as = (m.awayScore ?? '').toString();
                     html += `
-                            <div class="fixture-row-modern" data-match-id="${m.id}">
-                                <div class="fixture-modern-left">
-                                    <div class="fixture-modern-name" title="${m.home}">${m.home}</div>
-                                </div>
-                                <div class="fixture-modern-center">
-                                    <input type="text" inputmode="numeric" value="${hs}" placeholder="" 
-                                           class="fixture-modern-scorebox" data-match="${m.id}" data-side="home" 
-                                           autocomplete="off" />
-                                    <div class="fixture-modern-vs">VS</div>
-                                    <input type="text" inputmode="numeric" value="${as}" placeholder="" 
-                                           class="fixture-modern-scorebox" data-match="${m.id}" data-side="away" 
-                                           autocomplete="off" />
-                                </div>
-                                <div class="fixture-modern-right">
-                                    <div class="fixture-modern-name" title="${m.away}">${m.away}</div>
-                                </div>
+                        <div class="fixture-row-modern" data-match-id="${m.id}">
+                            <div class="fixture-modern-left"><div class="fixture-modern-name" title="${m.home}">${m.home}</div></div>
+                            <div class="fixture-modern-center">
+                                <input type="text" inputmode="numeric" value="${m.homeScore??''}" class="fixture-modern-scorebox" data-match="${m.id}" data-side="home" />
+                                <div class="fixture-modern-vs">VS</div>
+                                <input type="text" inputmode="numeric" value="${m.awayScore??''}" class="fixture-modern-scorebox" data-match="${m.id}" data-side="away" />
                             </div>
-                        `;
+                            <div class="fixture-modern-right"><div class="fixture-modern-name" title="${m.away}">${m.away}</div></div>
+                        </div>
+                    `;
                 });
                 container.innerHTML = `
-                        <div class="border-b border-white/5 pb-2 mb-2"><h3 class="text-xs font-black text-gray-300 tracking-[0.25em] uppercase">${group.name}</h3></div>
-                        <div class="flex flex-col gap-2">${html}</div>
-                    `;
+                    <div class="border-b border-white/5 pb-2 mb-2"><h3 class="text-xs font-black text-gray-300 tracking-[0.25em] uppercase">${group.name}</h3></div>
+                    <div class="flex flex-col gap-2">${html}</div>
+                `;
                 grid.appendChild(container);
 
                 container.querySelectorAll('.fixture-modern-scorebox').forEach(inp => {
-                    inp.addEventListener('change', function(e) {
-                        const matchId = this.dataset.match;
-                        const side = this.dataset.side;
-                        const val = this.value;
-                        updateGroupMatchValueNoRevert(matchId, side, val);
-                    });
-                    inp.addEventListener('input', function(e) {
+                    inp.addEventListener('input', function() {
                         const matchId = this.dataset.match;
                         const side = this.dataset.side;
                         const val = this.value;
@@ -2071,41 +1511,13 @@
                             }
                         });
                         saveTournamentsToStorage();
-                        scheduleStandingsUpdate();
                     });
                 });
             });
         }
 
-        let standingsTimeout = null;
-
-        function scheduleStandingsUpdate() {
-            if (standingsTimeout) clearTimeout(standingsTimeout);
-            standingsTimeout = setTimeout(() => {
-                if (currentWorkspaceTab === 'groups') {
-                    renderActiveGroupStandings();
-                }
-                standingsTimeout = null;
-            }, 600);
-        }
-
-        function updateGroupMatchValueNoRevert(matchId, side, value) {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t) return;
-            t.groups.forEach(g => {
-                const m = g.matches.find(mm => mm.id === matchId);
-                if (m) {
-                    if (side === 'home') m.homeScore = value;
-                    else m.awayScore = value;
-                    m.played = (m.homeScore !== "" && m.awayScore !== "");
-                }
-            });
-            saveTournamentsToStorage();
-            scheduleStandingsUpdate();
-        }
-
         // ──────────────────────────────────────────────────────────────
-        //  KNOCKOUT WINNER TOGGLE
+        //  KNOCKOUT LOGIC & WINNER TOGGLE
         // ──────────────────────────────────────────────────────────────
         function toggleWinner(roundIdx, slotIdx) {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -2113,44 +1525,11 @@
             const round = t.rounds[roundIdx];
             if (!round) return;
             const slot = round.slots[slotIdx];
-            if (!slot) return;
-            if (!slot.name || slot.name.trim() === '') return;
+            if (!slot || !slot.name || slot.name.trim() === '') return;
 
             const totalRounds = t.rounds.length;
-            const isChampionRound = (roundIdx === totalRounds - 1);
-            if (isChampionRound) return;
+            if (roundIdx === totalRounds - 1) return;
 
-            // Final round handling (totalRounds - 2)
-            if (roundIdx === totalRounds - 2) {
-                const championSlot = t.rounds[totalRounds - 1].slots[0];
-                if (slot.isWinner) {
-                    slot.isWinner = false;
-                    const otherIdx = slotIdx === 0 ? 1 : 0;
-                    const otherSlot = round.slots[otherIdx];
-                    if (otherSlot) otherSlot.isWinner = false;
-                    championSlot.name = '';
-                    saveTournamentsToStorage();
-                    renderActiveBracket();
-                    updateConnectors();
-                    return;
-                }
-                const otherIdx = slotIdx === 0 ? 1 : 0;
-                const otherSlot = round.slots[otherIdx];
-                if (otherSlot) otherSlot.isWinner = false;
-                round.slots.forEach(s => s.isWinner = false);
-                slot.isWinner = true;
-                championSlot.name = slot.name;
-                championSlot.isWinner = false;
-                saveTournamentsToStorage();
-                renderActiveBracket();
-                updateConnectors();
-                if (championSlot.name && championSlot.name !== '') {
-                    celebrate();
-                }
-                return;
-            }
-
-            // Regular rounds
             const matchIdx = Math.floor(slotIdx / 2);
             const slotInMatch = slotIdx % 2;
             const otherSlotIdx = (slotInMatch === 0) ? slotIdx + 1 : slotIdx - 1;
@@ -2166,7 +1545,6 @@
                 targetSlot.name = '';
                 saveTournamentsToStorage();
                 renderActiveBracket();
-                updateConnectors();
                 return;
             }
 
@@ -2177,30 +1555,23 @@
 
             saveTournamentsToStorage();
             renderActiveBracket();
-            updateConnectors();
 
             if (nextRoundIdx === totalRounds - 1) {
                 const champSlot = t.rounds[totalRounds - 1].slots[0];
-                if (champSlot.name && champSlot.name !== '') {
-                    celebrate();
-                }
+                if (champSlot.name && champSlot.name !== '') celebrate();
             }
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  SCORE CHANGE HANDLER (Knockout)
-        // ──────────────────────────────────────────────────────────────
         function handleScoreChange(roundIdx, slotIdx, field, val) {
             const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t) return;
-            if (!t.rounds[roundIdx] || !t.rounds[roundIdx].slots[slotIdx]) return;
+            if (!t || !t.rounds[roundIdx] || !t.rounds[roundIdx].slots[slotIdx]) return;
             t.rounds[roundIdx].slots[slotIdx][field] = val;
             saveTournamentsToStorage();
             updateConnectors();
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  RENDER: BRACKET — FULLY CENTERED VERTICALLY
+        //  RENDER: INWARD SYMMETRICAL KNOCKOUT BRACKET
         // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
@@ -2208,251 +1579,139 @@
             const viewport = document.getElementById('bracket-viewport');
             viewport.innerHTML = '';
 
-            const totalRounds = t.rounds.length;
-            const leftRounds = Math.max(0, totalRounds - 2);
+            const totalRounds = t.rounds.length; // includes Champion round at index totalRounds - 1
+            const bracketRoundsCount = totalRounds - 1; // total progression rounds (e.g. 5 for 32 players: R32, R16, QF, SF, Final)
 
-            const bracketFlex = document.createElement('div');
-            bracketFlex.className =
-                'flex flex-row items-stretch justify-center w-full h-full relative gap-1 md:gap-2 flex-nowrap';
-            viewport.appendChild(bracketFlex);
+            // Define Column Sequence: Left side (0 -> bracketRoundsCount-1), Champion Center, Right side (bracketRoundsCount-1 -> 0)
+            let columnsToBuild = [];
 
-            const columns = [];
+            // Left rounds (from initial round to final)
+            for (let r = 0; r < bracketRoundsCount; r++) {
+                columnsToBuild.push({ roundIdx: r, side: 'left' });
+            }
+            // Center Champion
+            columnsToBuild.push({ roundIdx: bracketRoundsCount, side: 'center' });
+            // Right rounds (from final back to initial round)
+            for (let r = bracketRoundsCount - 1; r >= 0; r--) {
+                columnsToBuild.push({ roundIdx: r, side: 'right' });
+            }
 
-            function createCol(slots, rIdx, indices, side, title) {
+            columnsToBuild.forEach(colSpec => {
+                const rIdx = colSpec.roundIdx;
+                const side = colSpec.side;
+                const round = t.rounds[rIdx];
+
                 const col = document.createElement('div');
-                const isChampion = (rIdx === totalRounds - 1 && side === 'center');
-                if (isChampion) {
-                    col.className = 'bracket-col champion-col flex flex-col justify-center items-center h-full relative';
-                } else {
-                    col.className = 'bracket-col flex flex-col flex-1 relative';
-                }
-                col.setAttribute('data-round', rIdx);
-                col.setAttribute('data-side', side);
-                col.innerHTML = `<div class="col-title">${title}</div>`;
 
-                if (isChampion) {
-                    const slot = slots[0];
+                if (side === 'center') {
+                    col.className = 'bracket-col champion-col';
+                    col.innerHTML = `<div class="col-title">${round.title}</div>`;
+
+                    const champSlot = round.slots[0];
                     const div = document.createElement('div');
-                    div.className = "slot champion-slot";
+                    div.className = "champion-slot";
                     div.setAttribute('data-round', rIdx);
                     div.setAttribute('data-slot', 0);
-                    div.setAttribute('data-side', 'center');
                     div.id = 'champion-slot-container';
                     div.innerHTML = `
-                            <div class="flex items-center gap-3">
-                                <input type="text" id="winner-box" value="${slot.name||''}" placeholder="CROWN CHAMPION" class="name-input text-center font-black rounded-full" style="width:160px;height:40px;border:2px solid #e5c122;border-radius:9999px;" readonly />
-                                <svg class="trophy-svg" width="40" height="40" viewBox="0 0 100 100" fill="none">
-                                    <rect x="32" y="78" width="36" height="10" rx="3" fill="#151928" stroke="#8e7323" stroke-width="2"/>
-                                    <path d="M38 78 L43 66 L57 66 L62 78Z" fill="#8e7323"/>
-                                    <rect x="46" y="52" width="8" height="15" fill="#ffd13b"/>
-                                    <path d="M28 24 C16 24,16 42,28 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
-                                    <path d="M72 24 C84 24,84 42,72 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
-                                    <path d="M28 18 C28 52,72 52,72 18Z" fill="#ffd13b"/>
-                                    <rect x="25" y="14" width="50" height="5" rx="2" fill="#ffe980"/>
-                                    <polygon points="50,23 53,30 60,30 55,34 57,41 50,37 43,41 45,34 40,30 47,30" fill="#fff" opacity="0.9"/>
-                                </svg>
-                            </div>
-                        `;
+                        <svg class="trophy-svg" width="44" height="44" viewBox="0 0 100 100" fill="none">
+                            <rect x="32" y="78" width="36" height="10" rx="3" fill="#151928" stroke="#8e7323" stroke-width="2"/>
+                            <path d="M38 78 L43 66 L57 66 L62 78Z" fill="#8e7323"/>
+                            <rect x="46" y="52" width="8" height="15" fill="#ffd13b"/>
+                            <path d="M28 24 C16 24,16 42,28 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
+                            <path d="M72 24 C84 24,84 42,72 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
+                            <path d="M28 18 C28 52,72 52,72 18Z" fill="#ffd13b"/>
+                            <rect x="25" y="14" width="50" height="5" rx="2" fill="#ffe980"/>
+                            <polygon points="50,23 53,30 60,30 55,34 57,41 50,37 43,41 45,34 40,30 47,30" fill="#fff" opacity="0.9"/>
+                        </svg>
+                        <input type="text" value="${champSlot.name||''}" placeholder="CROWN CHAMPION" class="name-input" readonly />
+                    `;
                     col.appendChild(div);
-                    columns.push({ col, round: rIdx, side: 'center' });
-                    return col;
-                }
-
-                const isFinal = (rIdx === totalRounds - 2 && side === 'center');
-
-                if (isFinal) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'final-slot-wrapper';
-                    const slotL = slots[0];
-                    const divL = createSlotElement(slotL, rIdx, 0, 'final-left');
-                    wrapper.appendChild(divL);
-                    const vs = document.createElement('div');
-                    vs.className = 'final-vs';
-                    vs.textContent = '⚔';
-                    wrapper.appendChild(vs);
-                    const slotR = slots[1];
-                    const divR = createSlotElement(slotR, rIdx, 1, 'final-right');
-                    wrapper.appendChild(divR);
-                    col.appendChild(wrapper);
-                    columns.push({ col, round: rIdx, side: 'center' });
-                    return col;
-                }
-
-                indices.forEach((sIdx) => {
-                    const slot = slots[sIdx];
-                    const div = createSlotElement(slot, rIdx, sIdx, side);
-                    col.appendChild(div);
-                });
-
-                columns.push({ col, round: rIdx, side });
-                return col;
-            }
-
-            function createSlotElement(slot, rIdx, sIdx, side) {
-                const div = document.createElement('div');
-                let slotClasses = `slot ${slot.isWinner ? 'winner-slot' : ''}`;
-                if (sIdx % 2 === 0) slotClasses += ' slot-pair-first';
-                else slotClasses += ' slot-pair-second';
-                div.className = slotClasses;
-                div.setAttribute('data-round', rIdx);
-                div.setAttribute('data-slot', sIdx);
-                div.setAttribute('data-side', side);
-
-                const nameInput = document.createElement('input');
-                nameInput.type = 'text';
-                nameInput.value = slot.name || '';
-                nameInput.placeholder = 'Undecided';
-                nameInput.className = `name-input ${slot.isWinner ? 'winner-name' : ''}`;
-                nameInput.style.borderRadius = '9999px 0 0 9999px';
-                nameInput.readOnly = true;
-                nameInput.onclick = function(e) {
-                    e.stopPropagation();
-                    toggleWinner(rIdx, sIdx);
-                };
-
-                const score1 = document.createElement('input');
-                score1.type = 'text';
-                score1.inputMode = 'numeric';
-                score1.value = slot.scoreLeg1 ?? '';
-                score1.placeholder = '-';
-                score1.maxLength = 2;
-                score1.className = 'score-input score-gold';
-                score1.autocomplete = 'off';
-                score1.addEventListener('change', function() {
-                    handleScoreChange(rIdx, sIdx, 'scoreLeg1', this.value);
-                });
-                score1.addEventListener('input', function() {
-                    const t2 = tournaments.find(x => x.id === activeTournamentId);
-                    if (t2 && t2.rounds && t2.rounds[rIdx] && t2.rounds[rIdx].slots[sIdx]) {
-                        t2.rounds[rIdx].slots[sIdx].scoreLeg1 = this.value;
-                        saveTournamentsToStorage();
-                    }
-                });
-
-                const isFinalRound = (rIdx === (tournaments.find(x => x.id === activeTournamentId)?.rounds?.length || 0) - 2);
-                let score2 = null;
-                if (!isFinalRound) {
-                    score2 = document.createElement('input');
-                    score2.type = 'text';
-                    score2.inputMode = 'numeric';
-                    score2.value = slot.scoreLeg2 ?? '';
-                    score2.placeholder = '-';
-                    score2.maxLength = 2;
-                    score2.className = 'score-input score-dark';
-                    score2.style.borderRadius = '0 9999px 9999px 0';
-                    score2.autocomplete = 'off';
-                    score2.addEventListener('change', function() {
-                        handleScoreChange(rIdx, sIdx, 'scoreLeg2', this.value);
-                    });
-                    score2.addEventListener('input', function() {
-                        const t2 = tournaments.find(x => x.id === activeTournamentId);
-                        if (t2 && t2.rounds && t2.rounds[rIdx] && t2.rounds[rIdx].slots[sIdx]) {
-                            t2.rounds[rIdx].slots[sIdx].scoreLeg2 = this.value;
-                            saveTournamentsToStorage();
-                        }
-                    });
                 } else {
-                    score1.style.borderRadius = '0 9999px 9999px 0';
+                    col.className = 'bracket-col';
+                    col.innerHTML = `<div class="col-title">${round.title}</div>`;
+
+                    const isFinals = (rIdx === bracketRoundsCount - 1);
+                    const totalSlots = round.slots.length;
+                    const halfSlots = totalSlots / 2;
+
+                    // Filter slots belonging to Left side (indices 0 .. halfSlots-1) or Right side (halfSlots .. totalSlots-1)
+                    let slotIndices = [];
+                    if (isFinals) {
+                        slotIndices = side === 'left' ? [0] : [1];
+                    } else {
+                        if (side === 'left') {
+                            for (let i = 0; i < halfSlots; i++) slotIndices.push(i);
+                        } else {
+                            for (let i = halfSlots; i < totalSlots; i++) slotIndices.push(i);
+                        }
+                    }
+
+                    // Group into match pairs (2 slots per match)
+                    for (let p = 0; p < slotIndices.length; p += (isFinals ? 1 : 2)) {
+                        const pairContainer = document.createElement('div');
+                        pairContainer.className = 'match-pair';
+
+                        const currentPairIndices = isFinals ? [slotIndices[p]] : [slotIndices[p], slotIndices[p+1]];
+
+                        currentPairIndices.forEach(sIdx => {
+                            const slot = round.slots[sIdx];
+                            const div = document.createElement('div');
+                            div.className = `slot slot-${side} ${slot.isWinner ? 'winner-slot' : ''}`;
+                            div.setAttribute('data-round', rIdx);
+                            div.setAttribute('data-slot', sIdx);
+                            div.setAttribute('data-side', side);
+
+                            const nameInput = document.createElement('input');
+                            nameInput.type = 'text';
+                            nameInput.value = slot.name || '';
+                            nameInput.placeholder = 'Undecided';
+                            nameInput.className = `name-input ${slot.isWinner ? 'winner-name' : ''}`;
+                            nameInput.readOnly = true;
+                            nameInput.onclick = (e) => { e.stopPropagation(); toggleWinner(rIdx, sIdx); };
+
+                            const score1 = document.createElement('input');
+                            score1.type = 'text';
+                            score1.inputMode = 'numeric';
+                            score1.value = slot.scoreLeg1 ?? '';
+                            score1.placeholder = '-';
+                            score1.maxLength = 2;
+                            score1.className = 'score-input score-gold';
+                            score1.addEventListener('change', function() { handleScoreChange(rIdx, sIdx, 'scoreLeg1', this.value); });
+
+                            let score2 = null;
+                            if (!isFinals) {
+                                score2 = document.createElement('input');
+                                score2.type = 'text';
+                                score2.inputMode = 'numeric';
+                                score2.value = slot.scoreLeg2 ?? '';
+                                score2.placeholder = '-';
+                                score2.maxLength = 2;
+                                score2.className = 'score-input score-dark score-last';
+                                score2.addEventListener('change', function() { handleScoreChange(rIdx, sIdx, 'scoreLeg2', this.value); });
+                            } else {
+                                score1.classList.add('score-last');
+                            }
+
+                            div.appendChild(nameInput);
+                            div.appendChild(score1);
+                            if (score2) div.appendChild(score2);
+
+                            pairContainer.appendChild(div);
+                        });
+
+                        col.appendChild(pairContainer);
+                    }
                 }
 
-                div.appendChild(nameInput);
-                div.appendChild(score1);
-                if (score2) div.appendChild(score2);
-                return div;
-            }
-
-            // ── BUILD ──
-            // Left
-            for (let r = 0; r < leftRounds; r++) {
-                const slots = t.rounds[r].slots;
-                const totalSlots = slots.length;
-                const half = totalSlots / 2;
-                const indices = Array.from({ length: half }, (_, i) => i);
-                bracketFlex.appendChild(createCol(slots, r, indices, 'left', t.rounds[r].title));
-            }
-
-            // Center: champion above final
-            const centerWrapper = document.createElement('div');
-            centerWrapper.className = 'flex flex-col items-center justify-center gap-2 flex-shrink-0';
-            centerWrapper.style.minWidth = '120px';
-
-            const championR = t.rounds[totalRounds - 1];
-            const championCol = createCol(championR.slots, totalRounds - 1, [0], 'center', championR.title);
-            championCol.className = 'bracket-col champion-col flex flex-col justify-center items-center';
-            championCol.style.marginBottom = '0px';
-
-            const finalR = t.rounds[totalRounds - 2];
-            const finalCol = createCol(finalR.slots, totalRounds - 2, [0, 1], 'center', finalR.title);
-            finalCol.className = 'bracket-col flex flex-col justify-center items-center';
-            finalCol.style.marginTop = '0px';
-
-            centerWrapper.appendChild(championCol);
-            centerWrapper.appendChild(finalCol);
-            bracketFlex.appendChild(centerWrapper);
-
-            // Right
-            for (let r = leftRounds - 1; r >= 0; r--) {
-                const slots = t.rounds[r].slots;
-                const totalSlots = slots.length;
-                const half = totalSlots / 2;
-                const indices = Array.from({ length: half }, (_, i) => i + half);
-                bracketFlex.appendChild(createCol(slots, r, indices, 'right', t.rounds[r].title));
-            }
-
-            // ── ALIGN & CENTER ──
-            requestAnimationFrame(() => {
-                alignBracketCentered(columns, leftRounds);
-                updateConnectors();
+                viewport.appendChild(col);
             });
+
+            requestAnimationFrame(() => updateConnectors());
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  FIXED ALIGNMENT: V-SHAPE PYRAMID (LEFT TOP HALF, RIGHT BOTTOM HALF)
-        // ──────────────────────────────────────────────────────────────
-        function alignBracketCentered(columns, leftRounds) {
-            const container = document.getElementById('bracket-container');
-            if (!container) return;
-            const containerRect = container.getBoundingClientRect();
-            const containerHeight = containerRect.height;
-
-            const leftCols = columns.filter(c => c.side === 'left');
-            const rightCols = columns.filter(c => c.side === 'right');
-            const centerCols = columns.filter(c => c.side === 'center');
-
-            function getBoundingBox(cols, rect) {
-                let minTop = Infinity, maxBottom = -Infinity;
-                cols.forEach(({ col }) => {
-                    const cRect = col.getBoundingClientRect();
-                    const top = cRect.top - rect.top;
-                    const bottom = cRect.bottom - rect.top;
-                    if (top < minTop) minTop = top;
-                    if (bottom > maxBottom) maxBottom = bottom;
-                });
-                return { minTop, maxBottom };
-            }
-
-            function centerGroup(cols, targetCenter, containerRect) {
-                if (cols.length === 0) return;
-                const box = getBoundingBox(cols, containerRect);
-                const currentCenter = (box.minTop + box.maxBottom) / 2;
-                const delta = targetCenter - currentCenter;
-                cols.forEach(({ col }) => {
-                    const currentMargin = parseFloat(col.style.marginTop) || 0;
-                    col.style.marginTop = (currentMargin + delta) + 'px';
-                });
-            }
-
-            const topHalfCenter = containerHeight / 4;
-            const bottomHalfCenter = containerHeight * 3 / 4;
-            const fullCenter = containerHeight / 2;
-
-            centerGroup(leftCols, topHalfCenter, containerRect);
-            centerGroup(rightCols, bottomHalfCenter, containerRect);
-            centerGroup(centerCols, fullCenter, containerRect);
-        }
-
-        // ──────────────────────────────────────────────────────────────
-        //  CONNECTOR LINES
+        //  SVG CONNECTOR DRAWING (SPLIT INWARD PATHS)
         // ──────────────────────────────────────────────────────────────
         function updateConnectors() {
             const svg = document.getElementById('connector-svg');
@@ -2468,170 +1727,125 @@
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.rounds || currentWorkspaceTab !== 'knockout') return;
 
-            const totalRounds = t.rounds.length;
-            if (totalRounds < 2) return;
-            const leftRounds = totalRounds - 2;
-            const gap = 6;
+            const totalRounds = t.rounds.length; // total including Champion
+            const bracketRoundsCount = totalRounds - 1;
 
-            function drawConnection(slotAIdx, slotBIdx, roundIdx, targetSlotIdx, targetRoundIdx, side) {
-                let targetSide = side;
-                if (targetRoundIdx === totalRounds - 2 || targetRoundIdx === totalRounds - 1) targetSide = 'center';
+            // 1. Connect rounds up to Final
+            for (let r = 0; r < bracketRoundsCount - 1; r++) {
+                const slots = t.rounds[r].slots;
+                const matchCount = slots.length / 2;
 
-                const elA = document.querySelector(
-                    `[data-round="${roundIdx}"][data-slot="${slotAIdx}"][data-side="${side}"]`);
-                const elB = document.querySelector(
-                    `[data-round="${roundIdx}"][data-slot="${slotBIdx}"][data-side="${side}"]`);
+                for (let m = 0; m < matchCount; m++) {
+                    const idxA = 2 * m;
+                    const idxB = 2 * m + 1;
+                    const targetIdx = m;
 
-                let elTarget = null;
-                if (targetRoundIdx === totalRounds - 1) {
-                    elTarget = document.getElementById('champion-slot-container');
-                    if (!elTarget) {
-                        elTarget = document.querySelector(
-                            `[data-round="${targetRoundIdx}"][data-slot="0"][data-side="center"]`);
+                    const isLeftSide = idxA < (slots.length / 2);
+                    const sideStr = isLeftSide ? 'left' : 'right';
+
+                    const slotAEl = document.querySelector(`[data-round="${r}"][data-slot="${idxA}"][data-side="${sideStr}"]`);
+                    const slotBEl = document.querySelector(`[data-round="${r}"][data-slot="${idxB}"][data-side="${sideStr}"]`);
+                    const targetEl = document.querySelector(`[data-round="${r+1}"][data-slot="${targetIdx}"][data-side="${sideStr}"]`);
+
+                    if (!slotAEl || !slotBEl || !targetEl) continue;
+
+                    const rA = slotAEl.getBoundingClientRect();
+                    const rB = slotBEl.getBoundingClientRect();
+                    const rT = targetEl.getBoundingClientRect();
+
+                    let xA, xB, xT;
+                    if (isLeftSide) {
+                        xA = rA.right - rect.left + 4;
+                        xB = rB.right - rect.left + 4;
+                        xT = rT.left - rect.left - 4;
+                    } else {
+                        xA = rA.left - rect.left - 4;
+                        xB = rB.left - rect.left - 4;
+                        xT = rT.right - rect.left + 4;
                     }
-                } else if (targetRoundIdx === totalRounds - 2) {
-                    elTarget = document.querySelector(
-                        `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"]`);
-                    if (!elTarget) {
-                        elTarget = document.querySelector(
-                            `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"][data-side="center"]`);
-                    }
-                } else {
-                    elTarget = document.querySelector(
-                        `[data-round="${targetRoundIdx}"][data-slot="${targetSlotIdx}"][data-side="${targetSide}"]`);
-                }
 
-                if (!elA || !elB || !elTarget) return;
+                    const yA = rA.top + rA.height / 2 - rect.top;
+                    const yB = rB.top + rB.height / 2 - rect.top;
+                    const yT = rT.top + rT.height / 2 - rect.top;
 
-                const nameA = elA.querySelector('.name-input');
-                const nameB = elB.querySelector('.name-input');
-                const nameTarget = elTarget.querySelector('.name-input');
-                if (!nameA || !nameB || !nameTarget) return;
+                    const slotA = slots[idxA];
+                    const slotB = slots[idxB];
+                    const targetSlot = t.rounds[r + 1].slots[targetIdx];
 
-                const rA = nameA.getBoundingClientRect();
-                const rB = nameB.getBoundingClientRect();
-                const rT = nameTarget.getBoundingClientRect();
+                    const isAWinner = targetSlot.name && slotA.name && targetSlot.name === slotA.name;
+                    const isBWinner = targetSlot.name && slotB.name && targetSlot.name === slotB.name;
+                    const isWinner = isAWinner || isBWinner;
 
-                const xA = rA.right - rect.left + gap;
-                const xB = rB.right - rect.left + gap;
-                const xT = rT.left - rect.left - gap;
+                    const mergeX = (xA + xT) / 2;
+                    const midY = (yA + yB) / 2;
 
-                const yA = rA.top + rA.height / 2 - rect.top;
-                const yB = rB.top + rB.height / 2 - rect.top;
-                const yT = rT.top + rT.height / 2 - rect.top;
+                    const winColor = '#ffd13b';
+                    const normColor = 'rgba(255,255,255,0.35)';
+                    const winW = 3;
+                    const normW = 1.5;
 
-                const slotA = t.rounds[roundIdx].slots[slotAIdx];
-                const slotB = t.rounds[roundIdx].slots[slotBIdx];
-                const targetSlot = t.rounds[targetRoundIdx].slots[targetSlotIdx];
-
-                const isAWinner = targetSlot.name && slotA.name && targetSlot.name === slotA.name;
-                const isBWinner = targetSlot.name && slotB.name && targetSlot.name === slotB.name;
-                const isWinner = isAWinner || isBWinner;
-
-                const mergeX = (Math.max(xA, xB) + xT) / 2;
-                const winColor = '#ffd13b';
-                const normColor = 'rgba(255,255,255,0.35)';
-                const winW = 3;
-                const normW = 1.5;
-
-                function addPath(d, color, width, isW) {
-                    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    p.setAttribute('d', d);
-                    p.setAttribute('stroke', color);
-                    p.setAttribute('stroke-width', width);
-                    p.setAttribute('fill', 'none');
-                    p.setAttribute('stroke-linecap', 'round');
-                    p.setAttribute('stroke-linejoin', 'round');
-                    if (isW) p.classList.add('winner-path');
-                    else p.classList.add('default-path');
-                    svg.appendChild(p);
-                }
-
-                addPath(`M ${xA} ${yA} H ${mergeX}`, isAWinner ? winColor : normColor, isAWinner ? winW : normW, isAWinner);
-                addPath(`M ${xB} ${yB} H ${mergeX}`, isBWinner ? winColor : normColor, isBWinner ? winW : normW, isBWinner);
-                const topY = Math.min(yA, yB);
-                const botY = Math.max(yA, yB);
-                addPath(`M ${mergeX} ${topY} V ${botY}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
-                addPath(`M ${mergeX} ${(yA + yB) / 2} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW : normW,
-                    isWinner);
-            }
-
-            // Left side
-            for (let r = 0; r < leftRounds; r++) {
-                const pairs = t.rounds[r].slots.length / 2;
-                const halfPairs = pairs / 2;
-                for (let m = 0; m < halfPairs; m++) {
-                    drawConnection(m * 2, m * 2 + 1, r, m, r + 1, 'left');
+                    addConnectorPath(svg, `M ${xA} ${yA} H ${mergeX}`, isAWinner ? winColor : normColor, isAWinner ? winW : normW, isAWinner);
+                    addConnectorPath(svg, `M ${xB} ${yB} H ${mergeX}`, isBWinner ? winColor : normColor, isBWinner ? winW : normW, isBWinner);
+                    const topY = Math.min(yA, yB);
+                    const botY = Math.max(yA, yB);
+                    addConnectorPath(svg, `M ${mergeX} ${topY} V ${botY}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
+                    addConnectorPath(svg, `M ${mergeX} ${midY} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW : normW, isWinner);
                 }
             }
 
-            // Right side
-            for (let r = leftRounds - 1; r >= 0; r--) {
-                const pairs = t.rounds[r].slots.length / 2;
-                const halfPairs = pairs / 2;
-                for (let m = halfPairs; m < pairs; m++) {
-                    drawConnection(m * 2, m * 2 + 1, r, m, r + 1, 'right');
-                }
+            // 2. Connect Left Final & Right Final to Central Champion Box
+            const finalRoundIdx = bracketRoundsCount - 1;
+            const champRoundIdx = bracketRoundsCount;
+
+            const leftFinalEl = document.querySelector(`[data-round="${finalRoundIdx}"][data-slot="0"][data-side="left"]`);
+            const rightFinalEl = document.querySelector(`[data-round="${finalRoundIdx}"][data-slot="1"][data-side="right"]`);
+            const champEl = document.getElementById('champion-slot-container');
+
+            if (leftFinalEl && champEl) {
+                const rLF = leftFinalEl.getBoundingClientRect();
+                const rC = champEl.getBoundingClientRect();
+                const xLF = rLF.right - rect.left + 4;
+                const xC_L = rC.left - rect.left - 4;
+                const yLF = rLF.top + rLF.height / 2 - rect.top;
+                const yC = rC.top + rC.height / 2 - rect.top;
+
+                const leftFinalSlot = t.rounds[finalRoundIdx].slots[0];
+                const champSlot = t.rounds[champRoundIdx].slots[0];
+                const isWinner = champSlot.name && leftFinalSlot.name && champSlot.name === leftFinalSlot.name;
+
+                addConnectorPath(svg, `M ${xLF} ${yLF} H ${xC_L} V ${yC}`, isWinner ? '#ffd13b' : 'rgba(255,255,255,0.35)', isWinner ? 3 : 1.5, isWinner);
             }
 
-            // Final → Champion (curved connections)
-            if (leftRounds >= 0) {
-                const finalR = totalRounds - 2;
-                const championR = totalRounds - 1;
-                const finalSlots = t.rounds[finalR].slots;
-                if (finalSlots.length >= 2) {
-                    const champSlot = t.rounds[championR].slots[0];
-                    const elFinal0 = document.querySelector(`[data-round="${finalR}"][data-slot="0"]`);
-                    const elFinal1 = document.querySelector(`[data-round="${finalR}"][data-slot="1"]`);
-                    const elChamp = document.getElementById('champion-slot-container') ||
-                        document.querySelector(`[data-round="${championR}"][data-slot="0"][data-side="center"]`);
+            if (rightFinalEl && champEl) {
+                const rRF = rightFinalEl.getBoundingClientRect();
+                const rC = champEl.getBoundingClientRect();
+                const xRF = rRF.left - rect.left - 4;
+                const xC_R = rC.right - rect.left + 4;
+                const yRF = rRF.top + rRF.height / 2 - rect.top;
+                const yC = rC.top + rC.height / 2 - rect.top;
 
-                    if (elFinal0 && elFinal1 && elChamp) {
-                        const nameA = elFinal0.querySelector('.name-input');
-                        const nameB = elFinal1.querySelector('.name-input');
-                        const nameT = elChamp.querySelector('.name-input');
-                        if (nameA && nameB && nameT) {
-                            const rA = nameA.getBoundingClientRect();
-                            const rB = nameB.getBoundingClientRect();
-                            const rT = nameT.getBoundingClientRect();
-                            const xA = rA.right - rect.left + gap;
-                            const xB = rB.right - rect.left + gap;
-                            const xT = rT.left - rect.left - gap;
-                            const yA = rA.top + rA.height / 2 - rect.top;
-                            const yB = rB.top + rB.height / 2 - rect.top;
-                            const yT = rT.top + rT.height / 2 - rect.top;
+                const rightFinalSlot = t.rounds[finalRoundIdx].slots[1];
+                const champSlot = t.rounds[champRoundIdx].slots[0];
+                const isWinner = champSlot.name && rightFinalSlot.name && champSlot.name === rightFinalSlot.name;
 
-                            const slotA = finalSlots[0];
-                            const slotB = finalSlots[1];
-                            const isAWinner = champSlot.name && slotA.name && champSlot.name === slotA.name;
-                            const isBWinner = champSlot.name && slotB.name && champSlot.name === slotB.name;
-                            const winColor = '#ffd13b';
-                            const normColor = 'rgba(255,255,255,0.35)';
-                            const winW = 3;
-                            const normW = 1.5;
-
-                            function addPath2(d, color, width, isW) {
-                                const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                                p.setAttribute('d', d);
-                                p.setAttribute('stroke', color);
-                                p.setAttribute('stroke-width', width);
-                                p.setAttribute('fill', 'none');
-                                p.setAttribute('stroke-linecap', 'round');
-                                if (isW) p.classList.add('winner-path');
-                                else p.classList.add('default-path');
-                                svg.appendChild(p);
-                            }
-
-                            const midX1 = (xA + xT) / 2;
-                            const midX2 = (xB + xT) / 2;
-                            addPath2(`M ${xA} ${yA} C ${midX1} ${yA}, ${midX1} ${yT}, ${xT} ${yT}`, isAWinner ? winColor :
-                                normColor, isAWinner ? winW : normW, isAWinner);
-                            addPath2(`M ${xB} ${yB} C ${midX2} ${yB}, ${midX2} ${yT}, ${xT} ${yT}`, isBWinner ? winColor :
-                                normColor, isBWinner ? winW : normW, isBWinner);
-                        }
-                    }
-                }
+                addConnectorPath(svg, `M ${xRF} ${yRF} H ${xC_R} V ${yC}`, isWinner ? '#ffd13b' : 'rgba(255,255,255,0.35)', isWinner ? 3 : 1.5, isWinner);
             }
+        }
+
+        function addConnectorPath(svg, d, color, width, isWinner) {
+            const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('d', d);
+            p.setAttribute('stroke', color);
+            p.setAttribute('stroke-width', width);
+            p.setAttribute('fill', 'none');
+            p.setAttribute('stroke-linecap', 'round');
+            p.setAttribute('stroke-linejoin', 'round');
+            if (isWinner) {
+                p.classList.add('winner-path');
+            } else {
+                p.classList.add('default-path');
+            }
+            svg.appendChild(p);
         }
 
         // ──────────────────────────────────────────────────────────────
@@ -2662,69 +1876,27 @@
             });
 
             let pairs = [];
-
             if (numGroups === 4 && qualifiersPerGroup === 4) {
-                const A = groupPositions["Group A"] || [];
-                const B = groupPositions["Group B"] || [];
-                const C = groupPositions["Group C"] || [];
-                const D = groupPositions["Group D"] || [];
-                pairs = [
-                    [A[0], D[3]],
-                    [C[3], B[0]],
-                    [A[1], D[2]],
-                    [C[2], B[1]],
-                    [A[2], D[1]],
-                    [C[1], B[2]],
-                    [A[3], D[0]],
-                    [C[0], B[3]]
-                ];
+                const A = groupPositions["Group A"] || [], B = groupPositions["Group B"] || [], C = groupPositions["Group C"] || [], D = groupPositions["Group D"] || [];
+                pairs = [[A[0], D[3]], [C[3], B[0]], [A[1], D[2]], [C[2], B[1]], [A[2], D[1]], [C[1], B[2]], [A[3], D[0]], [C[0], B[3]]];
             } else if (numGroups === 4 && qualifiersPerGroup === 2) {
-                const A = groupPositions["Group A"] || [];
-                const B = groupPositions["Group B"] || [];
-                const C = groupPositions["Group C"] || [];
-                const D = groupPositions["Group D"] || [];
-                pairs = [
-                    [A[0], D[1]],
-                    [C[1], B[0]],
-                    [A[1], D[0]],
-                    [C[0], B[1]]
-                ];
+                const A = groupPositions["Group A"] || [], B = groupPositions["Group B"] || [], C = groupPositions["Group C"] || [], D = groupPositions["Group D"] || [];
+                pairs = [[A[0], D[1]], [C[1], B[0]], [A[1], D[0]], [C[0], B[1]]];
             } else if (numGroups === 2 && qualifiersPerGroup === 4) {
-                const A = groupPositions["Group A"] || [];
-                const B = groupPositions["Group B"] || [];
-                pairs = [
-                    [A[0], B[3]],
-                    [A[1], B[2]],
-                    [A[2], B[1]],
-                    [A[3], B[0]]
-                ];
+                const A = groupPositions["Group A"] || [], B = groupPositions["Group B"] || [];
+                pairs = [[A[0], B[3]], [A[1], B[2]], [A[2], B[1]], [A[3], B[0]]];
             } else if (numGroups === 2 && qualifiersPerGroup === 2) {
-                const A = groupPositions["Group A"] || [];
-                const B = groupPositions["Group B"] || [];
-                pairs = [
-                    [A[0], B[1]],
-                    [A[1], B[0]]
-                ];
+                const A = groupPositions["Group A"] || [], B = groupPositions["Group B"] || [];
+                pairs = [[A[0], B[1]], [A[1], B[0]]];
             } else {
-                alert("Unsupported group/qualifier configuration. Please use one of the defined scenarios.");
+                alert("Unsupported group/qualifier configuration.");
                 return;
             }
-
-            pairs = pairs.filter(pair => pair[0] && pair[1]);
 
             const orderedTeams = [];
-            pairs.forEach(pair => {
-                orderedTeams.push(pair[0]);
-                orderedTeams.push(pair[1]);
-            });
+            pairs.forEach(pair => { orderedTeams.push(pair[0]); orderedTeams.push(pair[1]); });
 
-            const count = orderedTeams.length;
-            if ((count & (count - 1)) !== 0) {
-                alert("Total number of qualified teams is not a power of 2. Please check group settings.");
-                return;
-            }
-
-            const rounds = buildKnockoutRoundsFromOrder(orderedTeams);
+            const rounds = buildInitialKnockoutRounds(orderedTeams);
             if (!rounds) return;
 
             t.rounds = rounds;
@@ -2734,31 +1906,61 @@
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  BUILD INITIAL KNOCKOUT ROUNDS (direct)
+        //  CELEBRATION / CONFETTI
         // ──────────────────────────────────────────────────────────────
-        function buildInitialKnockoutRounds(contenders) {
-            const count = contenders.length;
-            if ((count & (count - 1)) !== 0) {
-                alert("Number of teams must be a power of 2 for a balanced bracket.");
-                return null;
+        function celebrate() {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const colors = ['#ffd13b', '#ffffff', '#e5b800', '#f39c12', '#f1c40f'];
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 4,
+                    d: Math.random() * 150,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleIncremental: Math.random() * 0.07 + 0.05,
+                    tiltAngle: 0
+                });
             }
-            const roundsCount = Math.log2(count);
-            const seeded = [...contenders];
-            let rounds = [];
-            for (let r = 0; r < roundsCount; r++) {
-                const slotsInRound = count / Math.pow(2, r);
-                let roundSlots = [];
-                for (let s = 0; s < slotsInRound; s++) {
-                    roundSlots.push({ name: r === 0 ? seeded[s] : "", scoreLeg1: "", scoreLeg2: "", isWinner: false });
+
+            let animationFrame;
+            let counter = 0;
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r / 2;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                    ctx.stroke();
+
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                    p.tilt = Math.sin(p.tiltAngle) * 15;
                 }
-                rounds.push({ roundIndex: r, title: getRoundTitle(r, roundsCount), slots: roundSlots });
+                counter++;
+                if (counter < 250) {
+                    animationFrame = requestAnimationFrame(draw);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
             }
-            rounds.push({ roundIndex: roundsCount, title: "Champion", slots: [{ name: "", isWinner: false }] });
-            return rounds;
+            draw();
         }
 
         // ──────────────────────────────────────────────────────────────
-        //  BACKUP
+        //  BACKUP & RESTORE
         // ──────────────────────────────────────────────────────────────
         function downloadBackup() {
             const data = JSON.stringify(tournaments, null, 2);
@@ -2781,127 +1983,15 @@
                     if (Array.isArray(data)) {
                         tournaments = data;
                         saveTournamentsToStorage();
-                        goHome();
                         alert('Backup restored successfully!');
-                    } else {
-                        alert('Invalid backup file.');
+                        goHome();
                     }
                 } catch (err) {
-                    alert('Error reading backup file.');
+                    alert('Invalid JSON backup file.');
                 }
             };
             reader.readAsText(file);
-            event.target.value = '';
         }
-
-        // ──────────────────────────────────────────────────────────────
-        //  CONFETTI
-        // ──────────────────────────────────────────────────────────────
-        const canvas = document.getElementById('confetti-canvas');
-        const ctx = canvas.getContext('2d');
-        let animId = null,
-            confettiParticles = [];
-
-        function resizeCanvas() { canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class ConfettiParticle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * -100 - 20;
-                this.size = Math.random() * 6 + 4;
-                this.speedY = Math.random() * 3 + 3;
-                this.speedX = Math.random() * 2 - 1;
-                this.color = ['#ffd13b', '#fff9e6', '#b58d10', '#8e7323', '#3b82f6', '#fff'][Math.floor(Math.random() * 6)];
-                this.rotation = Math.random() * 360;
-                this.rotSpeed = Math.random() * 4 - 2;
-                this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
-            }
-            update() { this.y += this.speedY;
-                this.x += this.speedX + Math.sin(this.y / 30) * 0.4;
-                this.rotation += this.rotSpeed; }
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate((this.rotation * Math.PI) / 180);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = 0.85;
-                if (this.shape === 'rect') ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size * 0.6);
-                else { ctx.beginPath();
-                    ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
-                    ctx.fill(); }
-                ctx.restore();
-            }
-        }
-
-        function celebrate() {
-            confettiParticles = [];
-            for (let i = 0; i < 150; i++) confettiParticles.push(new ConfettiParticle());
-            if (animId) cancelAnimationFrame(animId);
-            animateConfetti();
-            setTimeout(() => { if (animId) cancelAnimationFrame(animId);
-                ctx.clearRect(0, 0, canvas.width, canvas.height); }, 5000);
-        }
-
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            let active = false;
-            confettiParticles.forEach(p => {
-                if (p.y < canvas.height + 40) { p.update();
-                    p.draw();
-                    active = true; }
-            });
-            if (active) animId = requestAnimationFrame(animateConfetti);
-        }
-
-        // ──────────────────────────────────────────────────────────────
-        //  OBSERVERS
-        // ──────────────────────────────────────────────────────────────
-        const ro = new ResizeObserver(() => {
-            if (activeTournamentId) {
-                const t = tournaments.find(x => x.id === activeTournamentId);
-                if (t && t.rounds) {
-                    renderActiveBracket();
-                    updateConnectors();
-                }
-            }
-        });
-        const viewport = document.getElementById('bracket-viewport');
-        if (viewport) ro.observe(viewport);
-        window.addEventListener('resize', () => {
-            if (activeTournamentId) {
-                const t = tournaments.find(x => x.id === activeTournamentId);
-                if (t && t.rounds) {
-                    renderActiveBracket();
-                    updateConnectors();
-                }
-            }
-        });
-
-        // ──────────────────────────────────────────────────────────────
-        //  INIT
-        // ──────────────────────────────────────────────────────────────
-        window.addEventListener('load', () => {
-            loadTournamentsFromStorage();
-            goHome();
-            updateDistButtons();
-            document.querySelectorAll('.sort-option').forEach(el => {
-                el.classList.toggle('active', el.dataset.sort === currentSort);
-            });
-            document.getElementById('sortLabel').textContent = 'Newest';
-        });
-
-        document.addEventListener('click', function(e) {
-            const wrapper = document.querySelector('.sort-wrapper');
-            if (wrapper && !wrapper.contains(e.target)) {
-                sortMenuOpen = false;
-                document.getElementById('sortMenu').classList.remove('open');
-            }
-        });
-
-        document.addEventListener('touchstart', function() {}, { passive: true });
     </script>
 </body>
 </html>
