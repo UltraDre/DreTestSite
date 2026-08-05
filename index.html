@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Monarchs Tournament Engine</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
@@ -92,7 +91,7 @@
             position: relative;
             width: 100%;
             overflow-x: auto;
-            padding: 20px 0;
+            padding: 60px 0 20px 0;
         }
 
         .bracket-viewport {
@@ -246,7 +245,6 @@
             border: 2px solid #e5c122;
         }
 
-        /* ── FLOATING CHAMPION BOX ── */
         #floating-champion-box {
             position: absolute;
             transform: translateX(-50%);
@@ -991,9 +989,6 @@
     <canvas id="confetti-canvas"></canvas>
 
     <script>
-        // ──────────────────────────────────────────────────────────────
-        //  STATE
-        // ──────────────────────────────────────────────────────────────
         let tournaments = [];
         let activeTournamentId = null;
         let currentFormFormat = 'group';
@@ -1013,9 +1008,6 @@
             "Benfica", "Porto"
         ];
 
-        // ──────────────────────────────────────────────────────────────
-        //  INITIALIZATION & STORAGE
-        // ──────────────────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
             loadTournamentsFromStorage();
             window.addEventListener('resize', updateConnectors);
@@ -1032,9 +1024,6 @@
             renderTournamentListings();
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  SORT LOGIC
-        // ──────────────────────────────────────────────────────────────
         function toggleSortMenu() {
             sortMenuOpen = !sortMenuOpen;
             document.getElementById('sortMenu').classList.toggle('open', sortMenuOpen);
@@ -1074,9 +1063,6 @@
             return arr;
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  NAVIGATION
-        // ──────────────────────────────────────────────────────────────
         function goHome() {
             activeTournamentId = null;
             document.getElementById('home-view').classList.remove('hidden');
@@ -1126,6 +1112,7 @@
                 btnFixtures.classList.add('active');
                 renderActiveFixturesGrid();
             } else if (tab === 'knockout') {
+                document.getElementById('tab-view-[#knockout]').classList?.remove('hidden');
                 document.getElementById('tab-view-knockout').classList.remove('hidden');
                 btnKnockout.classList.add('active');
                 const guard = document.getElementById('knockout-guard-overlay');
@@ -1147,9 +1134,6 @@
             }
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  TOURNAMENT LISTINGS
-        // ──────────────────────────────────────────────────────────────
         function renderTournamentListings() {
             const grid = document.getElementById('tournament-cards-grid');
             grid.innerHTML = '';
@@ -1204,9 +1188,6 @@
             if (activeTournamentId === id) goHome();
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  EDIT PLAYERS MODAL
-        // ──────────────────────────────────────────────────────────────
         function openEditPlayersModal(id, event) {
             if (event) event.stopPropagation();
             editingTournamentId = id;
@@ -1263,9 +1244,6 @@
             if (activeTournamentId === t.id) launchTournament(t.id);
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  FORM HELPERS
-        // ──────────────────────────────────────────────────────────────
         function setFormFormat(fmt) {
             currentFormFormat = fmt;
             const tabKO = document.getElementById('tab-knockout-form');
@@ -1338,9 +1316,6 @@
             updateContendersCount();
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  ROUND ROBIN GENERATOR
-        // ──────────────────────────────────────────────────────────────
         function generateRoundRobinFixtures(teams) {
             if (teams.length < 2) return [];
             let allTeams = [...teams];
@@ -1365,9 +1340,6 @@
             return fixtures;
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  CREATE TOURNAMENT
-        // ──────────────────────────────────────────────────────────────
         function handleCreateTournament() {
             const name = document.getElementById('form-name').value.trim() || "MONARCHS CL 3B";
             const req = getRequiredEntrantCount();
@@ -1460,9 +1432,6 @@
             }
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  RENDER: GROUP STANDINGS & FIXTURES
-        // ──────────────────────────────────────────────────────────────
         function renderActiveGroupStandings() {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.groups) return;
@@ -1592,9 +1561,6 @@
             });
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  KNOCKOUT LOGIC & WINNER TOGGLE
-        // ──────────────────────────────────────────────────────────────
         function toggleWinner(roundIdx, slotIdx) {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.rounds) return;
@@ -1646,14 +1612,10 @@
             updateConnectors();
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  RENDER: INWARD SYMMETRICAL KNOCKOUT BRACKET (NO CHAMPION COLUMN)
-        // ──────────────────────────────────────────────────────────────
         function renderActiveBracket() {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.rounds) return;
             const viewport = document.getElementById('bracket-viewport');
-            // Remove existing columns, keep the champion box
             const championBox = document.getElementById('floating-champion-box');
             viewport.innerHTML = '';
             viewport.appendChild(championBox);
@@ -1754,14 +1716,10 @@
                 viewport.appendChild(col);
             });
 
-            // Update champion box position and data
             updateFloatingChampion();
             requestAnimationFrame(() => updateConnectors());
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  UPDATE FLOATING CHAMPION BOX (MOVED UP MORE)
-        // ──────────────────────────────────────────────────────────────
         function updateFloatingChampion() {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.rounds) return;
@@ -1779,7 +1737,6 @@
 
             if (!championBox) return;
 
-            // Get champion name from data
             const championSlot = t.rounds[totalRounds - 1].slots[0];
             const championName = championSlot ? championSlot.name : '';
             championInput.value = championName || '';
@@ -1789,10 +1746,12 @@
                 const rectRight = rightFinalSlot.getBoundingClientRect();
                 const containerRect = document.getElementById('bracket-container').getBoundingClientRect();
 
-                // Center between the two final slots
+                // Center horizontally between the two final slots
                 const centerX = (rectLeft.right + rectRight.left) / 2 - containerRect.left;
-                // Moved up significantly to avoid covering finalist boxes (-130 instead of -55)
-                const topY = rectLeft.top - containerRect.top - 130;
+                
+                // Positioned champion box elevated significantly higher above the finalists (-210px desktop, -150px mobile)
+                const offsetY = window.innerWidth < 640 ? 150 : 210;
+                const topY = rectLeft.top - containerRect.top - offsetY;
 
                 championBox.style.left = centerX + 'px';
                 championBox.style.top = topY + 'px';
@@ -1810,9 +1769,6 @@
             }
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  SVG CONNECTOR DRAWING (SPLIT INWARD PATHS)
-        // ──────────────────────────────────────────────────────────────
         function updateConnectors() {
             const svg = document.getElementById('connector-svg');
             const container = document.getElementById('bracket-container');
@@ -1830,10 +1786,8 @@
             const totalRounds = t.rounds.length;
             const bracketRoundsCount = totalRounds - 1;
 
-            // Update champion position as well
             updateFloatingChampion();
 
-            // Connect rounds 0 .. bracketRoundsCount-2 (all except final round)
             for (let r = 0; r < bracketRoundsCount - 1; r++) {
                 const slots = t.rounds[r].slots;
                 const matchCount = slots.length / 2;
@@ -1900,7 +1854,6 @@
                         normW, isWinner);
                 }
             }
-            // No connectors for the final round – the floating champion box replaces them.
         }
 
         function addConnectorPath(svg, d, color, width, isWinner) {
@@ -1919,9 +1872,6 @@
             svg.appendChild(p);
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  ADVANCE GROUP QUALIFIERS → KNOCKOUT
-        // ──────────────────────────────────────────────────────────────
         function advanceGroupQualifiers() {
             const t = tournaments.find(x => x.id === activeTournamentId);
             if (!t || !t.groups) return;
@@ -2007,9 +1957,6 @@
             switchActiveTab('knockout');
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  CELEBRATION / CONFETTI
-        // ──────────────────────────────────────────────────────────────
         function celebrate() {
             const canvas = document.getElementById('confetti-canvas');
             if (!canvas) return;
@@ -2061,9 +2008,6 @@
             draw();
         }
 
-        // ──────────────────────────────────────────────────────────────
-        //  BACKUP & RESTORE
-        // ──────────────────────────────────────────────────────────────
         function downloadBackup() {
             const data = JSON.stringify(tournaments, null, 2);
             const blob = new Blob([data], { type: 'application/json' });
