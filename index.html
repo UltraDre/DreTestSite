@@ -490,16 +490,19 @@
             color: #4b5563;
         }
 
+        /* Speaker text colors — no background */
         .msg-speaker-name .highlight-s1 {
-            color: #b45309;
+            color: #facc15;  /* bright yellow */
+            background: transparent;
             font-weight: 600;
         }
         .msg-speaker-name .highlight-s2 {
-            color: #065f46;
+            color: #34d399;  /* light green */
+            background: transparent;
             font-weight: 600;
         }
 
-        /* Timestamp inside name line — now white with shadow */
+        /* Timestamp inside name line — white with shadow */
         .msg-timestamp-inline {
             color: #ffffff;
             text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
@@ -541,13 +544,14 @@
             word-break: break-word;
         }
 
+        /* UPDATED: Removed yellow background, changed text to yellow for Speaker 1 */
         .msg-text mark {
-            background: #fef3c7;
-            color: #92400e;
+            background: transparent;
+            color: #facc15;
             font-weight: 600;
             padding: 0 2px;
-            border-radius: 3px;
-            transition: background 0.2s, color 0.2s;
+            border-radius: 0px;
+            transition: color 0.2s;
         }
 
         .msg-text mark.speaker2 {
@@ -934,22 +938,25 @@
             .msg-wrapper.sent .msg-speaker-name {
                 color: #8ca3c0;
             }
+            /* Dark mode speaker colors — keep them bright */
             .msg-speaker-name .highlight-s1 {
-                color: #fbbf24;
+                color: #facc15;
+                background: transparent;
             }
             .msg-speaker-name .highlight-s2 {
                 color: #34d399;
+                background: transparent;
             }
 
-            /* Keep timestamp white in dark mode as well */
             .msg-timestamp-inline {
                 color: #ffffff;
                 text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
             }
 
+            /* UPDATED: No yellow background, yellow text in Dark Mode as well */
             .msg-text mark {
-                background: #fef3c7;
-                color: #92400e;
+                background: transparent;
+                color: #facc15;
             }
             .msg-text mark.speaker2 {
                 background: #065f46;
@@ -1049,7 +1056,7 @@
                         &nbsp;·&nbsp; <code>6/6/26, 22:16 - Speaker: text</code>
                         <br>
                         <span class="accent">↳</span> multi‑line merged &nbsp;·&nbsp; <span class="highlight">speaker 1 yellow</span>
-                        &nbsp;·&nbsp; <span class="green">speaker 2 green</span>
+                        &nbsp;·&nbsp; <span class="green">speaker 2 light green</span>
                         &nbsp;·&nbsp; <span style="color:#64748b;">💾 auto‑saved</span>
                     </div>
                 </div>
@@ -1069,7 +1076,7 @@
             </div>
         </div>
 
-        <footer id="mainFooter">dual format · continuation lines · speaker 1 <span style="color:#b45309;font-weight:600;">yellow</span> · speaker 2 <span style="color:#065f46;font-weight:600;">green</span> · select &amp; delete · auto‑persist</footer>
+        <footer id="mainFooter">dual format · continuation lines · speaker 1 <span style="color:#facc15;font-weight:600;">yellow</span> · speaker 2 <span style="color:#34d399;font-weight:600;">light green</span> · select &amp; delete · auto‑persist</footer>
     </div>
 
     <script>
