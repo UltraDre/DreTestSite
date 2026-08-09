@@ -499,19 +499,15 @@
             font-weight: 600;
         }
 
-        /* Timestamp inside name line */
+        /* Timestamp inside name line — now white with shadow */
         .msg-timestamp-inline {
+            color: #ffffff;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
             font-size: 0.6rem;
-            font-weight: 400;
-            color: #8e9aaf;
-            opacity: 0.8;
+            font-weight: 500;
             letter-spacing: 0.2px;
             white-space: nowrap;
             transition: color 0.3s;
-        }
-
-        .msg-wrapper.sent .msg-timestamp-inline {
-            color: #6b7a8f;
         }
 
         /* ── Bubble ── */
@@ -539,7 +535,7 @@
         }
 
         .msg-text {
-            font-size: 0.95rem;  /* increased from 0.82rem */
+            font-size: 0.95rem;
             line-height: 1.5;
             white-space: pre-wrap;
             word-break: break-word;
@@ -945,11 +941,10 @@
                 color: #34d399;
             }
 
+            /* Keep timestamp white in dark mode as well */
             .msg-timestamp-inline {
-                color: #6b7a8f;
-            }
-            .msg-wrapper.sent .msg-timestamp-inline {
-                color: #8ca3c0;
+                color: #ffffff;
+                text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
             }
 
             .msg-text mark {
@@ -1406,7 +1401,7 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
-        // ── RENDER — WHATSAPP STYLE (no avatar, timestamp next to name) ──
+        // ── RENDER — WHATSAPP STYLE (no avatar, timestamp next to name, no "you") ──
         function renderResults(messages, speaker1, speaker2) {
             if (!messages.length) {
                 if (fileLoaded && parsedMessages.length) {
@@ -1496,7 +1491,7 @@
                     const bubbleContainer = document.createElement('div');
                     bubbleContainer.className = 'bubble-container';
 
-                    // ── Speaker name + timestamp inline ──
+                    // ── Speaker name + timestamp inline (no "you") ──
                     const nameEl = document.createElement('div');
                     nameEl.className = 'msg-speaker-name';
 
@@ -1513,7 +1508,6 @@
                         nameEl.innerHTML = `
                             <span class="highlight-s1">${escapeHtml(displayName)}</span>
                             <span class="msg-timestamp-inline">${timeStr}</span>
-                            <span style="font-weight:400;opacity:0.6;font-size:0.6rem;">· you</span>
                         `;
                     } else {
                         const displayName = msg.speaker;
@@ -1536,13 +1530,10 @@
                     bubbleContainer.appendChild(bubble);
 
                     // ── Assemble ──
-                    // No avatar
                     if (!isSent) {
-                        // received: checkbox on left, then bubbleContainer
                         wrapper.appendChild(cbWrap);
                         wrapper.appendChild(bubbleContainer);
                     } else {
-                        // sent: bubbleContainer then checkbox on right
                         wrapper.appendChild(bubbleContainer);
                         wrapper.appendChild(cbWrap);
                     }
@@ -1819,7 +1810,7 @@
         else mainFooter?.classList.remove('hide-footer');
 
         window.addEventListener('beforeunload', () => saveState());
-        console.log('⌕ log search ready · WhatsApp UI (no avatar, timestamp next to name)');
+        console.log('⌕ log search ready · WhatsApp UI (no avatar, timestamp next to name, no "you")');
     </script>
 </body>
 </html>
