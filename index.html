@@ -306,7 +306,7 @@
             color: #065f46;
         }
 
-        /* ── RESULTS — WHATSAPP STYLE ── */
+        /* ── RESULTS — WHATSAPP STYLE (no avatar) ── */
         .results-raw {
             width: 100%;
             flex: 1;
@@ -320,7 +320,6 @@
             position: relative;
         }
 
-        /* WhatsApp-like chat background pattern */
         .results-raw::before {
             content: '';
             position: absolute;
@@ -395,7 +394,6 @@
             transform: none;
         }
 
-        /* ── Message list (chat) ── */
         .message-list {
             flex: 1;
             overflow-y: auto;
@@ -448,32 +446,9 @@
             padding-right: 50px;
         }
 
-        /* ── Avatar ── */
+        /* ── No avatar ── */
         .msg-avatar {
-            flex-shrink: 0;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: #fff;
-            background: #6b7280;
-            user-select: none;
-            margin-bottom: 2px;
-            transition: background 0.3s;
-        }
-
-        .msg-avatar.speaker1-avatar {
-            background: #b45309;
-        }
-        .msg-avatar.speaker2-avatar {
-            background: #065f46;
-        }
-        .msg-avatar.dark-avatar {
-            background: #4b5563;
+            display: none;
         }
 
         /* ── Bubble container ── */
@@ -492,13 +467,17 @@
             align-items: flex-start;
         }
 
-        /* ── Speaker name ── */
+        /* ── Speaker name + timestamp ── */
         .msg-speaker-name {
-            font-size: 0.65rem;
-            font-weight: 600;
+            font-size: 0.7rem;
+            font-weight: 500;
             padding: 0 4px 2px 4px;
             color: #6b7280;
             transition: color 0.3s;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .msg-wrapper.received .msg-speaker-name {
@@ -507,15 +486,32 @@
 
         .msg-wrapper.sent .msg-speaker-name {
             padding-right: 0;
-            text-align: right;
+            justify-content: flex-end;
             color: #4b5563;
         }
 
         .msg-speaker-name .highlight-s1 {
             color: #b45309;
+            font-weight: 600;
         }
         .msg-speaker-name .highlight-s2 {
             color: #065f46;
+            font-weight: 600;
+        }
+
+        /* Timestamp inside name line */
+        .msg-timestamp-inline {
+            font-size: 0.6rem;
+            font-weight: 400;
+            color: #8e9aaf;
+            opacity: 0.8;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .msg-wrapper.sent .msg-timestamp-inline {
+            color: #6b7a8f;
         }
 
         /* ── Bubble ── */
@@ -529,14 +525,12 @@
             width: 100%;
         }
 
-        /* Sent (speaker1) — green like WhatsApp */
         .msg-wrapper.sent .bubble {
             background: #d9fdd3;
             color: #1e293b;
             border-bottom-right-radius: 4px;
         }
 
-        /* Received (speaker2) — white like WhatsApp */
         .msg-wrapper.received .bubble {
             background: #ffffff;
             color: #1e293b;
@@ -545,13 +539,12 @@
         }
 
         .msg-text {
-            font-size: 0.82rem;
+            font-size: 0.95rem;  /* increased from 0.82rem */
             line-height: 1.5;
             white-space: pre-wrap;
             word-break: break-word;
         }
 
-        /* ── Highlights inside bubble ── */
         .msg-text mark {
             background: #fef3c7;
             color: #92400e;
@@ -566,24 +559,9 @@
             color: #065f46;
         }
 
-        /* ── Timestamp ── */
+        /* ── No separate timestamp inside bubble ── */
         .msg-timestamp {
-            font-size: 0.55rem;
-            color: #8e9aaf;
-            padding: 2px 4px 0 4px;
-            opacity: 0.8;
-            letter-spacing: 0.2px;
-            white-space: nowrap;
-            transition: color 0.3s;
-        }
-
-        .msg-wrapper.sent .msg-timestamp {
-            text-align: right;
-            padding-right: 2px;
-        }
-        .msg-wrapper.received .msg-timestamp {
-            text-align: left;
-            padding-left: 2px;
+            display: none;
         }
 
         /* ── Checkbox ── */
@@ -627,10 +605,6 @@
         .msg-wrapper.received .msg-checkbox-wrap {
             order: 0;
             margin-right: 6px;
-        }
-
-        .msg-wrapper.sent .msg-avatar {
-            display: none;
         }
 
         /* ── Selected state ── */
@@ -738,16 +712,14 @@
             .msg-wrapper.received {
                 padding-right: 20px;
             }
-            .msg-avatar {
-                width: 28px;
-                height: 28px;
-                font-size: 0.55rem;
-            }
             .msg-text {
-                font-size: 0.78rem;
+                font-size: 0.9rem;
             }
-            .msg-timestamp {
-                font-size: 0.5rem;
+            .msg-speaker-name {
+                font-size: 0.65rem;
+            }
+            .msg-timestamp-inline {
+                font-size: 0.55rem;
             }
             .results-header {
                 padding: 10px 14px;
@@ -784,13 +756,11 @@
             .msg-wrapper.received {
                 padding-right: 6px;
             }
-            .msg-avatar {
-                width: 24px;
-                height: 24px;
-                font-size: 0.5rem;
-            }
             .message-list {
                 padding: 8px 8px 12px 8px;
+            }
+            .msg-text {
+                font-size: 0.85rem;
             }
         }
 
@@ -951,13 +921,11 @@
                 color: #9ca3af;
             }
 
-            /* Sent (speaker1) — dark */
             .msg-wrapper.sent .bubble {
                 background: #075e54;
                 color: #e2e8f0;
             }
 
-            /* Received (speaker2) — dark */
             .msg-wrapper.received .bubble {
                 background: #1e293b;
                 color: #e2e8f0;
@@ -977,8 +945,11 @@
                 color: #34d399;
             }
 
-            .msg-timestamp {
+            .msg-timestamp-inline {
                 color: #6b7a8f;
+            }
+            .msg-wrapper.sent .msg-timestamp-inline {
+                color: #8ca3c0;
             }
 
             .msg-text mark {
@@ -1018,19 +989,6 @@
             .empty-state code {
                 background: rgba(255, 255, 255, 0.06);
                 color: #cbd5e1;
-            }
-
-            .msg-avatar.speaker1-avatar {
-                background: #fbbf24;
-                color: #0f172a;
-            }
-            .msg-avatar.speaker2-avatar {
-                background: #34d399;
-                color: #0f172a;
-            }
-            .msg-avatar.dark-avatar {
-                background: #4b5563;
-                color: #e2e8f0;
             }
 
             footer {
@@ -1102,7 +1060,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: RESULTS — WHATSAPP STYLE -->
+            <!-- TAB 2: RESULTS — WHATSAPP STYLE (no avatar) -->
             <div class="tab-panel" id="resultsPanel">
                 <div class="results-raw">
                     <div class="results-header">
@@ -1448,7 +1406,7 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
-        // ── RENDER — WHATSAPP STYLE ──
+        // ── RENDER — WHATSAPP STYLE (no avatar, timestamp next to name) ──
         function renderResults(messages, speaker1, speaker2) {
             if (!messages.length) {
                 if (fileLoaded && parsedMessages.length) {
@@ -1496,7 +1454,6 @@
                 frag.appendChild(div);
 
                 const msgs = groups[key];
-                // sort by time within the day
                 msgs.sort((a, b) => a.fullTimestamp - b.fullTimestamp);
 
                 for (let i = 0; i < msgs.length; i++) {
@@ -1504,21 +1461,15 @@
                     const isSpeaker1 = s1 && msg.speakerLower === s1.toLowerCase();
                     const isSpeaker2 = s2 && msg.speakerLower === s2.toLowerCase();
 
-                    // Determine alignment: speaker1 = sent (right), speaker2 = received (left)
-                    // If only speaker1 is set, all messages are sent (right)
                     let isSent = false;
                     if (s1 && s2) {
                         isSent = isSpeaker1;
                     } else if (s1 && !s2) {
                         isSent = isSpeaker1;
                     } else {
-                        // fallback: if no speaker match, treat as received
                         isSent = false;
                     }
-
-                    // If speaker1 is set but this message is from speaker2, it's received
                     if (s1 && s2 && isSpeaker2) isSent = false;
-                    // If only speaker1 is set, all messages are from speaker1 → sent
                     if (s1 && !s2) isSent = true;
 
                     const wrapper = document.createElement('div');
@@ -1541,31 +1492,35 @@
                     });
                     cbWrap.appendChild(cb);
 
-                    // ── Avatar (only for received) ──
-                    let avatar = null;
-                    if (!isSent) {
-                        avatar = document.createElement('div');
-                        avatar.className = 'msg-avatar speaker2-avatar';
-                        const initials = msg.speaker.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        avatar.textContent = initials || '?';
-                        // In dark mode we use a different style but the class handles it
-                    }
-
                     // ── Bubble container ──
                     const bubbleContainer = document.createElement('div');
                     bubbleContainer.className = 'bubble-container';
 
-                    // ── Speaker name ──
+                    // ── Speaker name + timestamp inline ──
                     const nameEl = document.createElement('div');
                     nameEl.className = 'msg-speaker-name';
+
+                    // Format time for inline display: HH:MM
+                    const timeParts = msg.rawTime ? msg.rawTime.split(':') : ['00', '00'];
+                    let hh = timeParts[0] || '00',
+                        mm = timeParts[1] || '00';
+                    if (hh.length === 1) hh = '0' + hh;
+                    if (mm.length === 1) mm = '0' + mm;
+                    const timeStr = `${hh}:${mm}`;
+
                     if (isSent) {
-                        // For sent, show "You" or the speaker name with highlight
                         const displayName = s1 || msg.speaker;
-                        nameEl.innerHTML =
-                            `<span class="highlight-s1">${escapeHtml(displayName)}</span> <span style="font-weight:400;opacity:0.6;">· you</span>`;
+                        nameEl.innerHTML = `
+                            <span class="highlight-s1">${escapeHtml(displayName)}</span>
+                            <span class="msg-timestamp-inline">${timeStr}</span>
+                            <span style="font-weight:400;opacity:0.6;font-size:0.6rem;">· you</span>
+                        `;
                     } else {
                         const displayName = msg.speaker;
-                        nameEl.innerHTML = `<span class="highlight-s2">${escapeHtml(displayName)}</span>`;
+                        nameEl.innerHTML = `
+                            <span class="highlight-s2">${escapeHtml(displayName)}</span>
+                            <span class="msg-timestamp-inline">${timeStr}</span>
+                        `;
                     }
                     bubbleContainer.appendChild(nameEl);
 
@@ -1578,122 +1533,29 @@
                     txt.innerHTML = highlightText(msg.message, s1, s2);
                     bubble.appendChild(txt);
 
-                    // ── Timestamp ──
-                    const ts = document.createElement('div');
-                    ts.className = 'msg-timestamp';
-                    // Format time: HH:MM
-                    const timeParts = msg.rawTime ? msg.rawTime.split(':') : ['00', '00'];
-                    let hh = timeParts[0] || '00';
-                    let mm = timeParts[1] || '00';
-                    if (hh.length === 1) hh = '0' + hh;
-                    if (mm.length === 1) mm = '0' + mm;
-                    ts.textContent = `${hh}:${mm}`;
-                    bubble.appendChild(ts);
-
                     bubbleContainer.appendChild(bubble);
 
                     // ── Assemble ──
-                    if (!isSent && avatar) wrapper.appendChild(avatar);
-                    wrapper.appendChild(bubbleContainer);
-                    // Checkbox goes on the outer edge
-                    if (isSent) {
-                        // sent: checkbox on right
-                        wrapper.appendChild(cbWrap);
-                    } else {
-                        // received: checkbox on left (after avatar, before bubble)
-                        // But we need to insert it after avatar, before bubbleContainer
-                        // Since we already appended avatar and bubbleContainer, we need to reorder
-                        // Let's rebuild the wrapper in the right order
-                        // Actually, let's just rebuild the wrapper cleanly
-                    }
-
-                    // Clean rebuild for proper order
-                    // Since we already built it, let's just clear and rebuild properly
-                    // I'll use a cleaner approach: rebuild the wrapper from scratch
-                    const newWrapper = document.createElement('div');
-                    newWrapper.className = `msg-wrapper ${isSent ? 'sent' : 'received'}`;
-
-                    // Checkbox
-                    const cbWrap2 = document.createElement('div');
-                    cbWrap2.className = 'msg-checkbox-wrap';
-                    const cb2 = document.createElement('input');
-                    cb2.type = 'checkbox';
-                    cb2.className = 'msg-select';
-                    cb2.checked = false;
-                    cb2.addEventListener('change', (e) => {
-                        if (e.target.checked) { selectedMessages.add(msg);
-                            newWrapper.classList.add('selected'); } else { selectedMessages.delete(msg);
-                            newWrapper.classList.remove('selected'); }
-                        updateDeleteButtonVisibility();
-                        saveState();
-                    });
-                    cbWrap2.appendChild(cb2);
-
-                    // Avatar (received only)
-                    let avatar2 = null;
+                    // No avatar
                     if (!isSent) {
-                        avatar2 = document.createElement('div');
-                        avatar2.className = 'msg-avatar speaker2-avatar';
-                        const initials2 = msg.speaker.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-                        avatar2.textContent = initials2 || '?';
-                    }
-
-                    // Bubble container
-                    const bc2 = document.createElement('div');
-                    bc2.className = 'bubble-container';
-
-                    // Speaker name
-                    const nameEl2 = document.createElement('div');
-                    nameEl2.className = 'msg-speaker-name';
-                    if (isSent) {
-                        const displayName2 = s1 || msg.speaker;
-                        nameEl2.innerHTML =
-                            `<span class="highlight-s1">${escapeHtml(displayName2)}</span> <span style="font-weight:400;opacity:0.6;">· you</span>`;
+                        // received: checkbox on left, then bubbleContainer
+                        wrapper.appendChild(cbWrap);
+                        wrapper.appendChild(bubbleContainer);
                     } else {
-                        const displayName2 = msg.speaker;
-                        nameEl2.innerHTML = `<span class="highlight-s2">${escapeHtml(displayName2)}</span>`;
+                        // sent: bubbleContainer then checkbox on right
+                        wrapper.appendChild(bubbleContainer);
+                        wrapper.appendChild(cbWrap);
                     }
-                    bc2.appendChild(nameEl2);
-
-                    // Bubble
-                    const bubble2 = document.createElement('div');
-                    bubble2.className = 'bubble';
-                    const txt2 = document.createElement('div');
-                    txt2.className = 'msg-text';
-                    txt2.innerHTML = highlightText(msg.message, s1, s2);
-                    bubble2.appendChild(txt2);
-
-                    const ts2 = document.createElement('div');
-                    ts2.className = 'msg-timestamp';
-                    const tp2 = msg.rawTime ? msg.rawTime.split(':') : ['00', '00'];
-                    let hh2 = tp2[0] || '00',
-                        mm2 = tp2[1] || '00';
-                    if (hh2.length === 1) hh2 = '0' + hh2;
-                    if (mm2.length === 1) mm2 = '0' + mm2;
-                    ts2.textContent = `${hh2}:${mm2}`;
-                    bubble2.appendChild(ts2);
-                    bc2.appendChild(bubble2);
-
-                    // Assemble in correct order
-                    if (!isSent && avatar2) newWrapper.appendChild(avatar2);
-                    // For received: checkbox on left, after avatar
-                    if (!isSent) newWrapper.appendChild(cbWrap2);
-                    newWrapper.appendChild(bc2);
-                    // For sent: checkbox on right
-                    if (isSent) newWrapper.appendChild(cbWrap2);
 
                     // Restore selection state
                     const saved = loadState();
                     if (saved && saved.selectedIds && saved.selectedIds.includes(getMessageId(msg))) {
-                        cb2.checked = true;
-                        newWrapper.classList.add('selected');
+                        cb.checked = true;
+                        wrapper.classList.add('selected');
                         selectedMessages.add(msg);
                     }
 
-                    // Store reference to the checkbox for later updates
-                    newWrapper._checkbox = cb2;
-
-                    frag.appendChild(newWrapper);
+                    frag.appendChild(wrapper);
                 }
             }
 
@@ -1957,7 +1819,7 @@
         else mainFooter?.classList.remove('hide-footer');
 
         window.addEventListener('beforeunload', () => saveState());
-        console.log('⌕ log search ready · WhatsApp UI');
+        console.log('⌕ log search ready · WhatsApp UI (no avatar, timestamp next to name)');
     </script>
 </body>
 </html>
