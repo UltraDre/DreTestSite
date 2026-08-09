@@ -2,2116 +2,1962 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Monarchs Tournament Engine</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>log · search</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-
-        html,
-        body {
-            width: 100%;
-            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0d0f1a;
-            background-image: radial-gradient(circle at 10% 20%, rgba(16, 24, 48, 0.45) 0%, transparent 50%),
-                radial-gradient(circle at 90% 80%, rgba(124, 99, 26, 0.12) 0%, transparent 60%),
-                linear-gradient(to bottom, #0d0f1a, #080a12);
-            color: #fff;
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 1.6rem 1.2rem;
+            color: #0f172a;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 0 12px;
-            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s, color 0.2s;
         }
 
-        ::-webkit-scrollbar {
-            height: 8px;
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0d0f1a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #7c631a;
-            border-radius: 6px;
-            border: 1px solid #0d0f1a;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ffd13b;
-        }
-
-        .glass-card {
-            background: rgba(20, 24, 43, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 215, 0, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
-        }
-
-        #connector-svg {
-            position: absolute;
-            inset: 0;
+        .app {
+            max-width: 1000px;
+            margin: 0 auto;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-            overflow: visible;
-        }
-
-        #connector-svg path {
-            transition: stroke 0.4s ease, stroke-width 0.3s ease, opacity 0.4s ease;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        #connector-svg path.winner-path {
-            filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.35));
-            stroke: #ffd13b;
-            stroke-width: 3px;
-        }
-
-        #connector-svg path.default-path {
-            stroke: rgba(255, 255, 255, 0.35);
-            stroke-width: 1.5px;
-        }
-
-        .bracket-wrapper {
-            position: relative;
-            width: 100%;
-            overflow-x: auto;
-            padding: 60px 0 20px 0;
-            min-height: 550px;
-        }
-
-        .bracket-viewport {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            justify-content: center;
-            gap: 48px;
-            /* significantly increased gap for more breathing room */
-            min-width: 700px;
-            min-height: 750px;
-            position: relative;
-        }
-
-        .bracket-col {
-            flex: 0 1 150px;
-            min-width: 115px;
-            position: relative;
-            padding: 0 3px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .bracket-col .col-title {
-            text-align: center;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 0.25em;
-            color: rgba(255, 255, 255, 0.35);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            flex-shrink: 0;
-        }
-
-        .match-pair {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin: auto 0;
-        }
-
-        .slot {
-            display: flex;
-            align-items: center;
-            gap: 0px;
-            flex-shrink: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 10;
-            cursor: default;
-        }
-
-        .slot-left {
-            flex-direction: row;
-        }
-
-        .slot-right {
-            flex-direction: row-reverse;
-        }
-
-        .name-input {
-            width: 120px;
-            height: 34px;
-            padding: 0 10px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            background: #ffffff;
-            color: #0d0f1a;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-            flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-            cursor: pointer;
-        }
-
-        .slot-left .name-input {
-            border-radius: 9999px 0 0 9999px;
-            text-align: left;
-        }
-
-        .slot-right .name-input {
-            border-radius: 0 9999px 9999px 0;
-            text-align: right;
-        }
-
-        .name-input::placeholder {
-            color: #888888;
-            font-weight: 700;
-        }
-        .name-input:hover {
-            filter: brightness(0.92);
-        }
-        .name-input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(255, 209, 59, 0.3);
-        }
-
-        .name-input.winner-name {
-            border: 2px solid #ffd13b;
-            box-shadow: 0 0 18px rgba(255, 215, 0, 0.35);
-            background: #fffbe6;
-            cursor: pointer;
-        }
-
-        .score-input {
-            width: 28px;
-            height: 34px;
-            font-size: 12px;
-            font-weight: 900;
-            text-align: center;
-            border: none;
-            background: #ffd13b;
-            color: #0d0f1a;
-            flex-shrink: 0;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .score-input:focus {
-            outline: none;
-            filter: brightness(1.1);
-        }
-
-        .score-input.score-dark {
-            background: #e5b800;
-            color: #0d0f1a;
-        }
-
-        .score-input.score-gold {
-            background: #ffd13b;
-            color: #0d0f1a;
-        }
-
-        .slot-left .score-last {
-            border-radius: 0 9999px 9999px 0;
-        }
-
-        .slot-right .score-last {
-            border-radius: 9999px 0 0 9999px;
-        }
-
-        .slot.winner-slot .name-input {
-            box-shadow: 0 0 15px rgba(229, 193, 34, 0.45);
-            border: 2px solid #e5c122;
-        }
-
-        #floating-champion-box {
-            position: absolute;
-            transform: translateX(-50%);
-            z-index: 20;
-            width: 190px;
-            padding: 12px 16px;
-            border-radius: 24px;
-            background: rgba(13, 15, 26, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1.5px solid #ffd13b;
-            box-shadow: 0 0 50px rgba(255, 209, 59, 0.15), inset 0 0 30px rgba(255, 215, 0, 0.02);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        #floating-champion-box .trophy-svg {
-            width: 38px;
-            height: 38px;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.40));
-            animation: float 4s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-
-        #floating-champion-box .champion-name-input {
-            width: 100%;
-            height: 40px;
-            border-radius: 9999px !important;
-            text-align: center !important;
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 0.04em;
-            border: 2px solid #e5c122;
-            background: #ffffff;
-            color: #0d0f1a;
-            box-shadow: 0 0 25px rgba(229, 193, 34, 0.25);
-            cursor: default;
-            outline: none;
-            text-transform: uppercase;
-            padding: 0 10px;
-        }
-
-        #floating-champion-box .champion-name-input::placeholder {
-            color: #999;
-            font-weight: 800;
-            opacity: 0.6;
-        }
-
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-            }
-            50% {
-                transform: translateY(-5px) scale(1.05);
-            }
-        }
-
-        #confetti-canvas {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 100;
-            width: 100%;
-            height: 100%;
-        }
-
-        .gradient-btn {
-            background: linear-gradient(135deg, #ffd13b, #a07d0f);
-            color: #04060f;
-            box-shadow: 0 4px 15px rgba(255, 209, 59, 0.25);
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .gradient-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 209, 59, 0.35);
-            filter: brightness(1.1);
-        }
-
-        .secondary-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #e2e8f0;
-            transition: all 0.25s ease;
-        }
-
-        .secondary-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.18);
-            color: #fff;
-        }
-
-        .input-dark {
-            background: #0b0e1a;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-
-        .input-dark:focus {
-            border-color: #ffd13b;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
-            outline: none;
-        }
-
-        #groups-standings-grid td,
-        #groups-standings-grid th {
-            padding: 8px 6px !important;
-            font-size: 11px !important;
-        }
-
-        .fixture-row-modern {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 580px;
-            margin: 0 auto 2px auto;
-            padding: 8px 18px;
-            background: rgba(26, 31, 46, 0.75);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .fixture-modern-left,
-        .fixture-modern-right {
             flex: 1;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
         }
 
-        .fixture-modern-name {
-            font-size: 13px;
-            font-weight: 800;
-            color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-        }
-
-        .fixture-modern-center {
+        /* ── Tabs ── */
+        .tab-bar {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-shrink: 0;
-            margin: 0 12px;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0;
+            transition: border-color 0.2s;
         }
 
-        .fixture-modern-scorebox {
-            width: 60px;
-            height: 48px;
-            background: #ffd13b;
-            border-radius: 8px;
-            border: 1px solid rgba(180, 150, 30, 0.25);
-            color: #0d0f1a;
-            text-align: center;
-            font-size: 24px;
-            font-weight: 900;
-            outline: none;
-            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
-        }
-
-        .fixture-modern-scorebox:focus {
-            border-color: #a07d0f;
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.12);
-        }
-
-        .fixture-modern-vs {
-            font-size: 12px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 0.1em;
-        }
-
-        .floating-controls {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            background: rgba(13, 15, 26, 0.88);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-            pointer-events: none;
-            flex-wrap: wrap;
-            gap: 6px;
-            border-radius: 0 0 12px 12px;
-            margin: 0 -12px;
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-        .floating-controls>* {
-            pointer-events: auto;
-        }
-        .floating-controls .left-buttons,
-        .floating-controls .right-buttons {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .floating-controls .center-tabs {
-            display: flex;
-            justify-content: center;
-            flex: 1;
-            min-width: 180px;
-        }
-        .floating-controls .pill-nav {
-            background: rgba(20, 24, 43, 0.7);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 9999px;
-            padding: 3px;
-            display: flex;
-            gap: 3px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .floating-controls .pill-btn {
-            padding: 5px 12px;
-            border-radius: 9999px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: rgba(255, 255, 255, 0.5);
-            transition: all 0.2s;
-            cursor: pointer;
+        .tab-btn {
             background: transparent;
             border: none;
-            white-space: nowrap;
+            padding: 0.6rem 1.4rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 0;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: -0.2px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            font-family: inherit;
         }
-        .floating-controls .pill-btn.active {
-            background: #ffd13b;
-            color: #0d0f1a;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+
+        .tab-btn.active {
+            color: #0f172a;
+            border-bottom-color: #0f172a;
+            font-weight: 600;
         }
-        .floating-controls .pill-btn:hover:not(.active) {
+
+        .tab-btn:hover:not(.active) {
+            color: #1e293b;
+            background: #f1f5f9;
+        }
+
+        .tab-panels {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.2s ease;
+            flex: 1;
+        }
+
+        .tab-panel.active-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Cards ── */
+        .control-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eef2f6;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+            transition: color 0.2s;
+        }
+
+        .sub {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            padding-left: 10px;
+            margin-top: 2px;
+            font-weight: 400;
+            border-left: 2px solid #cbd5e1;
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .stats-badge {
+            background: #f1f5f9;
+            border-radius: 40px;
+            padding: 3px 14px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #475569;
+            border: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* ── File zone ── */
+        .file-zone {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.6rem 0 0.4rem 0;
+        }
+
+        .file-label,
+        button {
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 40px;
+            padding: 5px 14px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        .file-label:hover,
+        button:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+        button.secondary:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        #fileName {
+            font-size: 0.7rem;
+            color: #64748b;
+            padding: 2px 4px;
+            transition: color 0.2s;
+        }
+
+        .restore-badge {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 40px;
+            padding: 2px 12px;
+            font-size: 0.6rem;
+            color: #065f46;
+            display: inline-block;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        /* ── Inputs ── */
+        input {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 40px;
+            padding: 7px 14px;
+            font-size: 0.8rem;
+            color: #0f172a;
+            width: 100%;
+            outline: none;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.15);
+            background: #ffffff;
+        }
+
+        input::placeholder {
+            color: #b0bec5;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 0.8rem 0 0.2rem;
+        }
+
+        .field-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            margin-bottom: 3px;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .field-group:last-child {
+            flex: 0.3;
+            min-width: 80px;
+        }
+
+        .field-group:last-child button {
+            width: 100%;
+            background: #0f172a;
+            border-color: #0f172a;
             color: #fff;
+            padding: 7px 0;
+            font-weight: 500;
+            transition: background 0.2s, border-color 0.2s;
         }
-        .floating-controls .icon-btn {
+        .field-group:last-child button:hover {
+            background: #1e293b;
+            border-color: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .format-example {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 0.7rem;
+            margin-top: 14px;
+            border-left: 3px solid #cbd5e1;
+            color: #475569;
+            line-height: 1.6;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        code {
+            background: #eef2f6;
+            padding: 1px 6px;
+            border-radius: 8px;
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: #1e293b;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .format-example span.highlight {
+            color: #b45309;
+            font-weight: 500;
+        }
+        .format-example span.accent {
+            color: #2563eb;
+        }
+        .format-example span.green {
+            color: #065f46;
+        }
+
+        /* ── RESULTS — WHATSAPP STYLE ── */
+        .results-raw {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: #e5ddd5;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        /* WhatsApp-like chat background pattern */
+        .results-raw::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.06;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(0, 0, 0, 0.03) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(0, 0, 0, 0.03) 0%, transparent 50%),
+                repeating-linear-gradient(45deg,
+                    transparent,
+                    transparent 20px,
+                    rgba(0, 0, 0, 0.01) 20px,
+                    rgba(0, 0, 0, 0.01) 21px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .result-count-badge {
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 40px;
+            padding: 4px 16px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e293b;
+            border: none;
+            display: inline-block;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .delete-selected-btn {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.15s;
+            display: none;
+            font-family: inherit;
+        }
+
+        .delete-selected-btn.visible {
+            display: inline-block;
+        }
+
+        .delete-selected-btn:hover {
+            background: #fecaca;
+            border-color: #f87171;
+            transform: translateY(-1px);
+        }
+
+        .delete-selected-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── Message list (chat) ── */
+        .message-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            position: relative;
+            z-index: 1;
+            min-height: 300px;
+        }
+
+        /* ── Date divider ── */
+        .date-divider {
+            text-align: center;
+            margin: 12px 0 16px 0;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #6b7280;
+            letter-spacing: 0.3px;
+            position: relative;
+        }
+
+        .date-divider span {
+            background: rgba(225, 225, 225, 0.7);
+            backdrop-filter: blur(4px);
+            padding: 4px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        /* ── Message wrapper ── */
+        .msg-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-bottom: 2px;
+            max-width: 100%;
+            position: relative;
+        }
+
+        .msg-wrapper.sent {
+            justify-content: flex-end;
+            padding-left: 50px;
+        }
+
+        .msg-wrapper.received {
+            justify-content: flex-start;
+            padding-right: 50px;
+        }
+
+        /* ── Avatar ── */
+        .msg-avatar {
+            flex-shrink: 0;
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            background: rgba(20, 24, 43, 0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #c8d0e0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .floating-controls .icon-btn:hover {
-            background: rgba(255, 215, 0, 0.15);
-            color: #ffd13b;
-            border-color: rgba(255, 215, 0, 0.3);
-        }
-        .floating-controls .icon-btn.green {
-            background: rgba(34, 197, 94, 0.15);
-            border-color: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-        }
-        .floating-controls .icon-btn.blue {
-            background: rgba(59, 130, 246, 0.15);
-            border-color: rgba(59, 130, 246, 0.2);
-            color: #60a5fa;
-        }
-        .floating-controls .icon-btn.amber {
-            background: rgba(255, 215, 0, 0.12);
-            border-color: rgba(255, 215, 0, 0.2);
-            color: #ffd13b;
-        }
-
-        .main-content {
-            padding-top: 4px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        #home-view,
-        #create-view {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-        }
-        #home-view.hidden,
-        #create-view.hidden,
-        #tab-view-groups.hidden,
-        #tab-view-fixtures.hidden,
-        #tab-view-knockout.hidden {
-            display: none !important;
-        }
-        #tab-view-groups,
-        #tab-view-fixtures,
-        #tab-view-knockout {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sort-dropdown-btn {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 9999px;
-            padding: 4px 14px 4px 12px;
-            font-size: 10px;
-            font-weight: 700;
-            color: #9aa3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-            cursor: pointer;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        .sort-menu {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 6px);
-            min-width: 170px;
-            background: rgba(20, 24, 43, 0.92);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 215, 0, 0.08);
-            border-radius: 12px;
-            padding: 6px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-            z-index: 30;
-            display: none;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .sort-menu.open {
-            display: flex;
-        }
-        .sort-menu .sort-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 11px;
+            font-size: 0.65rem;
             font-weight: 600;
-            color: #c8d0e0;
-            cursor: pointer;
-            transition: all 0.15s;
-            background: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
-            text-transform: uppercase;
+            color: #fff;
+            background: #6b7280;
+            user-select: none;
+            margin-bottom: 2px;
+            transition: background 0.3s;
         }
-        .sort-menu .sort-option.active {
-            color: #ffd13b;
-            background: rgba(255, 215, 0, 0.08);
+
+        .msg-avatar.speaker1-avatar {
+            background: #b45309;
         }
-        .sort-wrapper {
+        .msg-avatar.speaker2-avatar {
+            background: #065f46;
+        }
+        .msg-avatar.dark-avatar {
+            background: #4b5563;
+        }
+
+        /* ── Bubble container ── */
+        .bubble-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+            min-width: 60px;
             position: relative;
-            display: inline-block;
+        }
+
+        .msg-wrapper.sent .bubble-container {
+            align-items: flex-end;
+        }
+        .msg-wrapper.received .bubble-container {
+            align-items: flex-start;
+        }
+
+        /* ── Speaker name ── */
+        .msg-speaker-name {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0 4px 2px 4px;
+            color: #6b7280;
+            transition: color 0.3s;
+        }
+
+        .msg-wrapper.received .msg-speaker-name {
+            padding-left: 0;
+        }
+
+        .msg-wrapper.sent .msg-speaker-name {
+            padding-right: 0;
+            text-align: right;
+            color: #4b5563;
+        }
+
+        .msg-speaker-name .highlight-s1 {
+            color: #b45309;
+        }
+        .msg-speaker-name .highlight-s2 {
+            color: #065f46;
+        }
+
+        /* ── Bubble ── */
+        .bubble {
+            padding: 8px 12px 6px 12px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+            transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+            width: 100%;
+        }
+
+        /* Sent (speaker1) — green like WhatsApp */
+        .msg-wrapper.sent .bubble {
+            background: #d9fdd3;
+            color: #1e293b;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Received (speaker2) — white like WhatsApp */
+        .msg-wrapper.received .bubble {
+            background: #ffffff;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .msg-text {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* ── Highlights inside bubble ── */
+        .msg-text mark {
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: 600;
+            padding: 0 2px;
+            border-radius: 3px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .msg-text mark.speaker2 {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* ── Timestamp ── */
+        .msg-timestamp {
+            font-size: 0.55rem;
+            color: #8e9aaf;
+            padding: 2px 4px 0 4px;
+            opacity: 0.8;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .msg-wrapper.sent .msg-timestamp {
+            text-align: right;
+            padding-right: 2px;
+        }
+        .msg-wrapper.received .msg-timestamp {
+            text-align: left;
+            padding-left: 2px;
+        }
+
+        /* ── Checkbox ── */
+        .msg-checkbox-wrap {
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 6px;
+            position: relative;
+        }
+
+        .msg-checkbox-wrap .msg-select {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            accent-color: #0f172a;
+            border-radius: 4px;
+            border: 1.5px solid #cbd5e1;
+            background: #fff;
+            transition: 0.1s;
+            appearance: auto;
+            -webkit-appearance: auto;
             flex-shrink: 0;
         }
 
-        .tournament-heading-row {
+        .msg-checkbox-wrap .msg-select:hover {
+            border-color: #94a3b8;
+            transform: scale(1.05);
+        }
+        .msg-checkbox-wrap .msg-select:checked {
+            accent-color: #0f172a;
+            border-color: #0f172a;
+        }
+
+        .msg-wrapper.sent .msg-checkbox-wrap {
+            order: 1;
+            margin-left: 6px;
+        }
+        .msg-wrapper.received .msg-checkbox-wrap {
+            order: 0;
+            margin-right: 6px;
+        }
+
+        .msg-wrapper.sent .msg-avatar {
+            display: none;
+        }
+
+        /* ── Selected state ── */
+        .msg-wrapper.selected .bubble {
+            outline: 2px solid #94a3b8;
+            outline-offset: 1px;
+        }
+
+        .msg-wrapper.selected .bubble::after {
+            content: '✓';
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-size: 0.5rem;
+            background: #0f172a;
+            color: #fff;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 10px;
-        }
-        .tournament-heading-row h3 {
-            font-size: 13px;
-            font-weight: 900;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.35);
+            justify-content: center;
+            font-weight: 700;
         }
 
-        /* knockout guard overlay – ensure it's always on top and visible */
-        #knockout-guard-overlay {
-            display: flex !important;
-            z-index: 60;
-            min-height: 400px;
-            background: rgba(13, 15, 26, 0.96);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 215, 0, 0.08);
-        }
-        #knockout-guard-overlay.hidden {
-            display: none !important;
+        .msg-wrapper.received.selected .bubble::after {
+            right: -6px;
+            left: auto;
         }
 
-        /* bracket container hidden by default when guard is shown */
-        #bracket-container.guarded {
-            display: none !important;
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            border-radius: 20px;
+            color: #6b7280;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            margin: auto;
+            line-height: 1.8;
+            max-width: 400px;
+            transition: background 0.3s, color 0.3s, border-color 0.3s;
         }
 
+        .empty-state code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #94a3b8;
+            margin-top: 2rem;
+            border-top: 1px solid #eef2f6;
+            padding-top: 1rem;
+            transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        footer.hide-footer {
+            display: none;
+        }
+
+        /* ── Responsive ── */
         @media (max-width: 640px) {
-            .name-input {
-                width: 80px;
-                height: 28px;
-                font-size: 8px;
-                padding: 0 5px;
+            body {
+                padding: 0.6rem;
             }
-            .score-input {
-                width: 22px;
-                height: 28px;
-                font-size: 9px;
+            .control-card {
+                padding: 1rem 1rem;
             }
-            .bracket-viewport {
-                min-width: 460px;
-                gap: 28px;
-                /* increased mobile gap for more breathing room */
+            .flex-row {
+                flex-direction: column;
+                gap: 0.5rem;
             }
-            .bracket-col {
-                flex: 0 1 95px;
-                min-width: 72px;
-                padding: 0 2px;
+            .field-group:last-child {
+                flex: 1;
+                min-width: 100%;
             }
-            #floating-champion-box {
-                width: 130px;
+            .tab-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.7rem;
+            }
+            .format-example {
+                font-size: 0.6rem;
                 padding: 8px 10px;
             }
-            #floating-champion-box .trophy-svg {
+            .results-raw {
+                border-radius: 14px;
+            }
+            .message-list {
+                padding: 12px 12px 16px 12px;
+            }
+            .bubble-container {
+                max-width: 85%;
+            }
+            .msg-wrapper.sent {
+                padding-left: 20px;
+            }
+            .msg-wrapper.received {
+                padding-right: 20px;
+            }
+            .msg-avatar {
                 width: 28px;
                 height: 28px;
+                font-size: 0.55rem;
             }
-            #floating-champion-box .champion-name-input {
-                height: 30px;
-                font-size: 9px;
+            .msg-text {
+                font-size: 0.78rem;
             }
-            #knockout-guard-overlay {
-                min-height: 300px;
-                padding: 20px 16px;
+            .msg-timestamp {
+                font-size: 0.5rem;
+            }
+            .results-header {
+                padding: 10px 14px;
+            }
+            .msg-wrapper.sent .msg-checkbox-wrap {
+                margin-left: 4px;
+            }
+            .msg-wrapper.received .msg-checkbox-wrap {
+                margin-right: 4px;
+            }
+            .msg-checkbox-wrap .msg-select {
+                width: 15px;
+                height: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .file-zone {
+                flex-wrap: wrap;
+            }
+            .flex-between {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            h1 {
+                font-size: 1rem;
+            }
+            .bubble-container {
+                max-width: 92%;
+            }
+            .msg-wrapper.sent {
+                padding-left: 6px;
+            }
+            .msg-wrapper.received {
+                padding-right: 6px;
+            }
+            .msg-avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 0.5rem;
+            }
+            .message-list {
+                padding: 8px 8px 12px 8px;
+            }
+        }
+
+        /* ── DARK MODE ── */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0b1120;
+                color: #e2e8f0;
+            }
+
+            .tab-bar {
+                border-bottom-color: #2d3a5e;
+            }
+            .tab-btn {
+                color: #94a3b8;
+            }
+            .tab-btn.active {
+                color: #facc15;
+                border-bottom-color: #facc15;
+            }
+            .tab-btn:hover:not(.active) {
+                color: #e2e8f0;
+                background: #1e293b;
+            }
+
+            .control-card {
+                background: #1e293b;
+                border-color: #2d3a5e;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            }
+
+            h1 {
+                color: #f1f5f9;
+            }
+            .sub {
+                color: #94a3b8;
+                border-left-color: #3b82f6;
+            }
+            .stats-badge {
+                background: #0f172a;
+                color: #a5f3fc;
+                border: 1px solid #2d3a5e;
+            }
+
+            .file-label,
+            button {
+                background: #0f172a;
+                border-color: #334155;
+                color: #e2e8f0;
+            }
+            .file-label:hover,
+            button:hover {
+                background: #2d3a5e;
+                border-color: #5b6e8c;
+            }
+            button.secondary {
+                background: #0f172a;
+                border-color: #475569;
+                color: #94a3b8;
+            }
+            button.secondary:hover {
+                background: #1e293b;
+                border-color: #5b6e8c;
+                color: #e2e8f0;
+            }
+            #fileName {
+                color: #cbd5e1;
+            }
+            .restore-badge {
+                background: #1e293b;
+                border-color: #3b82f6;
+                color: #93c5fd;
+            }
+
+            input {
+                background: #0f172a;
+                border-color: #334155;
+                color: #f1f5f9;
+            }
+            input:focus {
+                border-color: #60a5fa;
+                box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+                background: #1e293b;
+            }
+            input::placeholder {
+                color: #64748b;
+            }
+            label {
+                color: #9ca3af;
+            }
+            .field-group:last-child button {
+                background: #facc15;
+                border-color: #facc15;
+                color: #0f172a;
+            }
+            .field-group:last-child button:hover {
+                background: #eab308;
+                border-color: #eab308;
+            }
+
+            .format-example {
+                background: #0f172a;
+                border-left-color: #3b82f6;
+                color: #cbd5e1;
+            }
+            .format-example code {
+                background: #1e293b;
+                color: #e2e8f0;
+            }
+            .format-example span.highlight {
+                color: #fbbf24;
+            }
+            .format-example span.accent {
+                color: #60a5fa;
+            }
+            .format-example span.green {
+                color: #34d399;
+            }
+
+            /* ── Dark: Results ── */
+            .results-raw {
+                background: #0f1923;
+            }
+            .results-raw::before {
+                opacity: 0.08;
+                background-image:
+                    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+                    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+                    repeating-linear-gradient(45deg,
+                        transparent,
+                        transparent 20px,
+                        rgba(255, 255, 255, 0.005) 20px,
+                        rgba(255, 255, 255, 0.005) 21px);
+            }
+
+            .results-header {
+                background: rgba(15, 25, 35, 0.85);
+                backdrop-filter: blur(8px);
+                border-bottom-color: rgba(255, 255, 255, 0.06);
+            }
+            .result-count-badge {
+                background: rgba(255, 255, 255, 0.08);
+                color: #cbd5e1;
+            }
+            .delete-selected-btn {
+                background: #4c1d2b;
+                border-color: #7f1d3a;
+                color: #fca5a5;
+            }
+            .delete-selected-btn:hover {
+                background: #7f1d3a;
+                border-color: #b91c3a;
+                color: #fff;
+            }
+
+            .date-divider span {
+                background: rgba(30, 41, 59, 0.8);
+                color: #9ca3af;
+            }
+
+            /* Sent (speaker1) — dark */
+            .msg-wrapper.sent .bubble {
+                background: #075e54;
+                color: #e2e8f0;
+            }
+
+            /* Received (speaker2) — dark */
+            .msg-wrapper.received .bubble {
+                background: #1e293b;
+                color: #e2e8f0;
+                border-color: rgba(255, 255, 255, 0.05);
+            }
+
+            .msg-speaker-name {
+                color: #9ca3af;
+            }
+            .msg-wrapper.sent .msg-speaker-name {
+                color: #8ca3c0;
+            }
+            .msg-speaker-name .highlight-s1 {
+                color: #fbbf24;
+            }
+            .msg-speaker-name .highlight-s2 {
+                color: #34d399;
+            }
+
+            .msg-timestamp {
+                color: #6b7a8f;
+            }
+
+            .msg-text mark {
+                background: #fef3c7;
+                color: #92400e;
+            }
+            .msg-text mark.speaker2 {
+                background: #065f46;
+                color: #a7f3d0;
+            }
+
+            .msg-checkbox-wrap .msg-select {
+                border-color: #5b6e8c;
+                background: #0f172a;
+            }
+            .msg-checkbox-wrap .msg-select:hover {
+                border-color: #93c5fd;
+            }
+            .msg-checkbox-wrap .msg-select:checked {
+                accent-color: #60a5fa;
+                border-color: #60a5fa;
+            }
+
+            .msg-wrapper.selected .bubble {
+                outline-color: #60a5fa;
+            }
+            .msg-wrapper.selected .bubble::after {
+                background: #60a5fa;
+                color: #0f172a;
+            }
+
+            .empty-state {
+                background: rgba(15, 25, 35, 0.7);
+                color: #9ca3af;
+                border-color: rgba(255, 255, 255, 0.05);
+            }
+            .empty-state code {
+                background: rgba(255, 255, 255, 0.06);
+                color: #cbd5e1;
+            }
+
+            .msg-avatar.speaker1-avatar {
+                background: #fbbf24;
+                color: #0f172a;
+            }
+            .msg-avatar.speaker2-avatar {
+                background: #34d399;
+                color: #0f172a;
+            }
+            .msg-avatar.dark-avatar {
+                background: #4b5563;
+                color: #e2e8f0;
+            }
+
+            footer {
+                color: #5b6e8c;
+                border-top-color: #1e293b;
             }
         }
     </style>
 </head>
 <body>
+    <div class="app">
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="search">Search</button>
+            <button class="tab-btn" data-tab="results">Results</button>
+        </div>
 
-    <div id="app" class="flex flex-col min-h-screen">
+        <div class="tab-panels">
+            <!-- TAB 1: SEARCH -->
+            <div class="tab-panel active-panel" id="searchPanel">
+                <div class="control-card">
+                    <div class="flex-between">
+                        <div>
+                            <h1>⌕ log search</h1>
+                            <div class="sub">upload · filter by speaker &amp; date</div>
+                        </div>
+                        <div class="stats-badge" id="parseStats">no file</div>
+                    </div>
 
-        <!-- STICKY CONTROLS -->
-        <div class="floating-controls">
-            <div class="left-buttons">
-                <button onclick="goHome()" class="icon-btn" title="Dashboard">
-                    <i class="fa-solid fa-house"></i>
-                </button>
-                <button onclick="refreshCurrentView()" class="icon-btn amber" title="Refresh View">
-                    <i class="fa-solid fa-rotate"></i>
-                </button>
-            </div>
+                    <div class="file-zone">
+                        <input type="file" id="fileInput" accept=".txt, .text/plain" style="display: none;">
+                        <button class="file-label" id="uploadBtn">choose .txt</button>
+                        <span id="fileName">none</span>
+                        <button id="clearFileBtn" class="secondary" style="padding: 4px 12px;">clear</button>
+                        <span id="restoreIndicator" class="restore-badge" style="display:none;">↻ restored</span>
+                    </div>
 
-            <div id="active-nav-tabs" class="center-tabs hidden">
-                <div class="pill-nav">
-                    <button id="tab-groups" onclick="switchActiveTab('groups')" class="pill-btn">Groups</button>
-                    <button id="tab-fixtures" onclick="switchActiveTab('fixtures')" class="pill-btn">Fixtures</button>
-                    <button id="tab-knockout" onclick="switchActiveTab('knockout')" class="pill-btn">Knockout</button>
+                    <div class="flex-row">
+                        <div class="field-group">
+                            <label>speaker 1 *</label>
+                            <input type="text" id="name1" placeholder="e.g. Samuel" autocomplete="off">
+                        </div>
+                        <div class="field-group">
+                            <label>speaker 2</label>
+                            <input type="text" id="name2" placeholder="optional" autocomplete="off">
+                        </div>
+                        <div class="field-group">
+                            <label>from</label>
+                            <input type="text" id="startDate" placeholder="dd/mm/yyyy" autocomplete="off">
+                        </div>
+                        <div class="field-group">
+                            <label>to</label>
+                            <input type="text" id="endDate" placeholder="dd/mm/yyyy" autocomplete="off">
+                        </div>
+                        <div class="field-group">
+                            <label>&nbsp;</label>
+                            <button id="searchBtn">search</button>
+                        </div>
+                    </div>
+
+                    <div class="format-example">
+                        <span style="font-weight:500; color:inherit;">Formats</span>
+                        &nbsp;·&nbsp; <code>[15/07/2025, 23:11:51] Speaker: text</code>
+                        &nbsp;·&nbsp; <code>6/6/26, 22:16 - Speaker: text</code>
+                        <br>
+                        <span class="accent">↳</span> multi‑line merged &nbsp;·&nbsp; <span class="highlight">speaker 1 yellow</span>
+                        &nbsp;·&nbsp; <span class="green">speaker 2 green</span>
+                        &nbsp;·&nbsp; <span style="color:#64748b;">💾 auto‑saved</span>
+                    </div>
                 </div>
             </div>
 
-            <div id="view-actions" class="right-buttons hidden">
-                <button onclick="downloadBackup()" class="icon-btn green" title="Download Backup">
-                    <i class="fa-solid fa-download"></i>
-                </button>
-                <button onclick="document.getElementById('upload-input').click()" class="icon-btn blue" title="Restore Backup">
-                    <i class="fa-solid fa-upload"></i>
-                </button>
-                <input type="file" id="upload-input" accept=".json" style="display:none" onchange="uploadBackup(event)" />
+            <!-- TAB 2: RESULTS — WHATSAPP STYLE -->
+            <div class="tab-panel" id="resultsPanel">
+                <div class="results-raw">
+                    <div class="results-header">
+                        <span class="result-count-badge" id="resultCountBadge">0 messages</span>
+                        <button class="delete-selected-btn" id="deleteSelectedBtn">🗑 Delete selected</button>
+                    </div>
+                    <div id="resultsContainer" class="message-list">
+                        <div class="empty-state">upload a log · search → results appear here<br><span style="color:#94a3b8;">select messages with checkboxes · delete selected</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="main-content">
-
-            <!-- HOME VIEW -->
-            <main id="home-view" class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 max-w-6xl mx-auto w-full gap-8">
-                <div class="w-full text-center space-y-3 mb-4">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ffd13b]/10 to-[#a07d0f]/10 border border-[#ffd13b]/20 mb-2">
-                        <i class="fa-solid fa-trophy text-3xl text-[#ffd13b] drop-shadow-[0_0_10px_rgba(255,215,0,0.4)]"></i>
-                    </div>
-                    <h2 class="text-2xl md:text-4xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
-                        Welcome to the Arena
-                    </h2>
-                    <p class="text-xs md:text-sm text-gray-400 max-w-lg mx-auto">
-                        Design, run, simulate, and coordinate group stages and bracket knockouts seamlessly inside a gorgeous modular environment.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
-                    <div onclick="showCreateView()" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-[#ffd13b]/40 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[180px]">
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="p-3 bg-[#ffd13b]/10 rounded-xl text-[#ffd13b] group-hover:scale-110 transition-transform"><i class="fa-solid fa-plus text-xl"></i></span>
-                                <span class="text-[10px] tracking-widest font-black text-gray-500 uppercase">Step 01</span>
-                            </div>
-                            <h3 class="text-lg font-extrabold text-white group-hover:text-[#ffd13b] transition">Create Tournament</h3>
-                            <p class="text-xs text-gray-400">Setup dynamic group stages, custom qualifying quotas, or structured knockouts with automated seed distribution.</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs text-[#ffd13b] font-bold mt-4">
-                            Build your tournament now <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="scrollToTournaments()" class="glass-card p-6 rounded-2xl cursor-pointer hover:border-blue-500/40 hover:-translate-y-1 transition-all duration-300 group flex flex-col justify-between min-h-[180px]">
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-110 transition-transform"><i class="fa-solid fa-list-ul text-xl"></i></span>
-                                <span class="text-[10px] tracking-widest font-black text-gray-500 uppercase">Explore</span>
-                            </div>
-                            <h3 class="text-lg font-extrabold text-white group-hover:text-blue-400 transition">View Tournaments</h3>
-                            <p class="text-xs text-gray-400">Jump right back into any running tournament bracket or group match setups, and track active matches instantly.</p>
-                        </div>
-                        <div class="flex items-center gap-1.5 text-xs text-blue-400 font-bold mt-4">
-                            Jump to listings <i class="fa-solid fa-arrow-down transition-transform group-hover:translate-y-0.5"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tournament-listings" class="w-full max-w-4xl mt-6 space-y-4">
-                    <div class="tournament-heading-row">
-                        <h3>Active &amp; Saved Tournaments</h3>
-                        <div class="sort-wrapper">
-                            <button class="sort-dropdown-btn" onclick="toggleSortMenu()" id="sortDropdownBtn">
-                                <i class="fa-solid fa-arrow-up-wide-short"></i>
-                                <span class="sort-label" id="sortLabel">Newest</span>
-                                <i class="fa-solid fa-chevron-down text-[8px] opacity-50"></i>
-                            </button>
-                            <div class="sort-menu" id="sortMenu">
-                                <button class="sort-option" data-sort="date-desc" onclick="setSort('date-desc')">
-                                    <i class="fa-solid fa-clock"></i> Newest First
-                                </button>
-                                <button class="sort-option" data-sort="date-asc" onclick="setSort('date-asc')">
-                                    <i class="fa-solid fa-clock-rotate-left"></i> Oldest First
-                                </button>
-                                <button class="sort-option" data-sort="name-asc" onclick="setSort('name-asc')">
-                                    <i class="fa-solid fa-arrow-down-a-z"></i> Name A → Z
-                                </button>
-                                <button class="sort-option" data-sort="name-desc" onclick="setSort('name-desc')">
-                                    <i class="fa-solid fa-arrow-up-a-z"></i> Name Z → A
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tournament-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                </div>
-            </main>
-
-            <!-- CREATE VIEW -->
-            <main id="create-view" class="hidden flex-grow flex flex-col items-center justify-center p-4 md:p-8 max-w-3xl mx-auto w-full">
-                <div class="glass-card w-full p-6 md:p-8 rounded-2xl space-y-6">
-                    <div class="flex items-center gap-3 border-b border-white/5 pb-4">
-                        <span class="w-10 h-10 rounded-lg bg-[#ffd13b]/10 flex items-center justify-center text-[#ffd13b] text-lg"><i class="fa-solid fa-gears"></i></span>
-                        <div>
-                            <h2 class="text-lg font-black text-white uppercase tracking-wider">Configure Tournament</h2>
-                            <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Adjust configurations &amp; draft contenders</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Tournament Name</label>
-                            <input id="form-name" type="text" placeholder="e.g. MONARCHS CL 3B" class="w-full px-4 py-3 rounded-lg input-dark font-medium text-sm" />
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Format Structure</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <button id="tab-group" onclick="setFormFormat('group')" class="py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-900/30 border border-purple-500/35 text-white text-xs font-black tracking-wider uppercase transition-all flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-cubes"></i> Group Stage &amp; Bracket
-                                </button>
-                                <button id="tab-knockout-form" onclick="setFormFormat('knockout')" class="py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-sitemap"></i> Direct Knockout Bracket
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="h-px bg-white/5 my-2"></div>
-
-                        <div id="options-knockout" class="hidden space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Rounds / Participant Capacity</label>
-                                <select id="form-knockout-rounds" class="w-full px-4 py-3 rounded-lg input-dark font-semibold text-xs" onchange="adjustContendersPlaceholder()">
-                                    <option value="32">Round of 32 (32 Players / 5 Rounds)</option>
-                                    <option value="16" selected>Round of 16 (16 Players / 4 Rounds)</option>
-                                    <option value="8">Quarter-finals (8 Players / 3 Rounds)</option>
-                                    <option value="4">Semi-finals (4 Players / 2 Rounds)</option>
-                                    <option value="2">Final (2 Players / 1 Round)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Contender Distribution</label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <button id="dist-random-ko" onclick="setFormDist('random')" class="py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-shuffle"></i> Random Seed
-                                    </button>
-                                    <button id="dist-custom-ko" onclick="setFormDist('custom')" class="py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-list-ol"></i> Sequential Seed
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="options-group" class="space-y-4">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Total Entrants</label>
-                                    <select id="form-group-max" class="w-full px-4 py-3 rounded-lg input-dark font-bold text-xs" onchange="autoSuggestGroupStructure()">
-                                        <option value="20" selected>20 Entrants</option>
-                                        <option value="16">16 Entrants</option>
-                                        <option value="12">12 Entrants</option>
-                                        <option value="8">8 Entrants</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Contenders Per Group</label>
-                                    <select id="form-group-size" class="w-full px-4 py-3 rounded-lg input-dark font-bold text-xs" onchange="autoSuggestGroupStructure()">
-                                        <option value="5" selected>5 Players</option>
-                                        <option value="4">4 Players</option>
-                                        <option value="3">3 Players</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Group Qualifiers</label>
-                                    <select id="form-group-qualifiers" class="w-full px-4 py-3 rounded-lg input-dark font-bold text-xs">
-                                        <option value="4" selected>Top 4 Qualify</option>
-                                        <option value="2">Top 2 Qualify</option>
-                                        <option value="1">Top 1 Qualifies</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Contender Distribution</label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <button id="dist-random" onclick="setFormDist('random')" class="py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-shuffle"></i> Random Seed
-                                    </button>
-                                    <button id="dist-custom" onclick="setFormDist('custom')" class="py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-list-ol"></i> Sequential Seed
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Player Names (One Per Line)</label>
-                                <span id="contenders-counter" class="text-[10px] font-black text-[#ffd13b] uppercase">0 / 20 Contenders</span>
-                            </div>
-                            <textarea id="form-contenders" rows="6" placeholder="Enter contestant names, one on each line..." class="w-full p-4 rounded-lg input-dark font-semibold text-xs tracking-wide leading-relaxed" oninput="updateContendersCount()"></textarea>
-                            <div class="flex gap-2 mt-2 flex-wrap">
-                                <button onclick="autofillSampleTeams()" class="text-[10px] text-blue-400 hover:text-blue-300 font-bold tracking-wide uppercase flex items-center gap-1"><i class="fa-solid fa-keyboard"></i> Autofill Sample Teams</button>
-                                <span class="text-gray-600">|</span>
-                                <button onclick="clearContenderForm()" class="text-[10px] text-rose-400 hover:text-rose-300 font-bold tracking-wide uppercase flex items-center gap-1"><i class="fa-solid fa-eraser"></i> Clear Box</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/5 flex-wrap">
-                        <button onclick="goHome()" class="px-6 py-3 rounded-xl secondary-btn text-xs font-bold uppercase tracking-wider">Cancel</button>
-                        <button onclick="handleCreateTournament()" class="px-8 py-3 rounded-xl gradient-btn text-xs font-black uppercase tracking-wider"><i class="fa-solid fa-plus mr-1"></i> Create Tournament</button>
-                    </div>
-                </div>
-            </main>
-
-            <!-- GROUPS -->
-            <main id="tab-view-groups" class="hidden flex-grow w-full max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6">
-                <div class="text-center my-2">
-                    <h2 id="groups-title" class="text-sm sm:text-lg font-black tracking-[0.2em] text-[#ffd13b] leading-tight uppercase">MONARCHS CL 3B GROUP STAGE TOURNAMENT</h2>
-                </div>
-                <div id="groups-standings-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
-            </main>
-
-            <!-- FIXTURES -->
-            <main id="tab-view-fixtures" class="hidden flex-grow w-full max-w-6xl mx-auto p-4 md:p-8 flex flex-col gap-6">
-                <div class="text-center my-2">
-                    <h2 id="fixtures-title" class="text-sm sm:text-lg font-black tracking-[0.2em] text-[#ffd13b] leading-tight uppercase">MONARCHS CL 3B TOURNAMENT FIXTURES</h2>
-                </div>
-                <div id="fixtures-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-8"></div>
-            </main>
-
-            <!-- KNOCKOUT (SPLIT SYMMETRICAL INWARD BRACKET) -->
-            <main id="tab-view-knockout" class="hidden flex-grow w-full flex items-start justify-center bracket-wrapper">
-                <!-- GUARD OVERLAY – visible for group-stage tournaments without knockout rounds -->
-                <div id="knockout-guard-overlay" class="absolute inset-0 z-40 flex flex-col items-center justify-center text-center p-6 gap-4 rounded-2xl">
-                    <div class="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-400 text-2xl">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-                    <h3 class="text-lg font-black uppercase text-white tracking-wider">Knockout Stage Locked</h3>
-                    <p class="text-xs text-gray-400 max-w-md">Complete Group Matches and click "Generate Knockout Phase" to seed the top qualifying contenders into the final elimination bracket.</p>
-                    <button onclick="advanceGroupQualifiers()" class="gradient-btn px-6 py-2.5 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5">
-                        <i class="fa-solid fa-forward-fast"></i> Seed Knockout Stage Now
-                    </button>
-                </div>
-
-                <!-- BRACKET CONTAINER – hidden when guard is shown -->
-                <div id="bracket-container" class="relative w-full max-w-full guarded">
-                    <svg id="connector-svg"></svg>
-                    <div id="bracket-viewport" class="bracket-viewport">
-                        <div id="floating-champion-box">
-                            <svg class="trophy-svg" width="44" height="44" viewBox="0 0 100 100" fill="none">
-                                <rect x="32" y="78" width="36" height="10" rx="3" fill="#151928" stroke="#8e7323" stroke-width="2"/>
-                                <path d="M38 78 L43 66 L57 66 L62 78Z" fill="#8e7323"/>
-                                <rect x="46" y="52" width="8" height="15" fill="#ffd13b"/>
-                                <path d="M28 24 C16 24,16 42,28 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
-                                <path d="M72 24 C84 24,84 42,72 42" fill="none" stroke="#ffd13b" stroke-width="5" stroke-linecap="round"/>
-                                <path d="M28 18 C28 52,72 52,72 18Z" fill="#ffd13b"/>
-                                <rect x="25" y="14" width="50" height="5" rx="2" fill="#ffe980"/>
-                                <polygon points="50,23 53,30 60,30 55,34 57,41 50,37 43,41 45,34 40,30 47,30" fill="#fff" opacity="0.9"/>
-                            </svg>
-                            <input type="text" id="champion-name-input" class="champion-name-input" readonly placeholder="CROWN CHAMPION" />
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-        </div>
+        <footer id="mainFooter">dual format · continuation lines · speaker 1 <span style="color:#b45309;font-weight:600;">yellow</span> · speaker 2 <span style="color:#065f46;font-weight:600;">green</span> · select &amp; delete · auto‑persist</footer>
     </div>
-
-    <!-- EDIT PLAYERS MODAL -->
-    <div id="edit-players-modal" class="hidden fixed inset-0 z-[100] bg-[#04060f]/90 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-card w-full max-w-lg p-6 rounded-2xl space-y-6">
-            <div class="flex items-center justify-between border-b border-white/5 pb-4">
-                <div class="flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-lg bg-[#ffd13b]/10 flex items-center justify-center text-[#ffd13b] text-lg"><i class="fa-solid fa-pen-to-square"></i></span>
-                    <div>
-                        <h2 class="text-base font-black text-white uppercase tracking-wider">Edit Contenders</h2>
-                        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Modify participant names below</p>
-                    </div>
-                </div>
-                <button onclick="closeEditPlayersModal()" class="text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div id="edit-players-inputs" class="space-y-3 max-h-[350px] overflow-y-auto pr-2"></div>
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
-                <button onclick="closeEditPlayersModal()" class="px-5 py-2.5 rounded-xl secondary-btn text-xs font-bold uppercase tracking-wider">Cancel</button>
-                <button onclick="saveEditedPlayers()" class="px-6 py-2.5 rounded-xl gradient-btn text-xs font-black uppercase tracking-wider">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <canvas id="confetti-canvas"></canvas>
 
     <script>
-        let tournaments = [];
-        let activeTournamentId = null;
-        let currentFormFormat = 'group';
-        let currentFormDist = 'random';
-        let currentWorkspaceTab = 'groups';
-        let editingTournamentId = null;
-        let currentSort = 'date-desc';
-        let sortMenuOpen = false;
+        // ── GLOBALS ──
+        let parsedMessages = [];
+        let fileLoaded = false;
+        let currentDisplayedMessages = [];
+        let currentSpeaker1 = null;
+        let currentSpeaker2 = null;
+        let selectedMessages = new Set();
+        let rawFileContent = null;
+        let restoreInProgress = false;
 
-        const SAMPLE_CROWN_TEAMS = [
-            "Bigimachine", "Desmond", "Elona", "Mattys", "Abusiwan",
-            "Bigagold", "Bright", "Samuel", "Chris_Bicho", "Praise",
-            "Ruona", "Innocent", "Ultimatetee", "Adex", "Colepalmer",
-            "ToxicT", "Bayern-Munich", "AS-Roma", "Aston-villa", "PSG",
-            "Real-Madrid", "Barcelona", "Man-City", "Arsenal", "Inter-Milan",
-            "Juventus", "Dortmund", "Leverkusen", "AC-Milan", "Napoli",
-            "Benfica", "Porto"
-        ];
+        // DOM
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearFileBtn = document.getElementById('clearFileBtn');
+        const fileNameSpan = document.getElementById('fileName');
+        const parseStatsSpan = document.getElementById('parseStats');
+        const name1Input = document.getElementById('name1');
+        const name2Input = document.getElementById('name2');
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const mainFooter = document.getElementById('mainFooter');
+        const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+        const resultCountBadge = document.getElementById('resultCountBadge');
+        const restoreIndicator = document.getElementById('restoreIndicator');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadTournamentsFromStorage();
-            window.addEventListener('resize', () => {
-                if (activeTournamentId && currentWorkspaceTab === 'knockout') {
-                    updateConnectors();
+        // ── PERSISTENCE ──
+        const STORAGE_KEY = 'edge_searcher_state';
+
+        function getMessageId(msg) {
+            const s = `${msg.speaker}|${msg.rawDate}|${msg.rawTime}|${msg.message}`;
+            let h = 0;
+            for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i);
+                h = h & h; }
+            return `${msg.speaker}|${msg.rawDate}|${msg.rawTime}|${h}`;
+        }
+
+        function saveState() {
+            if (restoreInProgress) return;
+            try {
+                const selIds = [];
+                for (const m of selectedMessages) selIds.push(getMessageId(m));
+                const state = {
+                    fileContent: rawFileContent || null,
+                    fileName: fileNameSpan.textContent !== 'none' ? fileNameSpan.textContent : null,
+                    name1: name1Input.value,
+                    name2: name2Input.value,
+                    startDate: startDateInput.value,
+                    endDate: endDateInput.value,
+                    selectedIds: selIds,
+                    activeTab: document.querySelector('.tab-btn.active')?.dataset?.tab || 'search',
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (_) { /* ignore */ }
+        }
+
+        function loadState() {
+            try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch (_) { return null; }
+        }
+
+        function clearSavedState() { try { localStorage.removeItem(STORAGE_KEY); } catch (_) {} }
+
+        // ── TABS ──
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        function switchTab(tabId, save = true) {
+            panels.forEach(p => p.classList.remove('active-panel'));
+            tabBtns.forEach(b => b.classList.remove('active'));
+            const panel = document.getElementById(`${tabId}Panel`);
+            if (panel) panel.classList.add('active-panel');
+            const btn = Array.from(tabBtns).find(b => b.dataset.tab === tabId);
+            if (btn) btn.classList.add('active');
+
+            if (tabId === 'results') mainFooter?.classList.add('hide-footer');
+            else mainFooter?.classList.remove('hide-footer');
+
+            if (tabId === 'results') updateDeleteButtonVisibility();
+            if (save) saveState();
+        }
+
+        tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab, true)));
+
+        // ── HELPERS ──
+        function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+        // ── HIGHLIGHT with speaker colors ──
+        function highlightText(text, speaker1, speaker2) {
+            let out = text.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+
+            const entries = [];
+            if (speaker1 && speaker1.length) entries.push({ name: speaker1, cls: '' });
+            if (speaker2 && speaker2.length) entries.push({ name: speaker2, cls: 'speaker2' });
+
+            const seen = new Set();
+            const unique = [];
+            for (const e of entries) {
+                const key = e.name.toLowerCase();
+                if (!seen.has(key)) { seen.add(key);
+                    unique.push(e); }
+            }
+            unique.sort((a, b) => b.name.length - a.name.length);
+
+            for (const { name, cls } of unique) {
+                if (!name.length) continue;
+                const re = new RegExp(`(${escapeRegex(name)})`, 'gi');
+                const clsAttr = cls ? ` class="${cls}"` : '';
+                out = out.replace(re, `<mark${clsAttr}>$1</mark>`);
+            }
+
+            return out.replace(/\n/g, '<br>');
+        }
+
+        // ── DATE PARSERS ──
+        function parseDateDMY(s) {
+            if (!s || typeof s !== 'string') return null;
+            const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (!m) return null;
+            let d = parseInt(m[1], 10),
+                mo = parseInt(m[2], 10),
+                y = parseInt(m[3], 10);
+            if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            const dt = new Date(Date.UTC(y, mo - 1, d, 0, 0, 0, 0));
+            return isNaN(dt.getTime()) ? null : dt.getTime();
+        }
+
+        function parseDateMDY(s) {
+            if (!s || typeof s !== 'string') return null;
+            const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+            if (!m) return null;
+            let mo = parseInt(m[1], 10),
+                d = parseInt(m[2], 10),
+                yy = parseInt(m[3], 10);
+            if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            const dt = new Date(Date.UTC(2000 + yy, mo - 1, d, 0, 0, 0, 0));
+            return isNaN(dt.getTime()) ? null : dt.getTime();
+        }
+
+        function parseDateUniversal(s) {
+            if (!s || typeof s !== 'string') return null;
+            return parseDateDMY(s) ?? parseDateMDY(s);
+        }
+
+        function normaliseWhitespace(s) { return s.replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, ' '); }
+
+        // ── FORMAT 1 ──
+        function parseNewFormat(line) {
+            const cleaned = normaliseWhitespace(line);
+            const m = cleaned.match(/^\[(\d{1,2}\/\d{1,2}\/\d{4}),\s+(\d{1,2}:\d{2}:\d{2})\]\s+([^:]+):\s*(.*)$/);
+            if (!m) return null;
+            const dateStr = m[1],
+                timeStr = m[2],
+                speaker = m[3].trim(),
+                msg = m[4].trim();
+            if (!speaker) return null;
+            const tm = timeStr.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+            if (!tm) return null;
+            let h = parseInt(tm[1], 10),
+                min = parseInt(tm[2], 10),
+                sec = parseInt(tm[3], 10);
+            if (h < 0 || h > 23 || min < 0 || min > 59 || sec < 0 || sec > 59) return null;
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return null;
+            let d = parseInt(parts[0], 10),
+                mo = parseInt(parts[1], 10),
+                y = parseInt(parts[2], 10);
+            if (isNaN(d) || isNaN(mo) || isNaN(y) || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            const full = new Date(Date.UTC(y, mo - 1, d, h, min, sec, 0));
+            if (isNaN(full.getTime())) return null;
+            return {
+                rawDate: dateStr,
+                rawTime: timeStr,
+                speaker,
+                message: msg,
+                speakerLower: speaker.toLowerCase(),
+                dayTimestamp: Date.UTC(y, mo - 1, d, 0, 0, 0, 0),
+                fullTimestamp: full.getTime(),
+                displayDate: dateStr,
+                displayTime: timeStr,
+                continuationLines: []
+            };
+        }
+
+        // ── FORMAT 2 ──
+        function parseLegacyFormat(line) {
+            const cleaned = normaliseWhitespace(line);
+            const m = cleaned.match(/^(\d{1,2}\/\d{1,2}\/\d{2}),\s+(\d{1,2}:\d{2})\s+-\s+([^:]+):\s*(.*)$/);
+            if (!m) return null;
+            const dateStr = m[1],
+                timeStr = m[2],
+                speaker = m[3].trim(),
+                msg = m[4].trim();
+            if (!speaker) return null;
+            const tm = timeStr.match(/^(\d{1,2}):(\d{2})$/);
+            if (!tm) return null;
+            let h = parseInt(tm[1], 10),
+                min = parseInt(tm[2], 10);
+            if (h < 0 || h > 23 || min < 0 || min > 59) return null;
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return null;
+            let mo = parseInt(parts[0], 10),
+                d = parseInt(parts[1], 10),
+                yy = parseInt(parts[2], 10);
+            if (isNaN(mo) || isNaN(d) || isNaN(yy) || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            const y = 2000 + yy;
+            const full = new Date(Date.UTC(y, mo - 1, d, h, min, 0, 0));
+            if (isNaN(full.getTime())) return null;
+            return {
+                rawDate: dateStr,
+                rawTime: timeStr,
+                speaker,
+                message: msg,
+                speakerLower: speaker.toLowerCase(),
+                dayTimestamp: Date.UTC(y, mo - 1, d, 0, 0, 0, 0),
+                fullTimestamp: full.getTime(),
+                displayDate: dateStr,
+                displayTime: timeStr,
+                continuationLines: []
+            };
+        }
+
+        function parseMainMessageLine(line) {
+            return parseNewFormat(line) ?? parseLegacyFormat(line);
+        }
+
+        function parseFileWithContinuations(text) {
+            const lines = text.split(/\r?\n/);
+            const msgs = [];
+            let cur = null;
+            for (const line of lines) {
+                const match = parseMainMessageLine(line);
+                if (match) {
+                    if (cur) msgs.push(cur);
+                    cur = match;
+                    cur.continuationLines = [];
+                } else {
+                    if (cur && line.trim() !== '') cur.continuationLines.push(line);
+                    else if (cur && line === '') cur.continuationLines.push(line);
                 }
-            });
+            }
+            if (cur) msgs.push(cur);
+            const out = [];
+            for (const m of msgs) {
+                let full = m.message;
+                if (m.continuationLines.length) full += '\n' + m.continuationLines.join('\n');
+                out.push({
+                    rawDate: m.rawDate,
+                    rawTime: m.rawTime,
+                    speaker: m.speaker,
+                    speakerLower: m.speakerLower,
+                    message: full,
+                    dayTimestamp: m.dayTimestamp,
+                    fullTimestamp: m.fullTimestamp,
+                    displayDate: m.displayDate || m.rawDate,
+                    displayTime: m.displayTime || m.rawTime
+                });
+            }
+            return { messages: out, skippedLines: 0 };
+        }
+
+        // ── UI UPDATES ──
+        function updateStatsDisplay(count) {
+            if (count === 0 && !fileLoaded) parseStatsSpan.textContent = 'no file';
+            else if (count === 0 && fileLoaded) parseStatsSpan.textContent = '0 messages';
+            else parseStatsSpan.textContent = `${count} msgs`;
+        }
+
+        function resetSearchResults() {
+            currentDisplayedMessages = [];
+            currentSpeaker1 = null;
+            currentSpeaker2 = null;
+            selectedMessages.clear();
+            if (resultsContainer) {
+                if (fileLoaded && parsedMessages.length > 0) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">file loaded · enter speaker + date → search<br><span style="color:#94a3b8;">results appear as chat bubbles · select with checkboxes</span></div>`;
+                } else if (fileLoaded && parsedMessages.length === 0) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">no valid messages in file<br><span style="color:#94a3b8;">check format: <code>[dd/mm/yyyy, HH:MM:SS] Speaker: text</code></span></div>`;
+                } else {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">upload a log · search → results appear here<br><span style="color:#94a3b8;">select messages with checkboxes · delete selected</span></div>`;
+                }
+            }
+            updateResultCount(0);
+            updateDeleteButtonVisibility();
+        }
+
+        function updateResultCount(n) { if (resultCountBadge) resultCountBadge.textContent = `${n} message${n !== 1 ? 's' : ''}`; }
+
+        function updateDeleteButtonVisibility() {
+            const n = selectedMessages.size;
+            if (n > 0) {
+                deleteSelectedBtn.classList.add('visible');
+                deleteSelectedBtn.textContent = `🗑 Delete selected (${n})`;
+                deleteSelectedBtn.disabled = false;
+            } else {
+                deleteSelectedBtn.classList.remove('visible');
+                deleteSelectedBtn.textContent = '🗑 Delete selected';
+                deleteSelectedBtn.disabled = true;
+            }
+        }
+
+        // ── DATE DIVIDER HELPERS ──
+        function formatDateDivider(ts) {
+            const d = new Date(ts);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            const dDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+            if (dDate.getTime() === today.getTime()) return 'Today';
+            if (dDate.getTime() === yesterday.getTime()) return 'Yesterday';
+
+            const dd = String(d.getDate()).padStart(2, '0');
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const yyyy = d.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+
+        function getDateKey(ts) {
+            const d = new Date(ts);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        // ── RENDER — WHATSAPP STYLE ──
+        function renderResults(messages, speaker1, speaker2) {
+            if (!messages.length) {
+                if (fileLoaded && parsedMessages.length) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">no matches · adjust filters<br><span style="color:#94a3b8;">deleted messages are removed from this view only</span></div>`;
+                } else if (!fileLoaded) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">upload a log · search → results appear here<br><span style="color:#94a3b8;">select messages with checkboxes · delete selected</span></div>`;
+                } else {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">no results · try different criteria</div>`;
+                }
+                updateResultCount(0);
+                updateDeleteButtonVisibility();
+                return;
+            }
+
+            selectedMessages.clear();
+            const frag = document.createDocumentFragment();
+            updateResultCount(messages.length);
+
+            // Group by date
+            const groups = {};
+            for (const msg of messages) {
+                const key = getDateKey(msg.dayTimestamp);
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(msg);
+            }
+
+            const sortedKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+
+            const s1 = speaker1 || '';
+            const s2 = speaker2 || '';
+
+            for (const key of sortedKeys) {
+                const dayMs = new Date(key + 'T00:00:00Z').getTime();
+                const label = formatDateDivider(dayMs);
+
+                // Date divider
+                const div = document.createElement('div');
+                div.className = 'date-divider';
+                const span = document.createElement('span');
+                span.textContent = label;
+                div.appendChild(span);
+                frag.appendChild(div);
+
+                const msgs = groups[key];
+                // sort by time within the day
+                msgs.sort((a, b) => a.fullTimestamp - b.fullTimestamp);
+
+                for (let i = 0; i < msgs.length; i++) {
+                    const msg = msgs[i];
+                    const isSpeaker1 = s1 && msg.speakerLower === s1.toLowerCase();
+                    const isSpeaker2 = s2 && msg.speakerLower === s2.toLowerCase();
+
+                    // Determine alignment: speaker1 = sent (right), speaker2 = received (left)
+                    // If only speaker1 is set, all messages are sent (right)
+                    let isSent = false;
+                    if (s1 && s2) {
+                        isSent = isSpeaker1;
+                    } else if (s1 && !s2) {
+                        isSent = isSpeaker1;
+                    } else {
+                        // fallback: if no speaker match, treat as received
+                        isSent = false;
+                    }
+
+                    // If speaker1 is set but this message is from speaker2, it's received
+                    if (s1 && s2 && isSpeaker2) isSent = false;
+                    // If only speaker1 is set, all messages are from speaker1 → sent
+                    if (s1 && !s2) isSent = true;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `msg-wrapper ${isSent ? 'sent' : 'received'}`;
+
+                    // ── Checkbox ──
+                    const cbWrap = document.createElement('div');
+                    cbWrap.className = 'msg-checkbox-wrap';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.className = 'msg-select';
+                    cb.dataset.idx = i;
+                    cb.checked = false;
+                    cb.addEventListener('change', (e) => {
+                        if (e.target.checked) { selectedMessages.add(msg);
+                            wrapper.classList.add('selected'); } else { selectedMessages.delete(msg);
+                            wrapper.classList.remove('selected'); }
+                        updateDeleteButtonVisibility();
+                        saveState();
+                    });
+                    cbWrap.appendChild(cb);
+
+                    // ── Avatar (only for received) ──
+                    let avatar = null;
+                    if (!isSent) {
+                        avatar = document.createElement('div');
+                        avatar.className = 'msg-avatar speaker2-avatar';
+                        const initials = msg.speaker.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                        avatar.textContent = initials || '?';
+                        // In dark mode we use a different style but the class handles it
+                    }
+
+                    // ── Bubble container ──
+                    const bubbleContainer = document.createElement('div');
+                    bubbleContainer.className = 'bubble-container';
+
+                    // ── Speaker name ──
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'msg-speaker-name';
+                    if (isSent) {
+                        // For sent, show "You" or the speaker name with highlight
+                        const displayName = s1 || msg.speaker;
+                        nameEl.innerHTML =
+                            `<span class="highlight-s1">${escapeHtml(displayName)}</span> <span style="font-weight:400;opacity:0.6;">· you</span>`;
+                    } else {
+                        const displayName = msg.speaker;
+                        nameEl.innerHTML = `<span class="highlight-s2">${escapeHtml(displayName)}</span>`;
+                    }
+                    bubbleContainer.appendChild(nameEl);
+
+                    // ── Bubble ──
+                    const bubble = document.createElement('div');
+                    bubble.className = 'bubble';
+
+                    const txt = document.createElement('div');
+                    txt.className = 'msg-text';
+                    txt.innerHTML = highlightText(msg.message, s1, s2);
+                    bubble.appendChild(txt);
+
+                    // ── Timestamp ──
+                    const ts = document.createElement('div');
+                    ts.className = 'msg-timestamp';
+                    // Format time: HH:MM
+                    const timeParts = msg.rawTime ? msg.rawTime.split(':') : ['00', '00'];
+                    let hh = timeParts[0] || '00';
+                    let mm = timeParts[1] || '00';
+                    if (hh.length === 1) hh = '0' + hh;
+                    if (mm.length === 1) mm = '0' + mm;
+                    ts.textContent = `${hh}:${mm}`;
+                    bubble.appendChild(ts);
+
+                    bubbleContainer.appendChild(bubble);
+
+                    // ── Assemble ──
+                    if (!isSent && avatar) wrapper.appendChild(avatar);
+                    wrapper.appendChild(bubbleContainer);
+                    // Checkbox goes on the outer edge
+                    if (isSent) {
+                        // sent: checkbox on right
+                        wrapper.appendChild(cbWrap);
+                    } else {
+                        // received: checkbox on left (after avatar, before bubble)
+                        // But we need to insert it after avatar, before bubbleContainer
+                        // Since we already appended avatar and bubbleContainer, we need to reorder
+                        // Let's rebuild the wrapper in the right order
+                        // Actually, let's just rebuild the wrapper cleanly
+                    }
+
+                    // Clean rebuild for proper order
+                    // Since we already built it, let's just clear and rebuild properly
+                    // I'll use a cleaner approach: rebuild the wrapper from scratch
+                    const newWrapper = document.createElement('div');
+                    newWrapper.className = `msg-wrapper ${isSent ? 'sent' : 'received'}`;
+
+                    // Checkbox
+                    const cbWrap2 = document.createElement('div');
+                    cbWrap2.className = 'msg-checkbox-wrap';
+                    const cb2 = document.createElement('input');
+                    cb2.type = 'checkbox';
+                    cb2.className = 'msg-select';
+                    cb2.checked = false;
+                    cb2.addEventListener('change', (e) => {
+                        if (e.target.checked) { selectedMessages.add(msg);
+                            newWrapper.classList.add('selected'); } else { selectedMessages.delete(msg);
+                            newWrapper.classList.remove('selected'); }
+                        updateDeleteButtonVisibility();
+                        saveState();
+                    });
+                    cbWrap2.appendChild(cb2);
+
+                    // Avatar (received only)
+                    let avatar2 = null;
+                    if (!isSent) {
+                        avatar2 = document.createElement('div');
+                        avatar2.className = 'msg-avatar speaker2-avatar';
+                        const initials2 = msg.speaker.split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+                        avatar2.textContent = initials2 || '?';
+                    }
+
+                    // Bubble container
+                    const bc2 = document.createElement('div');
+                    bc2.className = 'bubble-container';
+
+                    // Speaker name
+                    const nameEl2 = document.createElement('div');
+                    nameEl2.className = 'msg-speaker-name';
+                    if (isSent) {
+                        const displayName2 = s1 || msg.speaker;
+                        nameEl2.innerHTML =
+                            `<span class="highlight-s1">${escapeHtml(displayName2)}</span> <span style="font-weight:400;opacity:0.6;">· you</span>`;
+                    } else {
+                        const displayName2 = msg.speaker;
+                        nameEl2.innerHTML = `<span class="highlight-s2">${escapeHtml(displayName2)}</span>`;
+                    }
+                    bc2.appendChild(nameEl2);
+
+                    // Bubble
+                    const bubble2 = document.createElement('div');
+                    bubble2.className = 'bubble';
+                    const txt2 = document.createElement('div');
+                    txt2.className = 'msg-text';
+                    txt2.innerHTML = highlightText(msg.message, s1, s2);
+                    bubble2.appendChild(txt2);
+
+                    const ts2 = document.createElement('div');
+                    ts2.className = 'msg-timestamp';
+                    const tp2 = msg.rawTime ? msg.rawTime.split(':') : ['00', '00'];
+                    let hh2 = tp2[0] || '00',
+                        mm2 = tp2[1] || '00';
+                    if (hh2.length === 1) hh2 = '0' + hh2;
+                    if (mm2.length === 1) mm2 = '0' + mm2;
+                    ts2.textContent = `${hh2}:${mm2}`;
+                    bubble2.appendChild(ts2);
+                    bc2.appendChild(bubble2);
+
+                    // Assemble in correct order
+                    if (!isSent && avatar2) newWrapper.appendChild(avatar2);
+                    // For received: checkbox on left, after avatar
+                    if (!isSent) newWrapper.appendChild(cbWrap2);
+                    newWrapper.appendChild(bc2);
+                    // For sent: checkbox on right
+                    if (isSent) newWrapper.appendChild(cbWrap2);
+
+                    // Restore selection state
+                    const saved = loadState();
+                    if (saved && saved.selectedIds && saved.selectedIds.includes(getMessageId(msg))) {
+                        cb2.checked = true;
+                        newWrapper.classList.add('selected');
+                        selectedMessages.add(msg);
+                    }
+
+                    // Store reference to the checkbox for later updates
+                    newWrapper._checkbox = cb2;
+
+                    frag.appendChild(newWrapper);
+                }
+            }
+
+            resultsContainer.innerHTML = '';
+            resultsContainer.appendChild(frag);
+            updateDeleteButtonVisibility();
+
+            // Re-sync selected count after restore
+            const savedState = loadState();
+            if (savedState && savedState.selectedIds && savedState.selectedIds.length) {
+                const ids = new Set(savedState.selectedIds);
+                const items = resultsContainer.querySelectorAll('.msg-wrapper');
+                let count = 0;
+                let idx = 0;
+                for (const key of sortedKeys) {
+                    const msgs = groups[key];
+                    for (const msg of msgs) {
+                        const item = items[idx];
+                        if (item && ids.has(getMessageId(msg))) {
+                            const cb = item.querySelector('.msg-select');
+                            if (cb) cb.checked = true;
+                            item.classList.add('selected');
+                            selectedMessages.add(msg);
+                            count++;
+                        }
+                        idx++;
+                    }
+                }
+                updateDeleteButtonVisibility();
+            }
+        }
+
+        function escapeHtml(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // ── SEARCH ──
+        function performSearch(save = true) {
+            if (!fileLoaded || !parsedMessages.length) {
+                resultsContainer.innerHTML =
+                    `<div class="empty-state">upload a valid chat log first<br><span style="color:#94a3b8;">supports <code>[dd/mm/yyyy, HH:MM:SS] Speaker: text</code> or <code>m/d/yy, HH:MM - Speaker: text</code></span></div>`;
+                switchTab('results', false);
+                return;
+            }
+
+            const n1 = name1Input.value.trim();
+            if (!n1) {
+                resultsContainer.innerHTML = `<div class="empty-state">enter speaker 1 (required)</div>`;
+                switchTab('results', false);
+                return;
+            }
+
+            const n2 = name2Input.value.trim();
+            const fromRaw = startDateInput.value.trim();
+            const toRaw = endDateInput.value.trim();
+
+            let fromMs = null,
+                toMs = null;
+            if (fromRaw) { fromMs = parseDateUniversal(fromRaw); if (fromMs === null) { resultsContainer.innerHTML =
+                        `<div class="empty-state">invalid from date · use dd/mm/yyyy</div>`; switchTab('results', false); return; } }
+            if (toRaw) { toMs = parseDateUniversal(toRaw); if (toMs === null) { resultsContainer.innerHTML =
+                        `<div class="empty-state">invalid to date · use dd/mm/yyyy</div>`; switchTab('results', false); return; } }
+            if (fromMs !== null && toMs !== null && fromMs > toMs) { resultsContainer.innerHTML =
+                    `<div class="empty-state">from date cannot be after to date</div>`; switchTab('results', false); return; }
+
+            const n1l = n1.toLowerCase(),
+                n2l = n2.toLowerCase();
+            let filtered = parsedMessages.filter(m => n2 ? m.speakerLower === n1l || m.speakerLower === n2l : m
+                .speakerLower === n1l);
+
+            if (fromMs !== null || toMs !== null) {
+                filtered = filtered.filter(m => {
+                    const d = m.dayTimestamp;
+                    if (fromMs !== null && d < fromMs) return false;
+                    if (toMs !== null && d > toMs) return false;
+                    return true;
+                });
+            }
+
+            filtered.sort((a, b) => a.fullTimestamp - b.fullTimestamp);
+
+            const s1 = n1 || null;
+            const s2 = n2 || null;
+
+            currentDisplayedMessages = filtered;
+            currentSpeaker1 = s1;
+            currentSpeaker2 = s2;
+            selectedMessages.clear();
+
+            renderResults(currentDisplayedMessages, currentSpeaker1, currentSpeaker2);
+
+            switchTab('results', false);
+            if (save) saveState();
+        }
+
+        // ── FILE LOADING ──
+        function loadFile(file) {
+            if (!file) { resetFileState(); return; }
+            fileNameSpan.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                rawFileContent = content;
+                const { messages } = parseFileWithContinuations(content);
+                parsedMessages = messages;
+                fileLoaded = true;
+                updateStatsDisplay(parsedMessages.length);
+                currentDisplayedMessages = [];
+                currentSpeaker1 = null;
+                currentSpeaker2 = null;
+                selectedMessages.clear();
+                resetSearchResults();
+                if (!parsedMessages.length) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">no valid messages found<br><span style="color:#94a3b8;">check format: <code>[dd/mm/yyyy, HH:MM:SS] Speaker: text</code> or <code>m/d/yy, HH:MM - Speaker: text</code></span></div>`;
+                } else {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">${parsedMessages.length} messages loaded · enter speaker + date → search</div>`;
+                }
+                updateDeleteButtonVisibility();
+                restoreIndicator.style.display = 'inline-block';
+                saveState();
+            };
+            reader.onerror = () => { alert('file read error');
+                resetFileState(); };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function resetFileState() {
+            parsedMessages = [];
+            fileLoaded = false;
+            rawFileContent = null;
+            fileNameSpan.textContent = 'none';
+            updateStatsDisplay(0);
+            fileInput.value = '';
+            currentDisplayedMessages = [];
+            currentSpeaker1 = null;
+            currentSpeaker2 = null;
+            selectedMessages.clear();
+            resetSearchResults();
+            resultsContainer.innerHTML =
+                `<div class="empty-state">upload a log · search → results appear here<br><span style="color:#94a3b8;">select messages with checkboxes · delete selected</span></div>`;
+            updateDeleteButtonVisibility();
+            restoreIndicator.style.display = 'none';
+            clearSavedState();
+        }
+
+        function clearFileAndReset() {
+            resetFileState();
+            fileInput.value = '';
+            name1Input.value = '';
+            name2Input.value = '';
+            startDateInput.value = '';
+            endDateInput.value = '';
+            resultsContainer.innerHTML =
+                `<div class="empty-state">file cleared · upload a new log</div>`;
+            parseStatsSpan.textContent = 'no file';
+            fileNameSpan.textContent = 'none';
+            fileLoaded = false;
+            parsedMessages = [];
+            rawFileContent = null;
+            currentDisplayedMessages = [];
+            currentSpeaker1 = null;
+            currentSpeaker2 = null;
+            selectedMessages.clear();
+            updateDeleteButtonVisibility();
+            restoreIndicator.style.display = 'none';
+            clearSavedState();
+            switchTab('search', false);
+        }
+
+        // ── DELETE ──
+        function deleteSelectedMessages() {
+            if (!selectedMessages.size) return;
+            const toDelete = new Set(selectedMessages);
+            currentDisplayedMessages = currentDisplayedMessages.filter(m => !toDelete.has(m));
+            selectedMessages.clear();
+            renderResults(currentDisplayedMessages, currentSpeaker1, currentSpeaker2);
+            updateDeleteButtonVisibility();
+            saveState();
+        }
+
+        // ── RESTORE ──
+        function restoreFromSaved() {
+            const saved = loadState();
+            if (!saved) return false;
+            restoreInProgress = true;
+            let restored = false;
+            try {
+                if (saved.name1 !== undefined) name1Input.value = saved.name1 || '';
+                if (saved.name2 !== undefined) name2Input.value = saved.name2 || '';
+                if (saved.startDate !== undefined) startDateInput.value = saved.startDate || '';
+                if (saved.endDate !== undefined) endDateInput.value = saved.endDate || '';
+
+                if (saved.fileContent && saved.fileName) {
+                    const { messages } = parseFileWithContinuations(saved.fileContent);
+                    if (messages.length) {
+                        parsedMessages = messages;
+                        fileLoaded = true;
+                        rawFileContent = saved.fileContent;
+                        fileNameSpan.textContent = saved.fileName;
+                        updateStatsDisplay(parsedMessages.length);
+                        resetSearchResults();
+                        restoreIndicator.style.display = 'inline-block';
+                        restored = true;
+                    } else {
+                        fileLoaded = false;
+                        rawFileContent = null;
+                        fileNameSpan.textContent = saved.fileName + ' (invalid)';
+                        updateStatsDisplay(0);
+                        resetSearchResults();
+                        restoreIndicator.style.display = 'none';
+                    }
+                }
+
+                if (fileLoaded && parsedMessages.length && name1Input.value.trim()) {
+                    performSearch(false);
+                } else if (fileLoaded && parsedMessages.length) {
+                    resultsContainer.innerHTML =
+                        `<div class="empty-state">${parsedMessages.length} messages restored · enter speaker + date → search</div>`;
+                    updateResultCount(0);
+                    updateDeleteButtonVisibility();
+                }
+
+                if (saved.activeTab) switchTab(saved.activeTab, false);
+                const active = document.querySelector('.tab-btn.active')?.dataset?.tab || 'search';
+                if (active === 'results') mainFooter?.classList.add('hide-footer');
+                else mainFooter?.classList.remove('hide-footer');
+
+                if (!restored && !saved.name1 && !saved.name2 && !saved.startDate && !saved.endDate) restored = false;
+                else restored = true;
+            } catch (_) { restored = false; } finally { restoreInProgress = false; }
+            return restored;
+        }
+
+        // ── EVENTS ──
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => { const f = e.target.files[0]; f ? loadFile(f) : resetFileState(); });
+        clearFileBtn.addEventListener('click', clearFileAndReset);
+        searchBtn.addEventListener('click', () => performSearch(true));
+        deleteSelectedBtn.addEventListener('click', deleteSelectedMessages);
+
+        [name1Input, name2Input, startDateInput, endDateInput].forEach(f => {
+            f.addEventListener('input', () => saveState());
+            f.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault();
+                    performSearch(true); } });
         });
 
-        function loadTournamentsFromStorage() {
-            const data = localStorage.getItem('arena_tournaments');
-            try { tournaments = data ? JSON.parse(data) : []; } catch (_) { tournaments = []; }
-            renderTournamentListings();
+        // ── INIT ──
+        resetSearchResults();
+        updateDeleteButtonVisibility();
+        const restored = restoreFromSaved();
+        if (!restored) {
+            resultsContainer.innerHTML =
+                `<div class="empty-state">upload a log · search → results appear here<br><span style="color:#94a3b8;">select messages with checkboxes · delete selected · auto‑saved</span></div>`;
         }
-
-        function saveTournamentsToStorage() {
-            localStorage.setItem('arena_tournaments', JSON.stringify(tournaments));
-            renderTournamentListings();
-        }
-
-        function toggleSortMenu() {
-            sortMenuOpen = !sortMenuOpen;
-            document.getElementById('sortMenu').classList.toggle('open', sortMenuOpen);
-        }
-
-        function setSort(sortKey) {
-            currentSort = sortKey;
-            sortMenuOpen = false;
-            document.getElementById('sortMenu').classList.remove('open');
-            const labels = {
-                'date-desc': 'Newest',
-                'date-asc': 'Oldest',
-                'name-asc': 'A → Z',
-                'name-desc': 'Z → A'
-            };
-            document.getElementById('sortLabel').textContent = labels[sortKey] || 'Sort';
-            renderTournamentListings();
-        }
-
-        function getSortedTournaments() {
-            const arr = [...tournaments];
-            switch (currentSort) {
-                case 'name-asc':
-                    arr.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'name-desc':
-                    arr.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                case 'date-asc':
-                    arr.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    break;
-                case 'date-desc':
-                default:
-                    arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    break;
-            }
-            return arr;
-        }
-
-        function goHome() {
-            activeTournamentId = null;
-            document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('create-view').classList.add('hidden');
-            hideWorkspaceViews();
-            document.getElementById('active-nav-tabs').classList.add('hidden');
-            document.getElementById('view-actions').classList.add('hidden');
-            renderTournamentListings();
-        }
-
-        function showCreateView() {
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('create-view').classList.remove('hidden');
-            hideWorkspaceViews();
-            document.getElementById('active-nav-tabs').classList.add('hidden');
-            document.getElementById('view-actions').classList.add('hidden');
-            adjustContendersPlaceholder();
-        }
-
-        function hideWorkspaceViews() {
-            ['tab-view-groups', 'tab-view-fixtures', 'tab-view-knockout'].forEach(id =>
-                document.getElementById(id).classList.add('hidden')
-            );
-        }
-
-        function scrollToTournaments() {
-            document.getElementById('tournament-listings').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function switchActiveTab(tab) {
-            currentWorkspaceTab = tab;
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t) return;
-            hideWorkspaceViews();
-
-            const btnGroups = document.getElementById('tab-groups');
-            const btnFixtures = document.getElementById('tab-fixtures');
-            const btnKnockout = document.getElementById('tab-knockout');
-            [btnGroups, btnFixtures, btnKnockout].forEach(btn => btn.classList.remove('active'));
-
-            const guard = document.getElementById('knockout-guard-overlay');
-            const container = document.getElementById('bracket-container');
-
-            if (tab === 'groups') {
-                document.getElementById('tab-view-groups').classList.remove('hidden');
-                btnGroups.classList.add('active');
-                renderActiveGroupStandings();
-            } else if (tab === 'fixtures') {
-                document.getElementById('tab-view-fixtures').classList.remove('hidden');
-                btnFixtures.classList.add('active');
-                renderActiveFixturesGrid();
-            } else if (tab === 'knockout') {
-                document.getElementById('tab-view-knockout').classList.remove('hidden');
-                btnKnockout.classList.add('active');
-
-                const hasRounds = t.rounds && t.rounds.length > 0;
-
-                if (hasRounds) {
-                    guard.classList.add('hidden');
-                    container.classList.remove('guarded');
-                    renderActiveBracket();
-                } else {
-                    guard.classList.remove('hidden');
-                    container.classList.add('guarded');
-                    guard.style.display = 'flex';
-                }
-            }
-        }
-
-        function refreshCurrentView() {
-            if (!activeTournamentId) return;
-            if (currentWorkspaceTab === 'groups') renderActiveGroupStandings();
-            else if (currentWorkspaceTab === 'fixtures') renderActiveFixturesGrid();
-            else if (currentWorkspaceTab === 'knockout') {
-                const t = tournaments.find(x => x.id === activeTournamentId);
-                if (!t) return;
-                const hasRounds = t.rounds && t.rounds.length > 0;
-                const guard = document.getElementById('knockout-guard-overlay');
-                const container = document.getElementById('bracket-container');
-                if (hasRounds) {
-                    guard.classList.add('hidden');
-                    container.classList.remove('guarded');
-                    renderActiveBracket();
-                } else {
-                    guard.classList.remove('hidden');
-                    container.classList.add('guarded');
-                    guard.style.display = 'flex';
-                }
-            }
-        }
-
-        function renderTournamentListings() {
-            const grid = document.getElementById('tournament-cards-grid');
-            grid.innerHTML = '';
-            const sorted = getSortedTournaments();
-
-            if (sorted.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-1 md:col-span-2 glass-card p-8 rounded-xl text-center space-y-2">
-                        <p class="text-sm text-gray-400 font-medium">No tournament brackets generated yet.</p>
-                        <button onclick="showCreateView()" class="inline-flex items-center gap-1.5 text-xs text-[#ffd13b] font-bold hover:underline">Create a tournament <i class="fa-solid fa-arrow-right"></i></button>
-                    </div>
-                `;
-                return;
-            }
-
-            sorted.forEach(t => {
-                const card = document.createElement('div');
-                card.className =
-                    "glass-card p-5 rounded-xl hover:border-[#ffd13b]/30 hover:-translate-y-0.5 transition-all flex flex-col justify-between";
-                const statsText = t.format === 'knockout' ?
-                    `${t.entrants.length} Entrants · Direct Elimination Bracket` :
-                    `${t.entrants.length} Entrants · ${t.groups ? t.groups.length : 0} Groups · Group & Knockout`;
-                const dateStr = t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '';
-                card.innerHTML = `
-                    <div class="space-y-1.5 mb-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[9px] px-2.5 py-0.5 rounded-full font-black uppercase tracking-wider ${t.format === 'knockout' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'}">
-                                ${t.format === 'knockout' ? 'Knockout' : 'Groups + KO'}
-                            </span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="openEditPlayersModal('${t.id}', event)" class="text-gray-400 hover:text-[#ffd13b] p-1.5 transition" title="Edit Players"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button onclick="deleteTournament('${t.id}', event)" class="text-gray-400 hover:text-rose-400 p-1.5 transition" title="Delete Tournament"><i class="fa-solid fa-trash-can"></i></button>
-                            </div>
-                        </div>
-                        <h4 class="text-sm font-black text-white uppercase tracking-wide truncate max-w-[250px]">${t.name}</h4>
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${statsText}</p>
-                        ${dateStr ? `<p class="text-[9px] text-gray-500 font-medium">${dateStr}</p>` : ''}
-                    </div>
-                    <button onclick="launchTournament('${t.id}')" class="w-full py-2.5 rounded-lg secondary-btn text-[10px] font-black uppercase tracking-widest text-center flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-circle-play text-xs text-[#ffd13b]"></i> Launch Match
-                    </button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function deleteTournament(id, e) {
-            if (e) e.stopPropagation();
-            if (!confirm('Delete this tournament permanently?')) return;
-            tournaments = tournaments.filter(t => t.id !== id);
-            saveTournamentsToStorage();
-            if (activeTournamentId === id) goHome();
-        }
-
-        function openEditPlayersModal(id, event) {
-            if (event) event.stopPropagation();
-            editingTournamentId = id;
-            const t = tournaments.find(x => x.id === id);
-            if (!t) return;
-            const container = document.getElementById('edit-players-inputs');
-            container.innerHTML = '';
-            t.entrants.forEach((entrant, index) => {
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-3";
-                div.innerHTML = `
-                    <span class="text-xs font-black text-gray-500 w-8 text-right">#${index+1}</span>
-                    <input type="text" value="${entrant}" class="flex-grow px-3 py-2 rounded bg-[#0b0e1a] border border-white/10 text-white font-semibold text-xs tracking-wide focus:outline-none focus:border-[#ffd13b]" data-index="${index}" />
-                `;
-                container.appendChild(div);
-            });
-            document.getElementById('edit-players-modal').classList.remove('hidden');
-        }
-
-        function closeEditPlayersModal() {
-            document.getElementById('edit-players-modal').classList.add('hidden');
-            editingTournamentId = null;
-        }
-
-        function saveEditedPlayers() {
-            if (!editingTournamentId) return;
-            const t = tournaments.find(x => x.id === editingTournamentId);
-            if (!t) return;
-            const inputs = document.querySelectorAll('#edit-players-inputs input');
-            const newNames = Array.from(inputs).map(inp => inp.value.trim() || `Player ${parseInt(inp.dataset.index)+1}`);
-            const oldNames = [...t.entrants];
-            t.entrants = [...newNames];
-            const renameMap = {};
-            oldNames.forEach((oldName, idx) => { renameMap[oldName] = newNames[idx]; });
-
-            if (t.groups) {
-                t.groups.forEach(group => {
-                    group.teams = group.teams.map(team => renameMap[team] || team);
-                    group.matches.forEach(m => {
-                        if (renameMap[m.home]) m.home = renameMap[m.home];
-                        if (renameMap[m.away]) m.away = renameMap[m.away];
-                    });
-                });
-            }
-            if (t.rounds) {
-                t.rounds.forEach(round => {
-                    round.slots.forEach(slot => {
-                        if (slot.name && renameMap[slot.name]) slot.name = renameMap[slot.name];
-                    });
-                });
-            }
-            saveTournamentsToStorage();
-            closeEditPlayersModal();
-            if (activeTournamentId === t.id) launchTournament(t.id);
-        }
-
-        function setFormFormat(fmt) {
-            currentFormFormat = fmt;
-            const tabKO = document.getElementById('tab-knockout-form');
-            const tabGP = document.getElementById('tab-group');
-            const optKO = document.getElementById('options-knockout');
-            const optGP = document.getElementById('options-group');
-            if (fmt === 'knockout') {
-                tabKO.className =
-                    "py-3 px-4 rounded-lg bg-gradient-to-r from-blue-600/20 to-blue-900/30 border border-blue-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
-                tabGP.className =
-                    "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-                optKO.classList.remove('hidden');
-                optGP.classList.add('hidden');
-            } else {
-                tabGP.className =
-                    "py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/20 to-purple-900/30 border border-purple-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2";
-                tabKO.className =
-                    "py-3 px-4 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-                optGP.classList.remove('hidden');
-                optKO.classList.add('hidden');
-            }
-            adjustContendersPlaceholder();
-        }
-
-        function setFormDist(dist) {
-            currentFormDist = dist;
-            document.querySelectorAll('#dist-random, #dist-random-ko').forEach(b => {
-                b.className = dist === 'random' ?
-                    "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2" :
-                    "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-            });
-            document.querySelectorAll('#dist-custom, #dist-custom-ko').forEach(b => {
-                b.className = dist === 'custom' ?
-                    "py-2.5 px-3 rounded-lg bg-gradient-to-r from-amber-600/20 to-amber-900/30 border border-amber-500/35 text-white text-xs font-black tracking-wider uppercase flex items-center justify-center gap-2" :
-                    "py-2.5 px-3 rounded-lg bg-white/5 border border-white/5 text-gray-400 text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2";
-            });
-        }
-
-        function getRequiredEntrantCount() {
-            if (currentFormFormat === 'knockout') return parseInt(document.getElementById('form-knockout-rounds').value);
-            return parseInt(document.getElementById('form-group-max').value);
-        }
-
-        function adjustContendersPlaceholder() {
-            const req = getRequiredEntrantCount();
-            document.getElementById('form-contenders').placeholder = `Enter exactly ${req} player names, each on a new line...`;
-            updateContendersCount();
-        }
-
-        function updateContendersCount() {
-            const lines = document.getElementById('form-contenders').value.split('\n').map(l => l.trim()).filter(l => l !== "");
-            const req = getRequiredEntrantCount();
-            const counter = document.getElementById('contenders-counter');
-            counter.innerText = `${lines.length} / ${req} Contenders`;
-            counter.className = `text-[10px] font-black ${lines.length === req ? 'text-emerald-400' : 'text-[#ffd13b]'} uppercase`;
-        }
-
-        function autoSuggestGroupStructure() { adjustContendersPlaceholder(); }
-
-        function autofillSampleTeams() {
-            const req = getRequiredEntrantCount();
-            let selection = [...SAMPLE_CROWN_TEAMS].slice(0, req);
-            if (currentFormDist === 'random') selection = selection.sort(() => 0.5 - Math.random());
-            document.getElementById('form-contenders').value = selection.join('\n');
-            updateContendersCount();
-        }
-
-        function clearContenderForm() {
-            document.getElementById('form-contenders').value = '';
-            updateContendersCount();
-        }
-
-        function generateRoundRobinFixtures(teams) {
-            if (teams.length < 2) return [];
-            let allTeams = [...teams];
-            if (allTeams.length % 2 !== 0) allTeams.push('BYE');
-            const m = allTeams.length;
-            const numRounds = m - 1;
-            const half = m / 2;
-            let fixtures = [];
-            let indices = Array.from({ length: m }, (_, i) => i);
-
-            for (let round = 0; round < numRounds; round++) {
-                for (let i = 0; i < half; i++) {
-                    const idx1 = indices[i];
-                    const idx2 = indices[m - 1 - i];
-                    if (idx1 !== idx2 && allTeams[idx1] !== 'BYE' && allTeams[idx2] !== 'BYE') {
-                        fixtures.push({ home: allTeams[idx1], away: allTeams[idx2], homeScore: "", awayScore: "",
-                            played: false });
-                    }
-                }
-                indices.splice(1, 0, indices.pop());
-            }
-            return fixtures;
-        }
-
-        function handleCreateTournament() {
-            const name = document.getElementById('form-name').value.trim() || "MONARCHS CL 3B";
-            const req = getRequiredEntrantCount();
-            let rawLines = document.getElementById('form-contenders').value.split('\n').map(l => l.trim()).filter(l => l !== "");
-            while (rawLines.length < req) rawLines.push(`Contender ${rawLines.length+1}`);
-            if (rawLines.length > req) rawLines = rawLines.slice(0, req);
-
-            const id = 'tour-' + Date.now();
-            let newTournament = { id, name, format: currentFormFormat, entrants: [...rawLines],
-            createdAt: new Date().toISOString() };
-
-            if (currentFormFormat === 'knockout') {
-                let orderedLines = [...rawLines];
-                if (currentFormDist === 'random') orderedLines.sort(() => 0.5 - Math.random());
-                newTournament.rounds = buildInitialKnockoutRounds(orderedLines);
-                newTournament.champion = "";
-            } else {
-                const sizeVal = parseInt(document.getElementById('form-group-size').value) || 5;
-                const qualifiersVal = parseInt(document.getElementById('form-group-qualifiers').value) || 4;
-                const seedList = currentFormDist === 'random' ? [...rawLines].sort(() => 0.5 - Math.random()) : [...rawLines];
-                newTournament.groupSettings = { groupSize: sizeVal, qualifiersPerGroup: qualifiersVal };
-                newTournament.groups = buildBalancedGroupFixtures(seedList, sizeVal);
-            }
-            tournaments.push(newTournament);
-            saveTournamentsToStorage();
-            launchTournament(id);
-        }
-
-        function buildBalancedGroupFixtures(teams, groupSize) {
-            const numGroups = Math.ceil(teams.length / groupSize);
-            let groups = [];
-            for (let g = 0; g < numGroups; g++) {
-                const groupName = String.fromCharCode(65 + g);
-                const groupTeams = teams.slice(g * groupSize, (g + 1) * groupSize);
-                let matches = generateRoundRobinFixtures(groupTeams).map((m, idx) => {
-                    m.id = `${groupName}-${idx}`;
-                    return m;
-                });
-                groups.push({ name: `Group ${groupName}`, teams: groupTeams, matches });
-            }
-            return groups;
-        }
-
-        function getRoundTitle(rIndex, total) {
-            const d = total - rIndex;
-            if (d === 1) return "Final";
-            if (d === 2) return "Semifinals";
-            if (d === 3) return "Quarterfinals";
-            if (d === 4) return "Round of 16";
-            if (d === 5) return "Round of 32";
-            return `Round ${rIndex+1}`;
-        }
-
-        function buildInitialKnockoutRounds(contenders) {
-            const count = contenders.length;
-            const roundsCount = Math.log2(count);
-            let rounds = [];
-            for (let r = 0; r < roundsCount; r++) {
-                const slotsInRound = count / Math.pow(2, r);
-                let roundSlots = [];
-                for (let s = 0; s < slotsInRound; s++) {
-                    roundSlots.push({ name: r === 0 ? contenders[s] : "", scoreLeg1: "", scoreLeg2: "", isWinner: false });
-                }
-                rounds.push({ roundIndex: r, title: getRoundTitle(r, roundsCount), slots: roundSlots });
-            }
-            rounds.push({ roundIndex: roundsCount, title: "Champion", slots: [{ name: "", isWinner: false }] });
-            return rounds;
-        }
-
-        function launchTournament(id) {
-            activeTournamentId = id;
-            const t = tournaments.find(x => x.id === id);
-            if (!t) return;
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('create-view').classList.add('hidden');
-            document.getElementById('groups-title').innerText = `${t.name} GROUP STAGE TOURNAMENT`;
-            document.getElementById('fixtures-title').innerText = `${t.name} TOURNAMENT FIXTURES`;
-            document.getElementById('view-actions').classList.remove('hidden');
-
-            if (t.format === 'knockout') {
-                document.getElementById('active-nav-tabs').classList.add('hidden');
-                hideWorkspaceViews();
-                document.getElementById('tab-view-knockout').classList.remove('hidden');
-                const guard = document.getElementById('knockout-guard-overlay');
-                const container = document.getElementById('bracket-container');
-                guard.classList.add('hidden');
-                container.classList.remove('guarded');
-                renderActiveBracket();
-                currentWorkspaceTab = 'knockout';
-            } else {
-                document.getElementById('active-nav-tabs').classList.remove('hidden');
-                const guard = document.getElementById('knockout-guard-overlay');
-                const container = document.getElementById('bracket-container');
-                guard.classList.remove('hidden');
-                container.classList.add('guarded');
-                guard.style.display = 'flex';
-                switchActiveTab('groups');
-            }
-        }
-
-        function renderActiveGroupStandings() {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.groups) return;
-            const grid = document.getElementById('groups-standings-grid');
-            grid.innerHTML = '';
-            t.groups.forEach(group => {
-                const standings = getGroupStandings(group);
-                const card = document.createElement('div');
-                card.className = "glass-card p-4 rounded-xl flex flex-col gap-4 overflow-hidden";
-                let rows = '';
-                standings.forEach((s, pos) => {
-                    const isQual = pos < t.groupSettings.qualifiersPerGroup;
-                    const badge = isQual ? 'bg-[#27ae60]' : 'bg-[#e74c3c]';
-                    rows += `
-                        <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-all font-bold text-gray-300">
-                            <td class="py-2 text-center"><span class="inline-block w-5 py-0.5 rounded text-white font-black text-[9px] ${badge}">${pos+1}</span></td>
-                            <td class="py-2 font-semibold text-white tracking-wide truncate max-w-[130px]">${s.team}</td>
-                            <td class="py-2 text-center text-gray-400">${s.played}</td>
-                            <td class="py-2 text-center text-gray-400">${s.wins}</td>
-                            <td class="py-2 text-center text-gray-400">${s.draws}</td>
-                            <td class="py-2 text-center text-gray-400">${s.losses}</td>
-                            <td class="py-2 text-center text-gray-400">${s.gf}</td>
-                            <td class="py-2 text-center text-gray-400">${s.ga}</td>
-                            <td class="py-2 text-center text-blue-400">${s.gd>0?'+':''}${s.gd}</td>
-                            <td class="py-2 text-center font-black text-[#ffd13b]">${s.pts}</td>
-                        </tr>
-                    `;
-                });
-                card.innerHTML = `
-                    <div class="border-b border-white/5 pb-2"><h3 class="text-xs font-black text-[#ffd13b] tracking-[0.2em] uppercase text-center">${group.name}</h3></div>
-                    <div class="w-full">
-                        <table class="w-full text-left border-collapse table-fixed">
-                            <thead><tr class="font-black text-gray-400 tracking-wider uppercase border-b border-white/5">
-                                <th class="py-2 text-center w-[10%]">S/N</th>
-                                <th class="py-2 text-left w-[30%]">Team</th>
-                                <th class="py-2 text-center w-[7%]">MP</th>
-                                <th class="py-2 text-center w-[7%]">W</th>
-                                <th class="py-2 text-center w-[7%]">D</th>
-                                <th class="py-2 text-center w-[7%]">L</th>
-                                <th class="py-2 text-center w-[7%]">GF</th>
-                                <th class="py-2 text-center w-[7%]">GA</th>
-                                <th class="py-2 text-center w-[8%]">GD</th>
-                                <th class="py-2 text-center w-[10%]">Pts</th>
-                            </tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function getGroupStandings(group) {
-            let map = {};
-            group.teams.forEach(t => { map[t] = { team: t, played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, gd: 0,
-                    pts: 0 }; });
-            group.matches.forEach(m => {
-                const hs = parseInt(m.homeScore),
-                    as = parseInt(m.awayScore);
-                if (!isNaN(hs) && !isNaN(as)) {
-                    map[m.home].played++;
-                    map[m.away].played++;
-                    map[m.home].gf += hs;
-                    map[m.home].ga += as;
-                    map[m.away].gf += as;
-                    map[m.away].ga += hs;
-                    if (hs > as) { map[m.home].wins++;
-                        map[m.home].pts += 3;
-                        map[m.away].losses++; } else if (hs < as) { map[m.away].wins++;
-                        map[m.away].pts += 3;
-                        map[m.home].losses++; } else { map[m.home].draws++;
-                        map[m.home].pts += 1;
-                        map[m.away].draws++;
-                        map[m.away].pts += 1; }
-                }
-            });
-            Object.keys(map).forEach(t => { map[t].gd = map[t].gf - map[t].ga; });
-            return Object.values(map).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
-        }
-
-        function renderActiveFixturesGrid() {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.groups) return;
-            const grid = document.getElementById('fixtures-grid');
-            grid.innerHTML = '';
-            t.groups.forEach(group => {
-                const container = document.createElement('div');
-                container.className = "flex flex-col gap-4 mb-8";
-                let html = '';
-                group.matches.forEach(m => {
-                    html += `
-                        <div class="fixture-row-modern" data-match-id="${m.id}">
-                            <div class="fixture-modern-left"><div class="fixture-modern-name" title="${m.home}">${m.home}</div></div>
-                            <div class="fixture-modern-center">
-                                <input type="text" inputmode="numeric" value="${m.homeScore??''}" class="fixture-modern-scorebox" data-match="${m.id}" data-side="home" />
-                                <div class="fixture-modern-vs">VS</div>
-                                <input type="text" inputmode="numeric" value="${m.awayScore??''}" class="fixture-modern-scorebox" data-match="${m.id}" data-side="away" />
-                            </div>
-                            <div class="fixture-modern-right"><div class="fixture-modern-name" title="${m.away}">${m.away}</div></div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = `
-                    <div class="border-b border-white/5 pb-2 mb-2"><h3 class="text-xs font-black text-gray-300 tracking-[0.25em] uppercase">${group.name}</h3></div>
-                    <div class="flex flex-col gap-2">${html}</div>
-                `;
-                grid.appendChild(container);
-
-                container.querySelectorAll('.fixture-modern-scorebox').forEach(inp => {
-                    inp.addEventListener('input', function() {
-                        const matchId = this.dataset.match;
-                        const side = this.dataset.side;
-                        const val = this.value;
-                        const t2 = tournaments.find(x => x.id === activeTournamentId);
-                        if (!t2) return;
-                        t2.groups.forEach(g => {
-                            const m = g.matches.find(mm => mm.id === matchId);
-                            if (m) {
-                                if (side === 'home') m.homeScore = val;
-                                else m.awayScore = val;
-                                m.played = (m.homeScore !== "" && m.awayScore !== "");
-                            }
-                        });
-                        saveTournamentsToStorage();
-                    });
-                });
-            });
-        }
-
-        function toggleWinner(roundIdx, slotIdx) {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.rounds) return;
-            const round = t.rounds[roundIdx];
-            if (!round) return;
-            const slot = round.slots[slotIdx];
-            if (!slot || !slot.name || slot.name.trim() === '') return;
-
-            const totalRounds = t.rounds.length;
-            if (roundIdx === totalRounds - 1) return;
-
-            const matchIdx = Math.floor(slotIdx / 2);
-            const slotInMatch = slotIdx % 2;
-            const otherSlotIdx = (slotInMatch === 0) ? slotIdx + 1 : slotIdx - 1;
-            const otherSlot = round.slots[otherSlotIdx];
-
-            const nextRoundIdx = roundIdx + 1;
-            if (nextRoundIdx >= t.rounds.length) return;
-            const targetSlot = t.rounds[nextRoundIdx].slots[matchIdx];
-
-            if (slot.isWinner) {
-                slot.isWinner = false;
-                if (otherSlot) otherSlot.isWinner = false;
-                targetSlot.name = '';
-                saveTournamentsToStorage();
-                renderActiveBracket();
-                return;
-            }
-
-            if (otherSlot) otherSlot.isWinner = false;
-            targetSlot.name = slot.name;
-            slot.isWinner = true;
-            targetSlot.isWinner = false;
-
-            saveTournamentsToStorage();
-            renderActiveBracket();
-
-            if (nextRoundIdx === totalRounds - 1) {
-                const champSlot = t.rounds[totalRounds - 1].slots[0];
-                if (champSlot.name && champSlot.name !== '') celebrate();
-            }
-        }
-
-        function handleScoreChange(roundIdx, slotIdx, field, val) {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.rounds[roundIdx] || !t.rounds[roundIdx].slots[slotIdx]) return;
-            t.rounds[roundIdx].slots[slotIdx][field] = val;
-            saveTournamentsToStorage();
-            updateConnectors();
-        }
-
-        function renderActiveBracket() {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.rounds) {
-                const guard = document.getElementById('knockout-guard-overlay');
-                const container = document.getElementById('bracket-container');
-                guard.classList.remove('hidden');
-                container.classList.add('guarded');
-                guard.style.display = 'flex';
-                return;
-            }
-            const viewport = document.getElementById('bracket-viewport');
-            const championBox = document.getElementById('floating-champion-box');
-            viewport.innerHTML = '';
-            viewport.appendChild(championBox);
-
-            const totalRounds = t.rounds.length;
-            const bracketRoundsCount = totalRounds - 1;
-
-            let columnsToBuild = [];
-            for (let r = 0; r < bracketRoundsCount; r++) {
-                columnsToBuild.push({ roundIdx: r, side: 'left' });
-            }
-            for (let r = bracketRoundsCount - 1; r >= 0; r--) {
-                columnsToBuild.push({ roundIdx: r, side: 'right' });
-            }
-
-            columnsToBuild.forEach(colSpec => {
-                const rIdx = colSpec.roundIdx;
-                const side = colSpec.side;
-                const round = t.rounds[rIdx];
-
-                const col = document.createElement('div');
-                col.className = 'bracket-col';
-                col.innerHTML = `<div class="col-title">${round.title}</div>`;
-
-                const isFinals = (rIdx === bracketRoundsCount - 1);
-                const totalSlots = round.slots.length;
-                const halfSlots = totalSlots / 2;
-
-                let slotIndices = [];
-                if (isFinals) {
-                    slotIndices = side === 'left' ? [0] : [1];
-                } else {
-                    if (side === 'left') {
-                        for (let i = 0; i < halfSlots; i++) slotIndices.push(i);
-                    } else {
-                        for (let i = halfSlots; i < totalSlots; i++) slotIndices.push(i);
-                    }
-                }
-
-                for (let p = 0; p < slotIndices.length; p += (isFinals ? 1 : 2)) {
-                    const pairContainer = document.createElement('div');
-                    pairContainer.className = 'match-pair';
-
-                    const currentPairIndices = isFinals ? [slotIndices[p]] : [slotIndices[p], slotIndices[p + 1]];
-
-                    currentPairIndices.forEach(sIdx => {
-                        const slot = round.slots[sIdx];
-                        const div = document.createElement('div');
-                        div.className = `slot slot-${side} ${slot.isWinner ? 'winner-slot' : ''}`;
-                        div.setAttribute('data-round', rIdx);
-                        div.setAttribute('data-slot', sIdx);
-                        div.setAttribute('data-side', side);
-
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.value = slot.name || '';
-                        nameInput.placeholder = 'Undecided';
-                        nameInput.className = `name-input ${slot.isWinner ? 'winner-name' : ''}`;
-                        nameInput.readOnly = true;
-                        nameInput.onclick = (e) => { e.stopPropagation();
-                            toggleWinner(rIdx, sIdx); };
-
-                        const score1 = document.createElement('input');
-                        score1.type = 'text';
-                        score1.inputMode = 'numeric';
-                        score1.value = slot.scoreLeg1 ?? '';
-                        score1.placeholder = '-';
-                        score1.maxLength = 2;
-                        score1.className = 'score-input score-gold';
-                        score1.addEventListener('change', function() { handleScoreChange(rIdx, sIdx, 'scoreLeg1',
-                                this.value); });
-
-                        let score2 = null;
-                        if (!isFinals) {
-                            score2 = document.createElement('input');
-                            score2.type = 'text';
-                            score2.inputMode = 'numeric';
-                            score2.value = slot.scoreLeg2 ?? '';
-                            score2.placeholder = '-';
-                            score2.maxLength = 2;
-                            score2.className = 'score-input score-dark score-last';
-                            score2.addEventListener('change', function() { handleScoreChange(rIdx, sIdx,
-                                    'scoreLeg2', this.value); });
-                        } else {
-                            score1.classList.add('score-last');
-                        }
-
-                        div.appendChild(nameInput);
-                        div.appendChild(score1);
-                        if (score2) div.appendChild(score2);
-
-                        pairContainer.appendChild(div);
-                    });
-
-                    col.appendChild(pairContainer);
-                }
-
-                viewport.appendChild(col);
-            });
-
-            updateFloatingChampion();
-            requestAnimationFrame(() => updateConnectors());
-        }
-
-        function updateFloatingChampion() {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.rounds) return;
-
-            const totalRounds = t.rounds.length;
-            const bracketRoundsCount = totalRounds - 1;
-            const finalRoundIdx = bracketRoundsCount - 1;
-
-            const leftFinalSlot = document.querySelector(
-                `[data-round="${finalRoundIdx}"][data-slot="0"][data-side="left"]`);
-            const rightFinalSlot = document.querySelector(
-                `[data-round="${finalRoundIdx}"][data-slot="1"][data-side="right"]`);
-            const championBox = document.getElementById('floating-champion-box');
-            const championInput = document.getElementById('champion-name-input');
-
-            if (!championBox) return;
-
-            const championSlot = t.rounds[totalRounds - 1].slots[0];
-            const championName = championSlot ? championSlot.name : '';
-            championInput.value = championName || '';
-
-            if (leftFinalSlot && rightFinalSlot) {
-                const rectLeft = leftFinalSlot.getBoundingClientRect();
-                const rectRight = rightFinalSlot.getBoundingClientRect();
-                const containerRect = document.getElementById('bracket-container').getBoundingClientRect();
-
-                const centerX = (rectLeft.right + rectRight.left) / 2 - containerRect.left;
-                const offsetY = window.innerWidth < 640 ? 130 : 180;
-                const topY = rectLeft.top - containerRect.top - offsetY;
-
-                championBox.style.left = centerX + 'px';
-                championBox.style.top = topY + 'px';
-                championBox.style.display = 'flex';
-
-                if (championName) {
-                    championBox.style.borderColor = '#ffd13b';
-                    championBox.style.boxShadow = '0 0 60px rgba(255, 209, 59, 0.25), inset 0 0 30px rgba(255, 215, 0, 0.04)';
-                } else {
-                    championBox.style.borderColor = 'rgba(255, 215, 0, 0.3)';
-                    championBox.style.boxShadow = '0 0 30px rgba(255, 209, 59, 0.1)';
-                }
-            } else {
-                championBox.style.display = 'none';
-            }
-        }
-
-        function updateConnectors() {
-            const svg = document.getElementById('connector-svg');
-            const container = document.getElementById('bracket-container');
-            if (!svg || !container || container.classList.contains('guarded')) return;
-
-            const rect = container.getBoundingClientRect();
-            svg.setAttribute('width', rect.width);
-            svg.setAttribute('height', rect.height);
-            svg.setAttribute('viewBox', `0 0 ${rect.width} ${rect.height}`);
-            svg.innerHTML = '';
-
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.rounds || currentWorkspaceTab !== 'knockout') return;
-
-            const totalRounds = t.rounds.length;
-            const bracketRoundsCount = totalRounds - 1;
-
-            updateFloatingChampion();
-
-            for (let r = 0; r < bracketRoundsCount - 1; r++) {
-                const slots = t.rounds[r].slots;
-                const matchCount = slots.length / 2;
-
-                for (let m = 0; m < matchCount; m++) {
-                    const idxA = 2 * m;
-                    const idxB = 2 * m + 1;
-                    const targetIdx = m;
-
-                    const isLeftSide = idxA < (slots.length / 2);
-                    const sideStr = isLeftSide ? 'left' : 'right';
-
-                    const slotAEl = document.querySelector(`[data-round="${r}"][data-slot="${idxA}"][data-side="${sideStr}"]`);
-                    const slotBEl = document.querySelector(`[data-round="${r}"][data-slot="${idxB}"][data-side="${sideStr}"]`);
-                    const targetEl = document.querySelector(
-                        `[data-round="${r+1}"][data-slot="${targetIdx}"][data-side="${sideStr}"]`);
-
-                    if (!slotAEl || !slotBEl || !targetEl) continue;
-
-                    const rA = slotAEl.getBoundingClientRect();
-                    const rB = slotBEl.getBoundingClientRect();
-                    const rT = targetEl.getBoundingClientRect();
-
-                    let xA, xB, xT;
-                    if (isLeftSide) {
-                        xA = rA.right - rect.left + 4;
-                        xB = rB.right - rect.left + 4;
-                        xT = rT.left - rect.left - 4;
-                    } else {
-                        xA = rA.left - rect.left - 4;
-                        xB = rB.left - rect.left - 4;
-                        xT = rT.right - rect.left + 4;
-                    }
-
-                    const yA = rA.top + rA.height / 2 - rect.top;
-                    const yB = rB.top + rB.height / 2 - rect.top;
-                    const yT = rT.top + rT.height / 2 - rect.top;
-
-                    const slotA = slots[idxA];
-                    const slotB = slots[idxB];
-                    const targetSlot = t.rounds[r + 1].slots[targetIdx];
-
-                    const isAWinner = targetSlot.name && slotA.name && targetSlot.name === slotA.name;
-                    const isBWinner = targetSlot.name && slotB.name && targetSlot.name === slotB.name;
-                    const isWinner = isAWinner || isBWinner;
-
-                    const mergeX = (xA + xT) / 2;
-                    const midY = (yA + yB) / 2;
-
-                    const winColor = '#ffd13b';
-                    const normColor = 'rgba(255,255,255,0.35)';
-                    const winW = 3;
-                    const normW = 1.5;
-
-                    addConnectorPath(svg, `M ${xA} ${yA} H ${mergeX}`, isAWinner ? winColor : normColor, isAWinner ? winW :
-                        normW, isAWinner);
-                    addConnectorPath(svg, `M ${xB} ${yB} H ${mergeX}`, isBWinner ? winColor : normColor, isBWinner ? winW :
-                        normW, isBWinner);
-                    const topY = Math.min(yA, yB);
-                    const botY = Math.max(yA, yB);
-                    addConnectorPath(svg, `M ${mergeX} ${topY} V ${botY}`, isWinner ? winColor : normColor, isWinner ?
-                        winW : normW, isWinner);
-                    addConnectorPath(svg, `M ${mergeX} ${midY} H ${xT}`, isWinner ? winColor : normColor, isWinner ? winW :
-                        normW, isWinner);
-                }
-            }
-        }
-
-        function addConnectorPath(svg, d, color, width, isWinner) {
-            const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            p.setAttribute('d', d);
-            p.setAttribute('stroke', color);
-            p.setAttribute('stroke-width', width);
-            p.setAttribute('fill', 'none');
-            p.setAttribute('stroke-linecap', 'round');
-            p.setAttribute('stroke-linejoin', 'round');
-            if (isWinner) {
-                p.classList.add('winner-path');
-            } else {
-                p.classList.add('default-path');
-            }
-            svg.appendChild(p);
-        }
-
-        function advanceGroupQualifiers() {
-            const t = tournaments.find(x => x.id === activeTournamentId);
-            if (!t || !t.groups) return;
-
-            let unplayed = false;
-            t.groups.forEach(group => {
-                group.matches.forEach(m => { if (m.homeScore === "" || m.awayScore === "") unplayed = true; });
-            });
-            if (unplayed && !confirm("Some group match scores are empty! Advance with current standings?")) return;
-
-            const groupNames = t.groups.map(g => g.name).sort();
-            const numGroups = groupNames.length;
-            const qualifiersPerGroup = t.groupSettings.qualifiersPerGroup || 4;
-
-            const groupPositions = {};
-            groupNames.forEach(gName => {
-                const group = t.groups.find(g => g.name === gName);
-                if (!group) return;
-                const standings = getGroupStandings(group);
-                const top = standings.slice(0, qualifiersPerGroup).map(s => s.team);
-                while (top.length < qualifiersPerGroup) top.push('');
-                groupPositions[gName] = top;
-            });
-
-            let pairs = [];
-            if (numGroups === 4 && qualifiersPerGroup === 4) {
-                const A = groupPositions["Group A"] || [],
-                    B = groupPositions["Group B"] || [],
-                    C = groupPositions["Group C"] || [],
-                    D = groupPositions["Group D"] || [];
-                pairs = [
-                    [A[0], D[3]],
-                    [C[3], B[0]],
-                    [A[1], D[2]],
-                    [C[2], B[1]],
-                    [A[2], D[1]],
-                    [C[1], B[2]],
-                    [A[3], D[0]],
-                    [C[0], B[3]]
-                ];
-            } else if (numGroups === 4 && qualifiersPerGroup === 2) {
-                const A = groupPositions["Group A"] || [],
-                    B = groupPositions["Group B"] || [],
-                    C = groupPositions["Group C"] || [],
-                    D = groupPositions["Group D"] || [];
-                pairs = [
-                    [A[0], D[1]],
-                    [C[1], B[0]],
-                    [A[1], D[0]],
-                    [C[0], B[1]]
-                ];
-            } else if (numGroups === 2 && qualifiersPerGroup === 4) {
-                const A = groupPositions["Group A"] || [],
-                    B = groupPositions["Group B"] || [];
-                pairs = [
-                    [A[0], B[3]],
-                    [A[1], B[2]],
-                    [A[2], B[1]],
-                    [A[3], B[0]]
-                ];
-            } else if (numGroups === 2 && qualifiersPerGroup === 2) {
-                const A = groupPositions["Group A"] || [],
-                    B = groupPositions["Group B"] || [];
-                pairs = [
-                    [A[0], B[1]],
-                    [A[1], B[0]]
-                ];
-            } else {
-                alert("Unsupported group/qualifier configuration.");
-                return;
-            }
-
-            const orderedTeams = [];
-            pairs.forEach(pair => { orderedTeams.push(pair[0]);
-                orderedTeams.push(pair[1]); });
-
-            const rounds = buildInitialKnockoutRounds(orderedTeams);
-            if (!rounds) return;
-
-            t.rounds = rounds;
-            t.champion = "";
-            saveTournamentsToStorage();
-
-            const guard = document.getElementById('knockout-guard-overlay');
-            const container = document.getElementById('bracket-container');
-            guard.classList.add('hidden');
-            container.classList.remove('guarded');
-            switchActiveTab('knockout');
-            renderActiveBracket();
-        }
-
-        function celebrate() {
-            const canvas = document.getElementById('confetti-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            let particles = [];
-            const colors = ['#ffd13b', '#ffffff', '#e5b800', '#f39c12', '#f1c40f'];
-
-            for (let i = 0; i < 150; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    r: Math.random() * 6 + 4,
-                    d: Math.random() * 150,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    tilt: Math.floor(Math.random() * 10) - 10,
-                    tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-                    tiltAngle: 0
-                });
-            }
-
-            let animationFrame;
-            let counter = 0;
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    ctx.beginPath();
-                    ctx.lineWidth = p.r / 2;
-                    ctx.strokeStyle = p.color;
-                    ctx.moveTo(p.x + p.tilt + p.r, p.y);
-                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
-                    ctx.stroke();
-
-                    p.tiltAngle += p.tiltAngleIncremental;
-                    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-                    p.tilt = Math.sin(p.tiltAngle) * 15;
-                }
-                counter++;
-                if (counter < 250) {
-                    animationFrame = requestAnimationFrame(draw);
-                } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-            }
-            draw();
-        }
-
-        function downloadBackup() {
-            const data = JSON.stringify(tournaments, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'tournaments_backup.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function uploadBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (Array.isArray(data)) {
-                        tournaments = data;
-                        saveTournamentsToStorage();
-                        alert('Backup restored successfully!');
-                        goHome();
-                    }
-                } catch (err) {
-                    alert('Invalid JSON backup file.');
-                }
-            };
-            reader.readAsText(file);
-        }
+        const activeTab = document.querySelector('.tab-btn.active')?.dataset?.tab || 'search';
+        if (activeTab === 'results') mainFooter?.classList.add('hide-footer');
+        else mainFooter?.classList.remove('hide-footer');
+
+        window.addEventListener('beforeunload', () => saveState());
+        console.log('⌕ log search ready · WhatsApp UI');
     </script>
 </body>
 </html>
