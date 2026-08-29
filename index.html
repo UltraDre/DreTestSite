@@ -1597,10 +1597,12 @@ Wolverhampton Wanderers</textarea>
             <h2 class="section-title"><i class="fas fa-list"></i> My Leagues</h2>
 
             <div id="cloudActionsContainer" class="cloud-actions">
-                <button class="btn btn-primary" onclick="showUploadModal()">
+                <!-- Upload button: hidden for non-admin -->
+                <button id="uploadCloudBtn" class="btn btn-primary" onclick="showUploadModal()">
                     <i class="fas fa-cloud-upload-alt"></i> Upload to Cloud
                 </button>
-                <button class="btn btn-secondary" onclick="showLoadModal()">
+                <!-- Load button: visible to everyone -->
+                <button id="loadCloudBtn" class="btn btn-secondary" onclick="showLoadModal()">
                     <i class="fas fa-cloud-download-alt"></i> Load from Cloud
                 </button>
             </div>
@@ -1968,6 +1970,8 @@ Wolverhampton Wanderers</textarea>
             const loginBtn = document.getElementById('loginNavBtn');
             const userMenu = document.getElementById('userMenu');
             const userNameSpan = document.getElementById('userMenuName');
+            const uploadBtn = document.getElementById('uploadCloudBtn');
+            const loadBtn = document.getElementById('loadCloudBtn');
 
             if (isAdmin) {
                 badge.classList.remove('hidden');
@@ -1976,10 +1980,10 @@ Wolverhampton Wanderers</textarea>
                 userNameSpan.textContent = currentUsername || 'admin';
                 document.getElementById('adminActions')?.classList.remove('hidden');
                 document.getElementById('visibleWeekSetting')?.classList.remove('hidden');
-                document.getElementById('cloudActionsContainer')?.classList.remove('hidden');
                 document.getElementById('createLeagueCard')?.classList.remove('disabled');
-                const cloudEl = document.getElementById('cloudActionsContainer');
-                if (cloudEl) cloudEl.style.display = 'flex';
+                // Show both cloud buttons
+                if (uploadBtn) uploadBtn.style.display = 'inline-flex';
+                if (loadBtn) loadBtn.style.display = 'inline-flex';
             } else {
                 badge.classList.add('hidden');
                 loginBtn.classList.remove('hidden');
@@ -1987,8 +1991,9 @@ Wolverhampton Wanderers</textarea>
                 document.getElementById('adminActions')?.classList.add('hidden');
                 document.getElementById('visibleWeekSetting')?.classList.add('hidden');
                 document.getElementById('createLeagueCard')?.classList.add('disabled');
-                const cloudEl = document.getElementById('cloudActionsContainer');
-                if (cloudEl) cloudEl.style.display = 'none';
+                // Hide upload, show load
+                if (uploadBtn) uploadBtn.style.display = 'none';
+                if (loadBtn) loadBtn.style.display = 'inline-flex';
             }
             if (document.getElementById('leagues').style.display !== 'none') {
                 renderLeagues();
@@ -2740,7 +2745,10 @@ Wolverhampton Wanderers</textarea>
         //  12. CLOUD OPERATIONS
         // ═══════════════════════════════════════════════════════════════════
         async function uploadToCloud(username, accessCode) {
-            if (!isAdmin) { showNotification('Admin required', 'error'); return; }
+            if (!isAdmin) {
+                showNotification('Admin required to upload', 'error');
+                return;
+            }
             if (!supabaseClient) {
                 showNotification('Supabase not available', 'error');
                 return;
@@ -2806,7 +2814,7 @@ Wolverhampton Wanderers</textarea>
         window.uploadToCloud = uploadToCloud;
 
         async function loadFromCloud(username) {
-            if (!isAdmin) { showNotification('Admin required', 'error'); return; }
+            // Allow non-admin to load
             if (!supabaseClient) {
                 showNotification('Supabase not available', 'error');
                 return;
@@ -2871,7 +2879,7 @@ Wolverhampton Wanderers</textarea>
         window.showUploadModal = showUploadModal;
 
         function showLoadModal() {
-            if (!isAdmin) { showNotification('Admin required', 'error'); return; }
+            // Anyone can load
             document.getElementById('loadModal').style.display = 'flex';
             document.getElementById('loadUsername').value = '';
         }
@@ -2990,7 +2998,7 @@ Wolverhampton Wanderers</textarea>
 
             if (!isAdmin) {
                 document.getElementById('createLeagueCard')?.classList.add('disabled');
-                document.getElementById('cloudActionsContainer').style.display = 'none';
+                // Cloud buttons handled by updateUIForAdminState
             }
 
             document.getElementById('loginPassword').addEventListener('keydown', function(e) {
