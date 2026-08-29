@@ -970,6 +970,7 @@
             display: block;
         }
 
+        /* ── week selector ── */
         .week-selector {
             display: flex;
             justify-content: center;
@@ -988,24 +989,37 @@
             transition: all 0.15s ease;
             font-weight: 500;
             font-size: 0.8rem;
+            border: 2px solid transparent;
         }
 
         .week-btn.active,
-        .week-btn:hover {
+        .week-btn:hover:not(.week-btn-disabled) {
             background: #f1f5f9;
             color: #0b1120;
         }
 
         .week-btn.public-visible {
-            border: 2px solid #60a5fa;
+            border-color: #60a5fa;
             background: #1a2a44;
             color: #93c5fd;
         }
 
         .week-btn.public-visible.active,
-        .week-btn.public-visible:hover {
+        .week-btn.public-visible:hover:not(.week-btn-disabled) {
             background: #60a5fa;
             color: #0b1120;
+        }
+
+        .week-btn-disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: transparent;
+        }
+
+        .week-btn-disabled:hover {
+            background: #1e293b;
+            color: #e8edf5;
         }
 
         .fixture-counter {
@@ -1195,7 +1209,7 @@
             padding: 12px 18px;
             border-radius: 12px;
             border: 1px solid #2a3445;
-            max-width: 400px;
+            max-width: 500px;
             margin: 10px auto 18px;
             flex-wrap: wrap;
             justify-content: center;
@@ -1216,7 +1230,7 @@
 
         .visible-week-setting select {
             width: auto;
-            min-width: 80px;
+            min-width: 60px;
             padding: 6px 30px 6px 14px;
             background: #1a2332;
             border: 1px solid #334155;
@@ -1233,6 +1247,23 @@
         .visible-week-setting select:focus {
             border-color: #60a5fa;
             outline: none;
+        }
+
+        .visible-week-setting .range-labels {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .visible-week-setting .range-labels span {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .visible-week-setting .hint {
+            font-size: 0.75rem;
+            color: #64748b;
         }
 
         /* ── cloud actions ── */
@@ -1359,6 +1390,15 @@
                 font-size: 1rem;
                 min-width: 34px;
             }
+
+            .visible-week-setting {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .visible-week-setting .range-labels {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1381,12 +1421,6 @@
 
             .modal-content {
                 padding: 24px 18px;
-            }
-
-            .visible-week-setting {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
             }
         }
 
@@ -1641,11 +1675,16 @@ Wolverhampton Wanderers</textarea>
                 </button>
             </div>
 
-            <!-- Visible Week Setting (admin only) -->
+            <!-- Visible Week Range Setting (admin only) -->
             <div id="visibleWeekSetting" class="visible-week-setting hidden">
-                <label><i class="fas fa-eye"></i> Public Visible Week</label>
-                <select id="publicWeekSelect" onchange="setPublicVisibleWeek()"></select>
-                <span style="font-size:0.75rem;color:#64748b;">(non-logged-in users see only this week)</span>
+                <label><i class="fas fa-eye"></i> Public Visible Weeks</label>
+                <div class="range-labels">
+                    <span>From</span>
+                    <select id="publicWeekStartSelect" onchange="setPublicVisibleWeekRange()"></select>
+                    <span>to</span>
+                    <select id="publicWeekEndSelect" onchange="setPublicVisibleWeekRange()"></select>
+                    <span class="hint">(non‑logged‑in users see all tabs, but only this range is clickable)</span>
+                </div>
             </div>
 
             <div class="tabs">
@@ -1981,7 +2020,6 @@ Wolverhampton Wanderers</textarea>
                 document.getElementById('adminActions')?.classList.remove('hidden');
                 document.getElementById('visibleWeekSetting')?.classList.remove('hidden');
                 document.getElementById('createLeagueCard')?.classList.remove('disabled');
-                // Show both cloud buttons
                 if (uploadBtn) uploadBtn.style.display = 'inline-flex';
                 if (loadBtn) loadBtn.style.display = 'inline-flex';
             } else {
@@ -1991,7 +2029,6 @@ Wolverhampton Wanderers</textarea>
                 document.getElementById('adminActions')?.classList.add('hidden');
                 document.getElementById('visibleWeekSetting')?.classList.add('hidden');
                 document.getElementById('createLeagueCard')?.classList.add('disabled');
-                // Hide upload, show load
                 if (uploadBtn) uploadBtn.style.display = 'none';
                 if (loadBtn) loadBtn.style.display = 'inline-flex';
             }
@@ -2099,7 +2136,17 @@ Wolverhampton Wanderers</textarea>
                     leagues.forEach(l => {
                         if (l.winnersCount === undefined) l.winnersCount = 1;
                         if (l.relegationCount === undefined) l.relegationCount = 3;
-                        if (l.publicVisibleWeek === undefined) l.publicVisibleWeek = 1;
+                        // Migrate old single public week to range
+                        if (l.publicVisibleWeek !== undefined && l.publicVisibleWeekStart === undefined) {
+                            l.publicVisibleWeekStart = l.publicVisibleWeek;
+                            l.publicVisibleWeekEnd = l.publicVisibleWeek;
+                            delete l.publicVisibleWeek;
+                        }
+                        if (l.publicVisibleWeekStart === undefined) l.publicVisibleWeekStart = 1;
+                        if (l.publicVisibleWeekEnd === undefined) {
+                            const totalWeeks = (l.teams.length - 1) * 2;
+                            l.publicVisibleWeekEnd = totalWeeks;
+                        }
                     });
                 } catch { leagues = []; }
             }
@@ -2117,7 +2164,6 @@ Wolverhampton Wanderers</textarea>
             const el = document.getElementById(sectionId);
             if (el) el.style.display = 'block';
 
-            // Navbar: only visible on home page
             const navbar = document.getElementById('mainNavbar');
             if (sectionId === 'home') {
                 navbar.classList.remove('hidden-nav');
@@ -2183,6 +2229,7 @@ Wolverhampton Wanderers</textarea>
             teamNames = teamNames.slice(0, teamCount);
 
             const leagueId = Date.now();
+            const totalWeeks = (teamCount - 1) * 2;
             const newLeague = {
                 id: leagueId,
                 name: leagueName,
@@ -2192,7 +2239,8 @@ Wolverhampton Wanderers</textarea>
                     'random',
                 winnersCount: winnersCount,
                 relegationCount: relegationCount,
-                publicVisibleWeek: 1
+                publicVisibleWeekStart: 1,
+                publicVisibleWeekEnd: totalWeeks
             };
             newLeague.table = recalculateTable(newLeague);
 
@@ -2376,13 +2424,15 @@ Wolverhampton Wanderers</textarea>
                 const wc = league.winnersCount ?? 1;
                 const rc = league.relegationCount ?? 3;
                 const isAdminUser = isAdmin;
+                const start = league.publicVisibleWeekStart || 1;
+                const end = league.publicVisibleWeekEnd || ((league.teams.length - 1) * 2);
                 card.innerHTML = `
                         <h3>${league.name} <span class="status">Active</span></h3>
                         <div class="league-details">
                             <p><i class="fas fa-users"></i> ${league.teams.length} teams</p>
                             <p><i class="fas fa-trophy" style="color:#4ade80;"></i> ${wc} winner${wc > 1 ? 's' : ''} &middot; <i class="fas fa-arrow-down" style="color:#f87171;"></i> ${rc} relegation${rc > 1 ? 's' : ''}</p>
                             <p style="font-size:0.8rem;color:#64748b;">${new Date(league.id).toLocaleDateString()}</p>
-                            ${league.publicVisibleWeek ? `<p style="font-size:0.75rem;color:#60a5fa;"><i class="fas fa-eye"></i> Public week: ${league.publicVisibleWeek}</p>` : ''}
+                            <p style="font-size:0.75rem;color:#60a5fa;"><i class="fas fa-eye"></i> Public weeks: ${start} – ${end}</p>
                         </div>
                         <div class="league-actions">
                             <button class="action-btn view-btn" onclick="showLeagueDetails(${league.id})"><i class="fas fa-eye"></i> View</button>
@@ -2405,14 +2455,15 @@ Wolverhampton Wanderers</textarea>
             if (!league) return;
             currentLeagueId = leagueId;
             if (!isAdmin) {
-                currentWeek = league.publicVisibleWeek || 1;
+                // Set current week to the start of the public range
+                currentWeek = league.publicVisibleWeekStart || 1;
             } else {
                 currentWeek = 1;
             }
             document.getElementById('leagueTitle').textContent = league.name;
 
             populateLeagueTable(league);
-            populatePublicWeekSelect(league);
+            populatePublicWeekSelects(league);
             generateWeekSelector(league);
             populateFixtures(league.fixtures, currentWeek);
             document.getElementById('league-details').style.display = 'block';
@@ -2428,69 +2479,101 @@ Wolverhampton Wanderers</textarea>
                 document.getElementById('visibleWeekSetting').classList.add('hidden');
             }
 
-            // Navbar hidden on league details
             document.getElementById('mainNavbar').classList.add('hidden-nav');
         }
         window.showLeagueDetails = showLeagueDetails;
 
-        function populatePublicWeekSelect(league) {
-            const select = document.getElementById('publicWeekSelect');
-            select.innerHTML = '';
+        function populatePublicWeekSelects(league) {
+            const startSelect = document.getElementById('publicWeekStartSelect');
+            const endSelect = document.getElementById('publicWeekEndSelect');
             const totalWeeks = (league.teams.length - 1) * 2;
+
+            startSelect.innerHTML = '';
+            endSelect.innerHTML = '';
             for (let w = 1; w <= totalWeeks; w++) {
-                const opt = document.createElement('option');
-                opt.value = w;
-                opt.textContent = `Week ${w}`;
-                if (w === (league.publicVisibleWeek || 1)) opt.selected = true;
-                select.appendChild(opt);
+                const optStart = document.createElement('option');
+                optStart.value = w;
+                optStart.textContent = w;
+                if (w === (league.publicVisibleWeekStart || 1)) optStart.selected = true;
+                startSelect.appendChild(optStart);
+
+                const optEnd = document.createElement('option');
+                optEnd.value = w;
+                optEnd.textContent = w;
+                if (w === (league.publicVisibleWeekEnd || totalWeeks)) optEnd.selected = true;
+                endSelect.appendChild(optEnd);
             }
         }
 
-        function setPublicVisibleWeek() {
+        function setPublicVisibleWeekRange() {
             const league = leagues.find(l => l.id === currentLeagueId);
             if (!league || !isAdmin) return;
-            const val = parseInt(document.getElementById('publicWeekSelect').value);
-            league.publicVisibleWeek = val;
+            const start = parseInt(document.getElementById('publicWeekStartSelect').value);
+            const end = parseInt(document.getElementById('publicWeekEndSelect').value);
+            if (start > end) {
+                showNotification('Start week cannot be greater than end week', 'error');
+                populatePublicWeekSelects(league);
+                return;
+            }
+            league.publicVisibleWeekStart = start;
+            league.publicVisibleWeekEnd = end;
             saveLeagues();
-            showNotification(`Public visible week set to ${val}`);
+            generateWeekSelector(league);
+            if (!isAdmin) {
+                if (currentWeek < start || currentWeek > end) {
+                    currentWeek = start;
+                    document.getElementById('currentWeek').textContent = start;
+                    populateFixtures(league.fixtures, start);
+                }
+            }
+            showNotification(`Public visible weeks set to ${start} – ${end}`);
         }
-        window.setPublicVisibleWeek = setPublicVisibleWeek;
+        window.setPublicVisibleWeekRange = setPublicVisibleWeekRange;
 
         function generateWeekSelector(league) {
             const totalWeeks = (league.teams.length - 1) * 2;
             const container = document.getElementById('weekSelector');
             container.innerHTML = '';
 
-            const visibleWeek = league.publicVisibleWeek || 1;
+            const start = league.publicVisibleWeekStart || 1;
+            const end = league.publicVisibleWeekEnd || totalWeeks;
 
             for (let w = 1; w <= totalWeeks; w++) {
-                if (!isAdmin && w !== visibleWeek) continue;
-
                 const btn = document.createElement('button');
-                btn.className = 'week-btn' + (w === currentWeek ? ' active' : '');
-                if (!isAdmin && w === visibleWeek) {
-                    btn.classList.add('public-visible');
-                }
+                const isVisible = (w >= start && w <= end);
+                let classes = 'week-btn';
+                if (w === currentWeek) classes += ' active';
+                if (!isAdmin && isVisible) classes += ' public-visible';
+                if (!isAdmin && !isVisible) classes += ' week-btn-disabled';
+                btn.className = classes;
                 btn.textContent = w;
-                btn.onclick = () => {
-                    currentWeek = w;
-                    document.getElementById('currentWeek').textContent = w;
-                    populateFixtures(league.fixtures, w);
-                    document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                };
+
+                // For non-admin, only allow click if within range
+                if (!isAdmin && !isVisible) {
+                    btn.onclick = () => {
+                        showNotification('This week is not publicly available', 'error');
+                    };
+                } else {
+                    btn.onclick = () => {
+                        currentWeek = w;
+                        document.getElementById('currentWeek').textContent = w;
+                        populateFixtures(league.fixtures, w);
+                        document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    };
+                }
                 container.appendChild(btn);
             }
 
-            if (!isAdmin && currentWeek !== visibleWeek) {
-                const weekBtn = container.querySelector(`.week-btn`);
-                if (weekBtn) {
-                    currentWeek = visibleWeek;
-                    document.getElementById('currentWeek').textContent = visibleWeek;
-                    populateFixtures(league.fixtures, visibleWeek);
-                    document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-                    weekBtn.classList.add('active');
-                }
+            // If not admin and currentWeek is outside range, set to start
+            if (!isAdmin && (currentWeek < start || currentWeek > end)) {
+                currentWeek = start;
+                document.getElementById('currentWeek').textContent = start;
+                populateFixtures(league.fixtures, start);
+                const btns = container.querySelectorAll('.week-btn');
+                btns.forEach(b => {
+                    if (parseInt(b.textContent) === start) b.classList.add('active');
+                });
             }
         }
 
@@ -2592,7 +2675,6 @@ Wolverhampton Wanderers</textarea>
                             </div>
                         `;
                 } else {
-                    // Read-only: use spans styled exactly like inputs, empty when no score
                     const homeDisplay = homeVal !== '' ? homeVal : '';
                     const awayDisplay = awayVal !== '' ? awayVal : '';
                     card.innerHTML = `
@@ -2716,7 +2798,11 @@ Wolverhampton Wanderers</textarea>
                     parsed.forEach(l => {
                         if (l.winnersCount === undefined) l.winnersCount = 1;
                         if (l.relegationCount === undefined) l.relegationCount = 3;
-                        if (l.publicVisibleWeek === undefined) l.publicVisibleWeek = 1;
+                        if (l.publicVisibleWeekStart === undefined) l.publicVisibleWeekStart = 1;
+                        if (l.publicVisibleWeekEnd === undefined) {
+                            const totalWeeks = (l.teams.length - 1) * 2;
+                            l.publicVisibleWeekEnd = totalWeeks;
+                        }
                     });
                     leagues = parsed;
                     saveLeagues();
@@ -2814,7 +2900,6 @@ Wolverhampton Wanderers</textarea>
         window.uploadToCloud = uploadToCloud;
 
         async function loadFromCloud(username) {
-            // Allow non-admin to load
             if (!supabaseClient) {
                 showNotification('Supabase not available', 'error');
                 return;
@@ -2853,6 +2938,13 @@ Wolverhampton Wanderers</textarea>
                 }
 
                 const loaded = cloudLeagues.map(item => item.data);
+                loaded.forEach(l => {
+                    if (l.publicVisibleWeekStart === undefined) l.publicVisibleWeekStart = 1;
+                    if (l.publicVisibleWeekEnd === undefined) {
+                        const totalWeeks = (l.teams.length - 1) * 2;
+                        l.publicVisibleWeekEnd = totalWeeks;
+                    }
+                });
                 leagues = loaded;
                 saveLeagues();
                 renderLeagues();
@@ -2879,7 +2971,6 @@ Wolverhampton Wanderers</textarea>
         window.showUploadModal = showUploadModal;
 
         function showLoadModal() {
-            // Anyone can load
             document.getElementById('loadModal').style.display = 'flex';
             document.getElementById('loadUsername').value = '';
         }
@@ -2998,7 +3089,6 @@ Wolverhampton Wanderers</textarea>
 
             if (!isAdmin) {
                 document.getElementById('createLeagueCard')?.classList.add('disabled');
-                // Cloud buttons handled by updateUIForAdminState
             }
 
             document.getElementById('loginPassword').addEventListener('keydown', function(e) {
