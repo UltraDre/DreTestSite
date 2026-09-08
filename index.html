@@ -7,6 +7,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js">
+    </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -655,6 +657,12 @@
             box-shadow: 0 8px 20px rgba(30, 41, 59, 0.15);
         }
 
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-secondary {
             background: #f1f4f9;
             color: #1e293b;
@@ -1100,6 +1108,151 @@
             margin-right: 4px;
         }
 
+        .backup-section .card .cloud-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .backup-section .card .cloud-buttons .btn-primary,
+        .backup-section .card .cloud-buttons .btn-secondary {
+            flex: 0 1 auto;
+        }
+
+        /* Cloud modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            backdrop-filter: blur(2px);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 32px 36px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-box .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-box .modal-sub {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .modal-box .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-box .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .modal-box .form-group input {
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fafbfc;
+            transition: border 0.2s, box-shadow 0.2s;
+            outline: none;
+            font-size: 16px !important;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .modal-box .form-group input:focus {
+            border-color: #1e293b;
+            box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
+            background: #ffffff;
+        }
+
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-box .modal-actions .btn-primary,
+        .modal-box .modal-actions .btn-secondary {
+            padding: 10px 24px;
+            font-size: 14px !important;
+        }
+
+        .modal-box .modal-status {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .modal-box .modal-status.show {
+            display: block;
+        }
+
+        .modal-box .modal-status.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .modal-box .modal-status.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .modal-box .modal-status.info {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .modal-box .modal-status .fa-icon {
+            margin-right: 6px;
+        }
+
         @media (max-width: 820px) {
             .app {
                 padding: 20px 16px 28px;
@@ -1119,7 +1272,6 @@
                 gap: 16px;
             }
 
-            /* KEY CHANGE: Keep row direction and push balance box to the right */
             .invoice-preview .inv-row-bottom {
                 flex-direction: row;
                 align-items: flex-start;
@@ -1130,7 +1282,7 @@
                 align-self: flex-start;
                 min-width: unset;
                 padding: 16px 20px;
-                margin-left: auto; /* Forces the box to the right edge */
+                margin-left: auto;
                 flex-shrink: 0;
             }
 
@@ -1206,6 +1358,11 @@
 
             .history-item .actions {
                 justify-content: flex-start;
+            }
+
+            .modal-box {
+                padding: 24px 20px;
+                margin: 10px;
             }
         }
 
@@ -1499,6 +1656,33 @@
         .logo-actions .btn-small .fa-icon {
             font-size: 14px;
         }
+
+        .cloud-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: #f1f4f9;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .cloud-status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .cloud-status-badge .dot.green {
+            background: #22c55e;
+        }
+        .cloud-status-badge .dot.red {
+            background: #ef4444;
+        }
+        .cloud-status-badge .dot.yellow {
+            background: #f59e0b;
+        }
     </style>
 </head>
 <body>
@@ -1689,7 +1873,6 @@
                                 <label for="amountPaid"><i class="fas fa-money-bill-wave fa-icon"></i> Amount paid (₦)</label>
                                 <input type="number" id="amountPaid" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
-                            <!-- Balance box color picker -->
                             <div class="form-group">
                                 <label for="balanceBoxColor"><i class="fas fa-palette fa-icon"></i> Box color</label>
                                 <input type="color" id="balanceBoxColor" value="#000000" />
@@ -1770,6 +1953,8 @@
         <!-- ========== BACKUP TAB ========== -->
         <div class="tab-content" id="backup-tab" role="tabpanel">
             <div class="backup-section">
+
+                <!-- Local Backup -->
                 <div class="card">
                     <h3><i class="fas fa-download fa-icon"></i> Download Backup</h3>
                     <p>Export all invoices, history, and settings as a JSON file.</p>
@@ -1777,6 +1962,8 @@
                         <i class="fas fa-download fa-icon"></i> Download Backup
                     </button>
                 </div>
+
+                <!-- Local Restore -->
                 <div class="card">
                     <h3><i class="fas fa-upload fa-icon"></i> Restore Backup</h3>
                     <p>Upload a JSON backup file to restore all data. This will overwrite current data.</p>
@@ -1787,12 +1974,95 @@
                         <input type="file" id="restoreBackupInput" accept=".json" />
                     </div>
                 </div>
+
+                <!-- Cloud Backup (NEW) -->
+                <div class="card" style="border-color:#1e293b;border-width:2px;">
+                    <h3><i class="fas fa-cloud fa-icon" style="color:#1e293b;"></i> Cloud Backup <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:6px;">via Supabase</span></h3>
+                    <p>Store your invoices securely in the cloud. <strong>Upload</strong> saves your current data with a username &amp; access code. <strong>Load</strong> restores from any username.</p>
+
+                    <div class="cloud-buttons">
+                        <button class="btn-primary" id="cloudUploadBtn">
+                            <i class="fas fa-cloud-upload-alt fa-icon"></i> Upload to Cloud
+                        </button>
+                        <button class="btn-secondary" id="cloudLoadBtn">
+                            <i class="fas fa-cloud-download-alt fa-icon"></i> Load from Cloud
+                        </button>
+                    </div>
+
+                    <div id="cloudStatus" class="cloud-status-badge" style="display:none;">
+                        <span class="dot" id="cloudStatusDot"></span>
+                        <span id="cloudStatusText">Connected</span>
+                    </div>
+
+                    <div style="margin-top:12px;font-size:12px;color:#94a3b8;border-top:1px solid #e9edf2;padding-top:12px;">
+                        <i class="fas fa-info-circle fa-icon"></i>
+                        <strong>Username</strong> — your unique identifier &bull;
+                        <strong>Access code</strong> — required for uploads (write protection)
+                    </div>
+                </div>
+
             </div>
         </div>
 
     </div>
 
+    <!-- ========== CLOUD MODAL ========== -->
+    <div class="modal-overlay" id="cloudModal">
+        <div class="modal-box">
+            <div class="modal-title" id="cloudModalTitle">
+                <i class="fas fa-cloud-upload-alt fa-icon"></i> Upload to Cloud
+            </div>
+            <div class="modal-sub" id="cloudModalSub">Enter your credentials to save this invoice to the cloud.</div>
+
+            <div class="form-group">
+                <label for="cloudUsernameInput"><i class="fas fa-user fa-icon"></i> Username</label>
+                <input type="text" id="cloudUsernameInput" placeholder="e.g. johndoe" inputmode="text" autocomplete="username" />
+            </div>
+
+            <div class="form-group" id="cloudAccessCodeGroup">
+                <label for="cloudAccessCodeInput"><i class="fas fa-key fa-icon"></i> Access Code</label>
+                <input type="password" id="cloudAccessCodeInput" placeholder="Your secret access code" autocomplete="current-password" />
+                <span style="font-size:11px;color:#94a3b8;margin-top:2px;">Required for uploads. Keep it safe — you'll need it to update.</span>
+            </div>
+
+            <div class="modal-status" id="cloudModalStatus"></div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cloudModalCancelBtn">Cancel</button>
+                <button class="btn-primary" id="cloudModalActionBtn">
+                    <i class="fas fa-cloud-upload-alt fa-icon"></i> Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
+        // ═══════════════════════════════════════════════════════
+        //  SUPABASE CONFIGURATION — EDIT THESE VALUES
+        // ═══════════════════════════════════════════════════════
+        const SUPABASE_URL = 'https://hbvpnslzoulogjivoipv.supabase.co'; // <-- REPLACE with your Supabase URL
+        const SUPABASE_ANON_KEY = 'sb_publishable_UTf_89tttlvxQ0N4JAqQaw_iXl7ocpm'; // <-- REPLACE with your Supabase anon key
+        // ═══════════════════════════════════════════════════════
+
+        // ─── Supabase client ───────────────────────────────────
+        let supabaseClient = null;
+        let supabaseReady = false;
+
+        try {
+            if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_URL !== 'https://your-project.supabase.co' &&
+                SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'your-anon-key') {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseReady = true;
+                console.log('✅ Supabase client initialized.');
+            } else if (!SUPABASE_URL || SUPABASE_URL === 'https://your-project.supabase.co') {
+                console.warn('⚠️ Supabase: Please set SUPABASE_URL and SUPABASE_ANON_KEY in the script.');
+            }
+        } catch (e) {
+            console.error('❌ Supabase init error:', e);
+        }
+
+        // ─── state ─────────────────────────────────────────────
         const state = {
             items: [],
             nextId: 1,
@@ -1857,6 +2127,8 @@
 
         const CURRENCY = '₦';
 
+        // ─── helpers ──────────────────────────────────────────
+
         function formatMoney(amount) {
             let parts = amount.toFixed(2).split('.');
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -1887,6 +2159,25 @@
                 toast.classList.remove('show');
             }, duration);
         }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
+        }
+
+        // ─── localStorage ──────────────────────────────────────
 
         function saveState() {
             const data = {
@@ -2000,6 +2291,8 @@
                 saveState();
             }, 300);
         }
+
+        // ─── history ──────────────────────────────────────────
 
         function getHistory() {
             try {
@@ -2258,6 +2551,8 @@
             historyList.innerHTML = html;
         }
 
+        // ─── logo ─────────────────────────────────────────────
+
         function updateLogoPreview() {
             const preview = logoPreview;
             const placeholder = preview.querySelector('.placeholder');
@@ -2325,6 +2620,8 @@
             debounceSave();
             showToast('Logo removed.', 'info');
         }
+
+        // ─── items ────────────────────────────────────────────
 
         function addItem(desc = '', qty = 1, rate = 0) {
             state.items.push({
@@ -2443,6 +2740,8 @@
             editAmountPaid.textContent = formatMoney(paid);
             editBalance.textContent = formatMoney(balance);
         }
+
+        // ─── preview ──────────────────────────────────────────
 
         function renderPreview() {
             const data = collectData();
@@ -2580,7 +2879,6 @@
             const boxColor = d.balanceBoxColor || '#000000';
             const boxTextColor = getContrastColor(boxColor);
 
-            // Build the new two-row header
             const topRow = `
                         <div class="inv-row-top">
                             <div class="inv-logo-area">
@@ -2662,6 +2960,8 @@
                             </div>
                         `;
         }
+
+        // ─── PDF download ─────────────────────────────────────
 
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
@@ -2764,6 +3064,8 @@
             });
         }
 
+        // ─── tabs ─────────────────────────────────────────────
+
         function switchTab(tabId) {
             const tabs = document.querySelectorAll('.tab-btn');
             const contents = {
@@ -2790,6 +3092,8 @@
                 });
             });
         }
+
+        // ─── plus / reset ──────────────────────────────────────
 
         function handlePlus() {
             const hasContent = state.items.length > 0 ||
@@ -2856,6 +3160,8 @@
         }
         window.resetInvoice = resetInvoice;
 
+        // ─── local backup ──────────────────────────────────────
+
         function downloadBackup() {
             const data = {
                 invoiceState: localStorage.getItem('invoiceState'),
@@ -2892,22 +3198,317 @@
             reader.readAsText(file);
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
+        // ─── CLOUD BACKUP (Supabase) ──────────────────────────
+
+        let cloudModalMode = 'upload'; // 'upload' | 'load'
+
+        function openCloudModal(mode) {
+            cloudModalMode = mode;
+            const modal = $('cloudModal');
+            const title = $('cloudModalTitle');
+            const sub = $('cloudModalSub');
+            const actionBtn = $('cloudModalActionBtn');
+            const accessGroup = $('cloudAccessCodeGroup');
+            const status = $('cloudModalStatus');
+
+            status.className = 'modal-status';
+            status.textContent = '';
+            status.style.display = 'none';
+
+            if (mode === 'upload') {
+                title.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload to Cloud';
+                sub.textContent = 'Enter your username and access code to save this invoice to the cloud.';
+                actionBtn.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload';
+                accessGroup.style.display = 'block';
+            } else {
+                title.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load from Cloud';
+                sub.textContent = 'Enter your username to restore your invoices from the cloud.';
+                actionBtn.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load';
+                accessGroup.style.display = 'none';
+            }
+
+            $('cloudUsernameInput').value = '';
+            $('cloudAccessCodeInput').value = '';
+            modal.classList.add('active');
+            setTimeout(() => $('cloudUsernameInput').focus(), 100);
         }
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr + 'T00:00:00');
-            return d.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+        function closeCloudModal() {
+            $('cloudModal').classList.remove('active');
+        }
+
+        function setCloudModalStatus(message, type = 'info') {
+            const status = $('cloudModalStatus');
+            status.textContent = message;
+            status.className = 'modal-status show ' + type;
+            status.style.display = 'block';
+        }
+
+        function clearCloudModalStatus() {
+            const status = $('cloudModalStatus');
+            status.className = 'modal-status';
+            status.textContent = '';
+            status.style.display = 'none';
+        }
+
+        function updateCloudStatusBadge(connected, message) {
+            const el = $('cloudStatus');
+            const dot = $('cloudStatusDot');
+            const text = $('cloudStatusText');
+            if (connected) {
+                el.style.display = 'inline-flex';
+                dot.className = 'dot green';
+                text.textContent = message || 'Connected to Supabase';
+            } else if (connected === false) {
+                el.style.display = 'inline-flex';
+                dot.className = 'dot red';
+                text.textContent = message || 'Not connected';
+            } else {
+                el.style.display = 'none';
+            }
+        }
+
+        // ─── cloud upload ──────────────────────────────────────
+
+        async function cloudUpload(username, accessCode) {
+            if (!supabaseReady || !supabaseClient) {
+                setCloudModalStatus('❌ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error');
+                return false;
+            }
+
+            if (!username.trim()) {
+                setCloudModalStatus('❌ Please enter a username.', 'error');
+                return false;
+            }
+            if (!accessCode.trim()) {
+                setCloudModalStatus('❌ Please enter your access code.', 'error');
+                return false;
+            }
+
+            // Build the data payload
+            const invoiceState = localStorage.getItem('invoiceState') || '{}';
+            const invoiceHistory = localStorage.getItem('invoiceHistory') || '[]';
+
+            const payload = {
+                username: username.trim(),
+                access_code: accessCode.trim(),
+                data: {
+                    invoiceState: invoiceState,
+                    invoiceHistory: invoiceHistory,
+                },
+                updated_at: new Date().toISOString(),
+            };
+
+            setCloudModalStatus('⏳ Uploading to cloud...', 'info');
+
+            try {
+                // Check if username exists
+                const { data: existing, error: findError } = await supabaseClient
+                    .from('invoice_backups')
+                    .select('username, access_code')
+                    .eq('username', username.trim())
+                    .maybeSingle();
+
+                if (findError && findError.code !== 'PGRST116') {
+                    throw findError;
+                }
+
+                let result;
+                if (existing) {
+                    // Update existing record — verify access code
+                    if (existing.access_code !== accessCode.trim()) {
+                        setCloudModalStatus('❌ Access code does not match. Please use the correct code for this username.', 'error');
+                        return false;
+                    }
+                    const { data, error } = await supabaseClient
+                        .from('invoice_backups')
+                        .update({
+                            data: payload.data,
+                            updated_at: payload.updated_at,
+                        })
+                        .eq('username', username.trim())
+                        .select();
+                    if (error) throw error;
+                    result = data;
+                    setCloudModalStatus('✅ Cloud backup updated successfully!', 'success');
+                    showToast('Cloud backup updated ✓', 'success');
+                } else {
+                    // Insert new record
+                    const { data, error } = await supabaseClient
+                        .from('invoice_backups')
+                        .insert({
+                            username: username.trim(),
+                            access_code: accessCode.trim(),
+                            data: payload.data,
+                            updated_at: payload.updated_at,
+                        })
+                        .select();
+                    if (error) throw error;
+                    result = data;
+                    setCloudModalStatus('✅ Cloud backup uploaded successfully!', 'success');
+                    showToast('Cloud backup uploaded ✓', 'success');
+                }
+
+                return true;
+
+            } catch (err) {
+                console.error('Cloud upload error:', err);
+                let msg = '❌ Upload failed: ';
+                if (err.code === '42P01') {
+                    msg +=
+                    'Table "invoice_backups" does not exist. Please create it in your Supabase database.';
+                } else if (err.message) {
+                    msg += err.message;
+                } else {
+                    msg += 'Unknown error. Check console for details.';
+                }
+                setCloudModalStatus(msg, 'error');
+                return false;
+            }
+        }
+
+        // ─── cloud load ───────────────────────────────────────
+
+        async function cloudLoad(username) {
+            if (!supabaseReady || !supabaseClient) {
+                setCloudModalStatus('❌ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error');
+                return false;
+            }
+
+            if (!username.trim()) {
+                setCloudModalStatus('❌ Please enter a username.', 'error');
+                return false;
+            }
+
+            setCloudModalStatus('⏳ Loading from cloud...', 'info');
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('invoice_backups')
+                    .select('data, updated_at')
+                    .eq('username', username.trim())
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (!data) {
+                    setCloudModalStatus(`❌ No backup found for username "${username.trim()}".`, 'error');
+                    return false;
+                }
+
+                const backupData = data.data;
+                if (backupData.invoiceState) {
+                    localStorage.setItem('invoiceState', backupData.invoiceState);
+                }
+                if (backupData.invoiceHistory) {
+                    localStorage.setItem('invoiceHistory', backupData.invoiceHistory);
+                }
+
+                const dateStr = data.updated_at ? new Date(data.updated_at).toLocaleString() : 'unknown date';
+                setCloudModalStatus(`✅ Backup loaded successfully! (from ${dateStr})`, 'success');
+                showToast('Cloud backup loaded ✓ Reloading...', 'success');
+
+                setTimeout(() => location.reload(), 1200);
+                return true;
+
+            } catch (err) {
+                console.error('Cloud load error:', err);
+                let msg = '❌ Load failed: ';
+                if (err.code === '42P01') {
+                    msg +=
+                        'Table "invoice_backups" does not exist. Please create it in your Supabase database.';
+                } else if (err.message) {
+                    msg += err.message;
+                } else {
+                    msg += 'Unknown error. Check console for details.';
+                }
+                setCloudModalStatus(msg, 'error');
+                return false;
+            }
+        }
+
+        // ─── cloud modal event handlers ──────────────────────
+
+        function setupCloudModal() {
+            const modal = $('cloudModal');
+            const cancelBtn = $('cloudModalCancelBtn');
+            const actionBtn = $('cloudModalActionBtn');
+            const usernameInput = $('cloudUsernameInput');
+            const accessInput = $('cloudAccessCodeInput');
+
+            // Close on overlay click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeCloudModal();
+            });
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeCloudModal();
+                }
+            });
+
+            cancelBtn.addEventListener('click', closeCloudModal);
+
+            actionBtn.addEventListener('click', async () => {
+                const username = usernameInput.value;
+                const accessCode = accessInput.value;
+
+                // Disable button during action
+                actionBtn.disabled = true;
+                const originalHtml = actionBtn.innerHTML;
+
+                try {
+                    if (cloudModalMode === 'upload') {
+                        await cloudUpload(username, accessCode);
+                    } else {
+                        await cloudLoad(username);
+                    }
+                } finally {
+                    actionBtn.disabled = false;
+                    actionBtn.innerHTML = originalHtml;
+                }
+            });
+
+            // Enter key in inputs triggers action
+            usernameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    if (cloudModalMode === 'load') {
+                        actionBtn.click();
+                    } else {
+                        accessInput.focus();
+                    }
+                }
+            });
+
+            accessInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    actionBtn.click();
+                }
+            });
+
+            // Open upload
+            $('cloudUploadBtn').addEventListener('click', () => {
+                if (!supabaseReady) {
+                    showToast('⚠️ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error', 5000);
+                    return;
+                }
+                openCloudModal('upload');
+            });
+
+            // Open load
+            $('cloudLoadBtn').addEventListener('click', () => {
+                if (!supabaseReady) {
+                    showToast('⚠️ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error', 5000);
+                    return;
+                }
+                openCloudModal('load');
             });
         }
+
+        // ─── attach input listeners ──────────────────────────
 
         function attachInputListeners() {
             const fields = [
@@ -2944,7 +3545,6 @@
                 debounceSave();
             });
 
-            // Balance box color
             balanceBoxColorInput.addEventListener('input', () => {
                 state.balanceBoxColor = balanceBoxColorInput.value;
                 renderPreview();
@@ -2992,6 +3592,8 @@
             });
         }
 
+        // ─── init ─────────────────────────────────────────────
+
         function init() {
             const today = new Date().toISOString().split('T')[0];
             if (!invDate.value) invDate.value = today;
@@ -3011,15 +3613,24 @@
             attachInputListeners();
             setupTabs();
             setupDownload();
+            setupCloudModal();
             renderHistory();
             renderPreview();
+
+            // Show Supabase status
+            if (supabaseReady) {
+                updateCloudStatusBadge(true, 'Connected');
+            } else {
+                updateCloudStatusBadge(false, 'Not configured');
+            }
 
             setTimeout(() => {
                 saveIndicator.classList.remove('visible');
             }, 1000);
         }
 
-        // Expose functions
+        // ─── expose globals ───────────────────────────────────
+
         window.loadFromHistory = loadFromHistory;
         window.duplicateHistory = duplicateHistory;
         window.deleteHistory = deleteHistory;
@@ -3027,6 +3638,7 @@
         window.switchTab = switchTab;
         window.startRename = startRename;
         window.renameHistory = renameHistory;
+        window.resetInvoice = resetInvoice;
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
