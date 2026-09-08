@@ -1119,15 +1119,19 @@
                 gap: 16px;
             }
 
+            /* KEY CHANGE: Keep row direction and push balance box to the right */
             .invoice-preview .inv-row-bottom {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 8px 16px;
             }
 
             .invoice-preview .inv-row-bottom .balance-box {
-                align-self: stretch;
+                align-self: flex-start;
                 min-width: unset;
                 padding: 16px 20px;
+                margin-left: auto; /* Forces the box to the right edge */
+                flex-shrink: 0;
             }
 
             .invoice-preview .inv-row-top .inv-title {
