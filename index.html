@@ -730,7 +730,6 @@
             margin-top: 2px;
         }
 
-        /* BALANCE BOX */
         .inv-right {
             display: flex;
             flex-direction: column;
@@ -1120,12 +1119,12 @@
             }
 
             .invoice-preview .inv-meta {
-                text-align: left;
+                text-align: right; /* CHANGED: was left */
                 width: 100%;
             }
 
             .inv-right {
-                align-items: flex-start;
+                align-items: flex-end; /* CHANGED: was flex-start */
                 width: 100%;
             }
 
@@ -1635,7 +1634,7 @@
                                 <label for="amountPaid"><i class="fas fa-money-bill-wave fa-icon"></i> Amount paid (₦)</label>
                                 <input type="number" id="amountPaid" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
-                            <!-- NEW: Balance box color picker -->
+                            <!-- Balance box color picker -->
                             <div class="form-group">
                                 <label for="balanceBoxColor"><i class="fas fa-palette fa-icon"></i> Box color</label>
                                 <input type="color" id="balanceBoxColor" value="#000000" />
@@ -1739,9 +1738,6 @@
     </div>
 
     <script>
-        // ============================================================
-        //  STATE
-        // ============================================================
         const state = {
             items: [],
             nextId: 1,
@@ -1755,9 +1751,6 @@
             balanceBoxColor: '#000000',
         };
 
-        // ============================================================
-        //  DOM REFS
-        // ============================================================
         const $ = (id) => document.getElementById(id);
 
         const invoiceNameInput = $('invoiceName');
@@ -1807,9 +1800,6 @@
         let saveTimeout = null;
         let toastTimeout = null;
 
-        // ============================================================
-        //  CURRENCY
-        // ============================================================
         const CURRENCY = '₦';
 
         function formatMoney(amount) {
@@ -1818,9 +1808,6 @@
             return CURRENCY + parts.join('.');
         }
 
-        // ============================================================
-        //  CONTRAST COLOR HELPER
-        // ============================================================
         function getContrastColor(hexColor) {
             if (!hexColor) return '#ffffff';
             let hex = hexColor.replace('#', '');
@@ -1834,9 +1821,6 @@
             return luminance > 0.5 ? '#000000' : '#ffffff';
         }
 
-        // ============================================================
-        //  TOAST
-        // ============================================================
         function showToast(message, type = 'info', duration = 3000) {
             toast.textContent = message;
             toast.className = 'toast ' + type;
@@ -1849,9 +1833,6 @@
             }, duration);
         }
 
-        // ============================================================
-        //  AUTO-SAVE (localStorage)
-        // ============================================================
         function saveState() {
             const data = {
                 invoiceName: invoiceNameInput.value,
@@ -1965,9 +1946,6 @@
             }, 300);
         }
 
-        // ============================================================
-        //  HISTORY (localStorage)
-        // ============================================================
         function getHistory() {
             try {
                 const raw = localStorage.getItem('invoiceHistory');
@@ -2225,9 +2203,6 @@
             historyList.innerHTML = html;
         }
 
-        // ============================================================
-        //  LOGO
-        // ============================================================
         function updateLogoPreview() {
             const preview = logoPreview;
             const placeholder = preview.querySelector('.placeholder');
@@ -2296,9 +2271,6 @@
             showToast('Logo removed.', 'info');
         }
 
-        // ============================================================
-        //  ITEMS
-        // ============================================================
         function addItem(desc = '', qty = 1, rate = 0) {
             state.items.push({
                 id: state.nextId++,
@@ -2401,9 +2373,6 @@
             }
         }
 
-        // ============================================================
-        //  SUMMARY
-        // ============================================================
         function updateSummary() {
             const subtotal = state.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
             const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
@@ -2420,9 +2389,6 @@
             editBalance.textContent = formatMoney(balance);
         }
 
-        // ============================================================
-        //  PREVIEW RENDER
-        // ============================================================
         function renderPreview() {
             const data = collectData();
             const html = buildInvoiceHtml(data);
@@ -2553,7 +2519,6 @@
                             </div>
                         `;
 
-            // Balance box with contrast color
             const boxColor = d.balanceBoxColor || '#000000';
             const boxTextColor = getContrastColor(boxColor);
 
@@ -2628,9 +2593,6 @@
                         `;
         }
 
-        // ============================================================
-        //  PDF DOWNLOAD
-        // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
                 const element = document.getElementById('invoiceToPdf');
@@ -2732,9 +2694,6 @@
             });
         }
 
-        // ============================================================
-        //  TABS
-        // ============================================================
         function switchTab(tabId) {
             const tabs = document.querySelectorAll('.tab-btn');
             const contents = {
@@ -2762,9 +2721,6 @@
             });
         }
 
-        // ============================================================
-        //  PLUS BUTTON
-        // ============================================================
         function handlePlus() {
             const hasContent = state.items.length > 0 ||
                 companyName.value.trim() ||
@@ -2783,9 +2739,6 @@
             showToast('New invoice created ✓', 'success');
         }
 
-        // ============================================================
-        //  RESET
-        // ============================================================
         function resetInvoiceData(silent = false) {
             state.items = [];
             state.nextId = 1;
@@ -2833,9 +2786,6 @@
         }
         window.resetInvoice = resetInvoice;
 
-        // ============================================================
-        //  BACKUP
-        // ============================================================
         function downloadBackup() {
             const data = {
                 invoiceState: localStorage.getItem('invoiceState'),
@@ -2872,9 +2822,6 @@
             reader.readAsText(file);
         }
 
-        // ============================================================
-        //  HELPERS
-        // ============================================================
         function escapeHtml(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -2892,9 +2839,6 @@
             });
         }
 
-        // ============================================================
-        //  INPUT LISTENERS
-        // ============================================================
         function attachInputListeners() {
             const fields = [
                 invoiceNameInput,
@@ -2930,7 +2874,7 @@
                 debounceSave();
             });
 
-            // Balance box color listener
+            // Balance box color
             balanceBoxColorInput.addEventListener('input', () => {
                 state.balanceBoxColor = balanceBoxColorInput.value;
                 renderPreview();
@@ -2978,9 +2922,6 @@
             });
         }
 
-        // ============================================================
-        //  INIT
-        // ============================================================
         function init() {
             const today = new Date().toISOString().split('T')[0];
             if (!invDate.value) invDate.value = today;
@@ -3008,7 +2949,7 @@
             }, 1000);
         }
 
-        // Expose functions globally
+        // Expose functions
         window.loadFromHistory = loadFromHistory;
         window.duplicateHistory = duplicateHistory;
         window.deleteHistory = deleteHistory;
