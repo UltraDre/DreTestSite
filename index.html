@@ -9,6 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
 
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
     <style>
         /* ---------- RESET & BASE ---------- */
         *,
@@ -70,6 +73,11 @@
             gap: 10px;
         }
 
+        .app-header h1 .fa-file-invoice {
+            color: #1e293b;
+            font-size: 26px;
+        }
+
         .app-header h1 span {
             background: #1e293b;
             color: #fff;
@@ -94,8 +102,7 @@
             border: none;
             background: #1e293b;
             color: #fff;
-            font-size: 22px !important;
-            font-weight: 300;
+            font-size: 18px !important;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -109,6 +116,10 @@
         .header-actions .btn-plus:hover {
             background: #0f172a;
             transform: scale(1.05);
+        }
+
+        .header-actions .btn-plus .fa-plus {
+            font-size: 18px;
         }
 
         /* ---------- TABS ---------- */
@@ -135,6 +146,9 @@
             font-family: inherit;
             letter-spacing: -0.2px;
             touch-action: manipulation;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tab-btn:hover {
@@ -161,6 +175,10 @@
         .tab-btn.active .badge-tab {
             background: #1e293b;
             color: #fff;
+        }
+
+        .tab-btn .fa-icon {
+            font-size: 16px;
         }
 
         /* ---------- TAB CONTENT ---------- */
@@ -269,13 +287,13 @@
         .logo-preview {
             width: 80px;
             height: 80px;
-            border: 2px dashed #dce1e8;
+            border: none;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            background: #fafbfc;
+            background: #ffffff;
             flex-shrink: 0;
             transition: border-color 0.2s;
             position: relative;
@@ -288,14 +306,13 @@
         }
 
         .logo-preview .placeholder {
-            font-size: 28px;
+            font-size: 32px;
             color: #cbd5e1;
             opacity: 0.6;
         }
 
         .logo-preview.has-logo {
-            border-color: #1e293b;
-            border-style: solid;
+            border: none;
         }
 
         .logo-actions {
@@ -334,6 +351,9 @@
             touch-action: manipulation;
             background: #f1f4f9;
             color: #1e293b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn-small:hover {
@@ -382,7 +402,8 @@
         }
 
         .logo-options .form-group select,
-        .logo-options .form-group input[type="range"] {
+        .logo-options .form-group input[type="range"],
+        .logo-options .form-group input[type="text"] {
             width: auto;
             padding: 4px 8px;
             border-radius: 6px;
@@ -530,12 +551,16 @@
             font-family: inherit;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             touch-action: manipulation;
         }
 
         .btn-add-item:hover {
             background: #e2e8f0;
+        }
+
+        .btn-add-item .fa-plus {
+            font-size: 14px;
         }
 
         /* ---------- SUMMARY (edit) ---------- */
@@ -554,7 +579,7 @@
         .summary-line {
             display: flex;
             justify-content: space-between;
-            width: 220px;
+            width: 320px;
             font-size: 14px;
             color: #475569;
         }
@@ -660,197 +685,252 @@
             background: #e2e8f0;
         }
 
-        /* ---------- INVOICE PREVIEW ---------- */
-        .invoice-preview {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1.5px solid #e9edf2;
-            padding: 48px 48px 40px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #1e293b;
-        }
-
-        .invoice-preview .inv-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 36px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .invoice-preview .inv-brand {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .invoice-preview .inv-brand .logo-wrap {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fafbfc;
-            overflow: hidden;
-        }
-
-        .invoice-preview .inv-brand .logo-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .invoice-preview .inv-brand .brand-text h2 {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.6px;
-            color: #0f172a;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .invoice-preview .inv-brand .brand-text .sub {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .invoice-preview .inv-meta {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .invoice-preview .inv-meta .inv-number {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .invoice-preview .inv-meta .inv-date {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .invoice-preview .inv-parties {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 32px;
-        }
-
-        .invoice-preview .inv-parties .party h4 {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: #94a3b8;
-            font-weight: 600;
-            margin: 0 0 4px 0;
-        }
-
-        .invoice-preview .inv-parties .party p {
-            margin: 2px 0;
-            color: #1e293b;
-        }
-
-        .invoice-preview .inv-parties .party .name {
-            font-weight: 600;
+        .btn-secondary .fa-icon,
+        .btn-primary .fa-icon {
             font-size: 16px;
         }
 
-        .invoice-preview table.inv-items {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0 24px;
-            font-size: 14px;
+        /* ---------- INVOICE PREVIEW (NEW DESIGN) ---------- */
+        .invoice-preview {
+            background: #ffffff;
+            border-radius: 0;
+            border: none;
+            padding: 40px;
+            font-family: inherit;
+            color: #1e293b;
         }
 
-        .invoice-preview table.inv-items th {
-            text-align: left;
-            padding: 10px 8px 10px 0;
-            border-bottom: 2px solid #e2e8f0;
-            font-weight: 600;
+        .new-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .new-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .new-brand .logo-wrap {
+            flex-shrink: 0;
+            display: block;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: transparent;
+            border: none;
+            outline: none;
+        }
+
+        .new-brand-text h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            color: #000;
+        }
+
+        .tagline {
             font-size: 12px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            color: #64748b;
+            color: #666;
+            margin-top: 2px;
         }
 
-        .invoice-preview table.inv-items th:last-child {
-            text-align: right;
-            padding-right: 0;
+        .new-invoice-title {
+            font-size: 54px;
+            color: #ddd;
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: 2px;
         }
 
-        .invoice-preview table.inv-items td {
-            padding: 10px 8px 10px 0;
-            border-bottom: 1px solid #f1f4f9;
+        .hero-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #2d2d2d;
+            margin-bottom: 20px;
         }
 
-        .invoice-preview table.inv-items td:last-child {
-            text-align: right;
-            padding-right: 0;
-            font-weight: 500;
+        .hero-left h4 {
+            text-transform: uppercase;
+            font-size: 12px;
+            color: #bbb;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
 
-        .invoice-preview table.inv-items tr:last-child td {
-            border-bottom: none;
+        .hero-left .client-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 0 5px 0;
+            color: #fff;
         }
 
-        .invoice-preview .inv-summary {
+        .hero-left .client-address {
+            color: #ddd;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .hero-right {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            margin-top: 8px;
-            padding-top: 12px;
-            border-top: 2px solid #e2e8f0;
         }
 
-        .invoice-preview .inv-summary .sum-line {
+        .grand-total-box {
+            padding: 15px 25px;
+            text-align: right;
+            margin-bottom: 10px;
+            color: #000;
+            background-color: var(--accent);
+        }
+
+        .grand-total-box .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            opacity: 0.7;
+        }
+
+        .grand-total-box .total {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #ddd;
+            margin-top: 10px;
+        }
+
+        .new-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .new-items th {
+            padding: 12px;
+            text-align: right;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background-color: var(--accent);
+            color: #000;
+        }
+
+        .new-items th:first-child,
+        .new-items td:first-child {
+            text-align: center;
+            width: 40px;
+        }
+
+        .new-items th:nth-child(2),
+        .new-items td:nth-child(2) {
+            text-align: left;
+        }
+
+        .new-items td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+            font-size: 14px;
+            background-color: inherit;
+        }
+
+        .new-items td:first-child {
+            color: #666;
+        }
+
+        .new-items td:nth-child(2) {
+            font-weight: 600;
+        }
+
+        .new-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 40px;
+        }
+
+        .summary-box {
+            width: 320px;
+            padding: 20px;
+            text-align: right;
+            background-color: var(--accent);
+            color: #000;
+        }
+
+        .sum-line {
             display: flex;
             justify-content: space-between;
-            width: 220px;
-            padding: 3px 0;
-            font-size: 14px;
-            color: #475569;
-        }
-
-        .invoice-preview .inv-summary .sum-line.total {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0f172a;
-            border-top: 1.5px solid #e2e8f0;
-            padding-top: 8px;
-            margin-top: 4px;
-        }
-
-        .invoice-preview .inv-summary .sum-line.balance {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0f172a;
-            border-top: 2px solid #1e293b;
-            padding-top: 8px;
-            margin-top: 4px;
-        }
-
-        .invoice-preview .inv-summary .sum-line.paid {
-            color: #22c55e;
-        }
-
-        .invoice-preview .inv-notes {
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1.5px solid #e9edf2;
-            color: #64748b;
+            padding: 5px 0;
             font-size: 14px;
         }
 
-        .invoice-preview .inv-notes strong {
-            color: #475569;
+        .sum-line.total {
+            font-weight: 800;
+            font-size: 20px;
+            border-top: 1px solid rgba(0,0,0,0.2);
+            margin-top: 5px;
+            padding-top: 10px;
         }
 
-        .invoice-preview .inv-notes p {
-            margin: 4px 0 0 0;
+        .new-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .thank-you {
+            max-width: 300px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .thank-you strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .thank-you p {
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .bank-info {
+            display: flex;
+            gap: 30px;
+            text-align: left;
+        }
+
+        .bank-info .col {
+            font-size: 12px;
+            color: #333;
+            max-width: 180px;
+        }
+
+        .bank-info .col h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #000;
+        }
+
+        .bank-info .col p {
+            margin: 2px 0;
+            color: #555;
         }
 
         .empty-state {
@@ -917,44 +997,62 @@
 
         .history-item .actions {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
         }
 
         .history-item .actions .btn-sm {
-            padding: 4px 6px;
+            padding: 4px 12px;
             border-radius: 6px;
-            font-size: 18px;
-            font-weight: 400;
+            font-size: 12px;
+            font-weight: 500;
             border: none;
             cursor: pointer;
             font-family: inherit;
             transition: all 0.15s;
             touch-action: manipulation;
-            background: transparent;
-            color: #64748b;
-            line-height: 1;
-            width: 32px;
-            height: 32px;
-            display: flex;
+            background: #f1f4f9;
+            color: #1e293b;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 4px;
         }
 
         .history-item .actions .btn-sm:hover {
-            background: #f1f4f9;
-            color: #0f172a;
+            background: #e2e8f0;
         }
 
-        .history-item .actions .btn-sm.delete:hover {
+        .history-item .actions .btn-sm.duplicate {
+            background: #e9edf2;
+            color: #1e293b;
+        }
+        .history-item .actions .btn-sm.duplicate:hover {
+            background: #dce1e8;
+        }
+
+        .history-item .actions .btn-sm.edit {
+            background: #1e293b;
+            color: #fff;
+        }
+        .history-item .actions .btn-sm.edit:hover {
+            background: #0f172a;
+        }
+
+        .history-item .actions .btn-sm.rename {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .history-item .actions .btn-sm.rename:hover {
+            background: #bae6fd;
+        }
+
+        .history-item .actions .btn-sm.delete {
             background: #fee2e2;
             color: #b91c1c;
         }
-
-        .history-item .actions .btn-sm.rename:hover {
-            background: #e0f2fe;
-            color: #0369a1;
+        .history-item .actions .btn-sm.delete:hover {
+            background: #fecaca;
         }
 
         .history-item .rename-input {
@@ -1026,6 +1124,10 @@
             font-size: 0;
         }
 
+        .backup-section .card .btn-secondary .fa-icon {
+            margin-right: 4px;
+        }
+
         /* ---------- RESPONSIVE ---------- */
         @media (max-width: 820px) {
             .app {
@@ -1088,11 +1190,6 @@
             .preview-toolbar .btn-secondary {
                 flex: 1;
                 justify-content: center;
-            }
-
-            .invoice-preview .inv-brand {
-                flex-direction: column;
-                align-items: flex-start;
             }
 
             .logo-options {
@@ -1312,6 +1409,57 @@
         .toast.info {
             background: #1e293b;
         }
+
+        /* Fix icon alignment */
+        .fa-icon {
+            font-size: 1em;
+            line-height: 1;
+        }
+        .btn-sm .fa-icon {
+            font-size: 14px;
+        }
+        .tab-btn .fa-icon {
+            font-size: 16px;
+        }
+        .header-actions .btn-secondary .fa-icon {
+            font-size: 14px;
+        }
+        .logo-preview .placeholder .fa-icon {
+            font-size: 32px;
+            color: #cbd5e1;
+        }
+        .btn-remove-item .fa-icon {
+            font-size: 18px;
+        }
+        .btn-add-item .fa-icon {
+            font-size: 14px;
+        }
+        .preview-toolbar .btn-secondary .fa-icon,
+        .preview-toolbar .btn-primary .fa-icon {
+            font-size: 16px;
+        }
+        .backup-section .card .btn-secondary .fa-icon {
+            font-size: 16px;
+        }
+        .history-item .actions .btn-sm .fa-icon {
+            font-size: 14px;
+        }
+        .history-item .actions .btn-sm {
+            gap: 4px;
+        }
+        .section-title .fa-icon {
+            font-size: 16px;
+            color: #1e293b;
+        }
+        .summary-line .fa-icon {
+            font-size: 14px;
+        }
+        .app-header h1 .fa-icon {
+            font-size: 26px;
+        }
+        .logo-actions .btn-small .fa-icon {
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -1324,25 +1472,35 @@
         <!-- HEADER -->
         <header class="app-header">
             <h1>
-                <span>📄</span> Invoice <span>₦</span>
+                <i class="fas fa-file-invoice fa-icon"></i> Invoice <span>₦</span>
             </h1>
             <div class="header-actions">
                 <span class="save-indicator" id="saveIndicator">
                     <span class="dot"></span> <span id="saveText">Saved</span>
                 </span>
-                <button class="btn-plus" id="plusBtn" title="Save current invoice to history and start fresh">+</button>
+                <button class="btn-plus" id="plusBtn" title="Save current invoice to history and start fresh">
+                    <i class="fas fa-plus"></i>
+                </button>
                 <button class="btn-secondary" onclick="resetInvoice()" style="padding:6px 16px;font-size:13px;">
-                    ↻ Reset
+                    <i class="fas fa-rotate fa-icon"></i> Reset
                 </button>
             </div>
         </header>
 
         <!-- TABS -->
         <div class="tabs" role="tablist">
-            <button class="tab-btn active" data-tab="edit-tab" role="tab">✎ Edit</button>
-            <button class="tab-btn" data-tab="preview-tab" role="tab">👁 Preview</button>
-            <button class="tab-btn" data-tab="history-tab" role="tab">📂 History <span class="badge-tab" id="historyBadge">0</span></button>
-            <button class="tab-btn" data-tab="backup-tab" role="tab">💾 Backup</button>
+            <button class="tab-btn active" data-tab="edit-tab" role="tab">
+                <i class="fas fa-pen fa-icon"></i> Edit
+            </button>
+            <button class="tab-btn" data-tab="preview-tab" role="tab">
+                <i class="fas fa-eye fa-icon"></i> Preview
+            </button>
+            <button class="tab-btn" data-tab="history-tab" role="tab">
+                <i class="fas fa-folder fa-icon"></i> History <span class="badge-tab" id="historyBadge">0</span>
+            </button>
+            <button class="tab-btn" data-tab="backup-tab" role="tab">
+                <i class="fas fa-database fa-icon"></i> Backup
+            </button>
         </div>
 
         <!-- ========== EDIT TAB ========== -->
@@ -1352,15 +1510,17 @@
 
                 <!-- Logo -->
                 <div class="full-width">
-                    <div class="section-title">Logo <span class="badge">optional</span></div>
+                    <div class="section-title">
+                        <i class="fas fa-image fa-icon"></i> Logo <span class="badge">optional</span>
+                    </div>
                     <div class="logo-section">
                         <div class="logo-preview" id="logoPreview">
-                            <span class="placeholder">🖼</span>
+                            <span class="placeholder"><i class="fas fa-image fa-icon"></i></span>
                             <button class="remove-logo-overlay" id="removeLogoBtn" title="Remove logo">✕</button>
                         </div>
                         <div class="logo-actions">
                             <div class="file-input-wrap">
-                                <button class="btn-small primary">Upload logo</button>
+                                <button class="btn-small primary"><i class="fas fa-upload fa-icon"></i> Upload logo</button>
                                 <input type="file" id="logoUpload" accept="image/*" />
                             </div>
                             <span class="text-muted" style="font-size:12px;">PNG, JPG, SVG · max 200px</span>
@@ -1377,8 +1537,16 @@
                         </div>
                         <div class="form-group">
                             <label for="logoScale">Scale</label>
-                            <input type="range" id="logoScale" min="20" max="200" value="100" />
+                            <input type="range" id="logoScale" min="10" max="400" value="100" />
                             <span id="logoScaleLabel">100%</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="accentColor"><i class="fas fa-palette fa-icon"></i> Accent Color</label>
+                            <input type="color" id="accentColor" value="#ffc107" style="padding: 4px; width: 60px; height: 40px; cursor: pointer;" />
+                        </div>
+                        <div class="form-group">
+                            <label for="accentColorText">Hex Code</label>
+                            <input type="text" id="accentColorText" value="#ffc107" maxlength="7" placeholder="#ffc107" />
                         </div>
                     </div>
                 </div>
@@ -1386,7 +1554,7 @@
                 <!-- Invoice Name -->
                 <div class="full-width">
                     <div class="form-group">
-                        <label for="invoiceName">Invoice Name</label>
+                        <label for="invoiceName"><i class="fas fa-tag fa-icon"></i> Invoice Name</label>
                         <input type="text" id="invoiceName" placeholder="e.g. Q1 Project Report" inputmode="text" />
                         <span class="text-muted" style="font-size:12px;">Used as the display name in history and backups</span>
                     </div>
@@ -1394,33 +1562,33 @@
 
                 <!-- Company -->
                 <div class="form-group">
-                    <label for="companyName">Company name</label>
+                    <label for="companyName"><i class="fas fa-building fa-icon"></i> Company name</label>
                     <input type="text" id="companyName" placeholder="Your company" inputmode="text" />
                 </div>
                 <div class="form-group">
-                    <label for="companyAddress">Address</label>
+                    <label for="companyAddress"><i class="fas fa-location-dot fa-icon"></i> Address</label>
                     <input type="text" id="companyAddress" placeholder="Street, city, postal" inputmode="text" />
                 </div>
                 <div class="form-group">
-                    <label for="companyEmail">Email</label>
+                    <label for="companyEmail"><i class="fas fa-envelope fa-icon"></i> Email</label>
                     <input type="email" id="companyEmail" placeholder="company@example.com" inputmode="email" />
                 </div>
                 <div class="form-group">
-                    <label for="companyPhone">Phone</label>
+                    <label for="companyPhone"><i class="fas fa-phone fa-icon"></i> Phone</label>
                     <input type="text" id="companyPhone" placeholder="+234 800 000 0000" inputmode="tel" />
                 </div>
 
                 <!-- Invoice meta -->
                 <div class="form-group">
-                    <label for="invNumber">Invoice #</label>
+                    <label for="invNumber"><i class="fas fa-hashtag fa-icon"></i> Invoice #</label>
                     <input type="text" id="invNumber" placeholder="INV-001" inputmode="text" />
                 </div>
                 <div class="form-group">
-                    <label for="invDate">Date</label>
+                    <label for="invDate"><i class="fas fa-calendar fa-icon"></i> Date</label>
                     <input type="date" id="invDate" inputmode="text" />
                 </div>
                 <div class="form-group">
-                    <label for="invDueDate">Due date</label>
+                    <label for="invDueDate"><i class="fas fa-calendar-check fa-icon"></i> Due date</label>
                     <input type="date" id="invDueDate" inputmode="text" />
                 </div>
                 <div class="form-group">
@@ -1429,22 +1597,24 @@
 
                 <!-- Client -->
                 <div class="full-width">
-                    <div class="section-title">Client <span class="badge">bill to</span></div>
+                    <div class="section-title">
+                        <i class="fas fa-user fa-icon"></i> Client <span class="badge">bill to</span>
+                    </div>
                     <div class="edit-grid" style="grid-template-columns:1fr 1fr;gap:16px 24px;margin-top:4px;">
                         <div class="form-group">
-                            <label for="clientName">Name</label>
+                            <label for="clientName"><i class="fas fa-user fa-icon"></i> Name</label>
                             <input type="text" id="clientName" placeholder="Client name" inputmode="text" />
                         </div>
                         <div class="form-group">
-                            <label for="clientAddress">Address</label>
+                            <label for="clientAddress"><i class="fas fa-location-dot fa-icon"></i> Address</label>
                             <input type="text" id="clientAddress" placeholder="Street, city, postal" inputmode="text" />
                         </div>
                         <div class="form-group">
-                            <label for="clientEmail">Email</label>
+                            <label for="clientEmail"><i class="fas fa-envelope fa-icon"></i> Email</label>
                             <input type="email" id="clientEmail" placeholder="client@example.com" inputmode="email" />
                         </div>
                         <div class="form-group">
-                            <label for="clientPhone">Phone</label>
+                            <label for="clientPhone"><i class="fas fa-phone fa-icon"></i> Phone</label>
                             <input type="text" id="clientPhone" placeholder="+234 800 000 0000" inputmode="tel" />
                         </div>
                     </div>
@@ -1452,7 +1622,9 @@
 
                 <!-- Line Items -->
                 <div class="full-width">
-                    <div class="section-title">Line items <span class="badge" id="itemCount">0 items</span></div>
+                    <div class="section-title">
+                        <i class="fas fa-list-ul fa-icon"></i> Line items <span class="badge" id="itemCount">0 items</span>
+                    </div>
                     <div class="items-table-wrap">
                         <table class="items-table" id="itemsTable">
                             <thead>
@@ -1468,7 +1640,9 @@
                             </tbody>
                         </table>
                     </div>
-                    <button class="btn-add-item" id="addItemBtn">+ Add line</button>
+                    <button class="btn-add-item" id="addItemBtn">
+                        <i class="fas fa-plus fa-icon"></i> Add line
+                    </button>
                 </div>
 
                 <!-- Summary -->
@@ -1476,15 +1650,15 @@
                     <div class="summary-row">
                         <div class="summary-inputs">
                             <div class="form-group">
-                                <label for="taxRate">Tax (%)</label>
+                                <label for="taxRate"><i class="fas fa-percent fa-icon"></i> Tax (%)</label>
                                 <input type="number" id="taxRate" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                             <div class="form-group">
-                                <label for="discountRate">Discount (%)</label>
+                                <label for="discountRate"><i class="fas fa-percent fa-icon"></i> Discount (%)</label>
                                 <input type="number" id="discountRate" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                             <div class="form-group">
-                                <label for="amountPaid">Amount paid (₦)</label>
+                                <label for="amountPaid"><i class="fas fa-money-bill-wave fa-icon"></i> Amount paid (₦)</label>
                                 <input type="number" id="amountPaid" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                         </div>
@@ -1518,7 +1692,7 @@
                 <!-- Notes -->
                 <div class="full-width">
                     <div class="form-group">
-                        <label for="notes">Notes / Terms</label>
+                        <label for="notes"><i class="fas fa-pencil fa-icon"></i> Notes / Terms</label>
                         <textarea id="notes" rows="3" placeholder="Payment terms, thanks, etc." inputmode="text"></textarea>
                     </div>
                 </div>
@@ -1531,10 +1705,10 @@
 
             <div class="preview-toolbar">
                 <button class="btn-secondary" onclick="window.print()">
-                    🖨 Print
+                    <i class="fas fa-print fa-icon"></i> Print
                 </button>
                 <button class="btn-primary" id="downloadPdfBtn">
-                    ⬇ Download PDF
+                    <i class="fas fa-download fa-icon"></i> Download PDF
                 </button>
             </div>
 
@@ -1548,8 +1722,10 @@
         <div class="tab-content" id="history-tab" role="tabpanel">
 
             <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <span style="font-size:14px;color:#64748b;">Saved invoices</span>
-                <button class="btn-small" onclick="clearAllHistory()" style="color:#b91c1c;">Clear all</button>
+                <span style="font-size:14px;color:#64748b;"><i class="fas fa-folder-open fa-icon"></i> Saved invoices</span>
+                <button class="btn-small" onclick="clearAllHistory()" style="color:#b91c1c;">
+                    <i class="fas fa-trash fa-icon"></i> Clear all
+                </button>
             </div>
 
             <div id="historyList" class="history-list">
@@ -1562,15 +1738,19 @@
         <div class="tab-content" id="backup-tab" role="tabpanel">
             <div class="backup-section">
                 <div class="card">
-                    <h3>📥 Download Backup</h3>
+                    <h3><i class="fas fa-download fa-icon"></i> Download Backup</h3>
                     <p>Export all invoices, history, and settings as a JSON file.</p>
-                    <button class="btn-primary" id="downloadBackupBtn">⬇ Download Backup</button>
+                    <button class="btn-primary" id="downloadBackupBtn">
+                        <i class="fas fa-download fa-icon"></i> Download Backup
+                    </button>
                 </div>
                 <div class="card">
-                    <h3>📤 Restore Backup</h3>
+                    <h3><i class="fas fa-upload fa-icon"></i> Restore Backup</h3>
                     <p>Upload a JSON backup file to restore all data. This will overwrite current data.</p>
                     <div class="file-input-wrap">
-                        <button class="btn-secondary">📂 Choose Backup File</button>
+                        <button class="btn-secondary">
+                            <i class="fas fa-folder-open fa-icon"></i> Choose Backup File
+                        </button>
                         <input type="file" id="restoreBackupInput" accept=".json" />
                     </div>
                 </div>
@@ -1593,6 +1773,7 @@
             logoAspect: 'original',
             logoScale: 100,
             invoiceName: '',
+            accentColor: '#ffc107',
         };
 
         // ============================================================
@@ -1636,6 +1817,9 @@
         const logoAspect = $('logoAspect');
         const logoScale = $('logoScale');
         const logoScaleLabel = $('logoScaleLabel');
+
+        const accentColor = $('accentColor');
+        const accentColorText = $('accentColorText');
 
         const saveIndicator = $('saveIndicator');
         const saveText = $('saveText');
@@ -1698,6 +1882,7 @@
                 logoData: state.logoData,
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
+                accentColor: accentColor.value,
             };
             try {
                 localStorage.setItem('invoiceState', JSON.stringify(data));
@@ -1752,6 +1937,11 @@
                 logoScale.value = state.logoScale;
                 logoScaleLabel.textContent = state.logoScale + '%';
 
+                if (data.accentColor) {
+                    accentColor.value = data.accentColor;
+                    accentColorText.value = data.accentColor;
+                }
+
                 updateLogoPreview();
                 renderItems();
                 updateSummary();
@@ -1802,7 +1992,6 @@
 
         function saveToHistory() {
             const data = collectData();
-            // Only save if there's at least some content
             const hasContent = state.items.length > 0 || data.company.name || data.client.name;
             if (!hasContent) {
                 showToast('Nothing to save — invoice is empty.', 'info');
@@ -1834,6 +2023,7 @@
                 logoData: state.logoData,
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
+                accentColor: accentColor.value,
             };
 
             history.unshift({
@@ -1885,6 +2075,11 @@
             logoScale.value = state.logoScale;
             logoScaleLabel.textContent = state.logoScale + '%';
 
+            if (d.accentColor) {
+                accentColor.value = d.accentColor;
+                accentColorText.value = d.accentColor;
+            }
+
             updateLogoPreview();
             renderItems();
             updateSummary();
@@ -1928,6 +2123,7 @@
                 logoData: d.logoData || null,
                 logoAspect: d.logoAspect || 'original',
                 logoScale: d.logoScale || 100,
+                accentColor: d.accentColor || '#ffc107',
             };
 
             history.unshift({
@@ -1994,7 +2190,6 @@
                 }
             });
 
-            // Replace the name span with the input
             nameSpan.replaceWith(input);
             input.focus();
             input.select();
@@ -2007,7 +2202,7 @@
             if (history.length === 0) {
                 historyList.innerHTML = `
                             <div class="history-empty">
-                                <div class="icon">📭</div>
+                                <div class="icon"><i class="fas fa-folder-open fa-icon"></i></div>
                                 <p>No invoices saved yet.</p>
                                 <p style="font-size:13px;margin-top:4px;">Click the <strong>+</strong> button to save the current invoice.</p>
                             </div>
@@ -2032,10 +2227,10 @@
                                     <span class="meta">${dateStr}</span>
                                 </div>
                                 <div class="actions">
-                                    <button class="btn-sm" onclick="duplicateHistory('${entry.id}')" title="Duplicate">📋</button>
-                                    <button class="btn-sm" onclick="loadFromHistory('${entry.id}')" title="Edit">✎</button>
-                                    <button class="btn-sm rename" onclick="startRename('${entry.id}')" title="Rename">✏️</button>
-                                    <button class="btn-sm delete" onclick="deleteHistory('${entry.id}')" title="Delete">🗑️</button>
+                                    <button class="btn-sm duplicate" onclick="duplicateHistory('${entry.id}')"><i class="fas fa-copy fa-icon"></i> Duplicate</button>
+                                    <button class="btn-sm edit" onclick="loadFromHistory('${entry.id}')"><i class="fas fa-pen fa-icon"></i> Edit</button>
+                                    <button class="btn-sm rename" onclick="startRename('${entry.id}')"><i class="fas fa-pencil fa-icon"></i> Rename</button>
+                                    <button class="btn-sm delete" onclick="deleteHistory('${entry.id}')"><i class="fas fa-trash fa-icon"></i> Delete</button>
                                 </div>
                             </div>
                         `;
@@ -2162,7 +2357,7 @@
                                     <span class="amount-display">${formatMoney(amount)}</span>
                                 </td>
                                 <td class="col-action">
-                                    <button class="btn-remove-item" data-id="${item.id}" title="Remove">✕</button>
+                                    <button class="btn-remove-item" data-id="${item.id}" title="Remove"><i class="fas fa-times fa-icon"></i></button>
                                 </td>
                             </tr>
                         `;
@@ -2292,6 +2487,7 @@
                 logo: state.logoData,
                 logoAspect: state.logoAspect,
                 logoScale: state.logoScale,
+                accentColor: accentColor.value || '#ffc107',
             };
         }
 
@@ -2303,143 +2499,120 @@
 
             let logoStyle = '';
             if (hasLogo) {
+                const bgProps = `background-image: url('${d.logo}'); background-size: contain; background-repeat: no-repeat; background-position: center;`;
                 if (d.logoAspect === 'circle') {
-                    logoStyle =
-                        `width: ${size}px; height: ${size}px; border-radius: 50%; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                    logoStyle = `width: ${size}px; height: ${size}px; border-radius: 50%; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 } else if (d.logoAspect === 'square') {
-                    logoStyle =
-                        `width: ${size}px; height: ${size}px; border-radius: 0; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                    logoStyle = `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 } else {
-                    logoStyle =
-                        `width: ${size}px; height: auto; max-height: ${size * 1.5}px; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                    logoStyle = `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 }
             }
+            const logoHtml = hasLogo ? `<div class="logo-wrap" style="${logoStyle}"></div>` : '';
 
-            const logoHtml = hasLogo ?
-                `<div class="logo-wrap" style="${logoStyle}"><img src="${d.logo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" /></div>` :
-                '';
+            const itemsRows = d.items.map((item, index) => `
+                <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
+                    <td>${index + 1}</td>
+                    <td><strong>${escapeHtml(item.description)}</strong></td>
+                    <td>${formatMoney(item.rate)}</td>
+                    <td>${item.qty}</td>
+                    <td>${formatMoney(item.amount)}</td>
+                </tr>
+            `).join('');
 
-            const itemsRows = d.items.map(item => `
-                            <tr>
-                                <td>${escapeHtml(item.description)}</td>
-                                <td style="text-align:left;">${item.qty}</td>
-                                <td style="text-align:left;">${formatMoney(item.rate)}</td>
-                                <td>${formatMoney(item.amount)}</td>
-                            </tr>
-                        `).join('');
-
-            const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
+            const accent = d.accentColor || '#ffc107';
+            const tagline = d.invoice.name ? escapeHtml(d.invoice.name) : 'Tagline Here';
 
             let summaryLines = `
-                            <div class="sum-line">
-                                <span>Subtotal</span>
-                                <span>${formatMoney(d.subtotal)}</span>
-                            </div>
-                        `;
+                <div class="sum-line"><span>Subtotal</span><span>${formatMoney(d.subtotal)}</span></div>
+            `;
             if (d.taxRate > 0) {
-                summaryLines += `
-                            <div class="sum-line">
-                                <span>Tax (${d.taxRate}%)</span>
-                                <span>${formatMoney(d.tax)}</span>
-                            </div>
-                        `;
+                summaryLines += `<div class="sum-line"><span>Tax</span><span>${formatMoney(d.tax)}</span></div>`;
             }
             if (d.discountRate > 0) {
-                summaryLines += `
-                            <div class="sum-line">
-                                <span>Discount (${d.discountRate}%)</span>
-                                <span>-${formatMoney(d.discount)}</span>
-                            </div>
-                        `;
+                summaryLines += `<div class="sum-line"><span>Discount</span><span>-${formatMoney(d.discount)}</span></div>`;
             }
-            summaryLines += `
-                            <div class="sum-line total">
-                                <span>Total</span>
-                                <span>${formatMoney(d.total)}</span>
-                            </div>
-                        `;
-            if (d.amountPaid > 0) {
-                summaryLines += `
-                            <div class="sum-line paid">
-                                <span>Amount paid</span>
-                                <span>${formatMoney(d.amountPaid)}</span>
-                            </div>
-                        `;
-            }
-            summaryLines += `
-                            <div class="sum-line balance">
-                                <span>Balance due</span>
-                                <span>${formatMoney(d.balance)}</span>
-                            </div>
-                        `;
+            summaryLines += `<div class="sum-line total"><span>Grand Total</span><span>${formatMoney(d.total)}</span></div>`;
 
             return `
-                            <div class="invoice-preview" id="invoiceToPdf">
-                                <div class="inv-header">
-                                    <div class="inv-brand">
-                                        ${logoHtml}
-                                        <div class="brand-text">
-                                            ${companyNameHtml}
-                                            ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
-                                            ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
-                                            ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="inv-meta">
-                                        ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
-                                        ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
-                                        ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
-                                    </div>
-                                </div>
-
-                                <div class="inv-parties">
-                                    <div class="party">
-                                        <h4>Bill to</h4>
-                                        ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
-                                        ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
-                                        ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
-                                        ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
-                                        ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                    </div>
-                                    <div class="party" style="text-align:right;">
-                                        <h4>Invoice details</h4>
-                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
-                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
-                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
-                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                    </div>
-                                </div>
-
-                                <table class="inv-items">
-                                    <thead>
-                                        <tr>
-                                            <th>Description</th>
-                                            <th style="text-align:left;">Qty</th>
-                                            <th style="text-align:left;">Rate</th>
-                                            <th style="text-align:right;">Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
-                                    </tbody>
-                                </table>
-
-                                <div class="inv-summary">
-                                    ${summaryLines}
-                                </div>
-
-                                ${d.notes ? `
-                                        <div class="inv-notes">
-                                            <strong>Notes</strong>
-                                            <p>${escapeHtml(d.notes)}</p>
-                                        </div>
-                                    ` : ''}
+                <div class="invoice-preview" id="invoiceToPdf" style="--accent: ${accent};">
+                    <div class="new-header">
+                        <div class="new-brand">
+                            ${logoHtml}
+                            <div class="new-brand-text">
+                                <h2>${escapeHtml(d.company.name)}</h2>
+                                <div class="tagline">${tagline}</div>
                             </div>
-                        `;
+                        </div>
+                        <div class="new-invoice-title">INVOICE</div>
+                    </div>
+
+                    <div class="hero-section">
+                        <div class="hero-left">
+                            <h4>Invoice To:</h4>
+                            <p class="client-name">${escapeHtml(d.client.name)}</p>
+                            <p class="client-address">${escapeHtml(d.client.address)}</p>
+                        </div>
+                        <div class="hero-right">
+                            <div class="grand-total-box">
+                                <div class="label">GRAND TOTAL</div>
+                                <div class="total">${formatMoney(d.total)}</div>
+                            </div>
+                            <div class="hero-meta">
+                                ${d.invoice.number ? `<div>Invoice no: <strong>${escapeHtml(d.invoice.number)}</strong></div>` : ''}
+                                ${d.invoice.date ? `<div>Invoice date: <strong>${d.invoice.date}</strong></div>` : ''}
+                                ${d.invoice.dueDate ? `<div>Due date: <strong>${d.invoice.dueDate}</strong></div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="new-items">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Item Description</th>
+                                <th>Unit Price</th>
+                                <th>QTY</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsRows || `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
+                        </tbody>
+                    </table>
+
+                    <div class="new-summary">
+                        <div class="summary-box">
+                            ${summaryLines}
+                        </div>
+                    </div>
+
+                    <div class="new-footer">
+                        <div class="thank-you">
+                            <strong>Thank you!</strong>
+                            <p>${d.notes ? escapeHtml(d.notes) : 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod amet consectetur adipiscing.'}</p>
+                        </div>
+                        <div class="bank-info">
+                            <div class="col">
+                                <h4>Bank Account (1)</h4>
+                                <p>International Bank Name</p>
+                                <p>${escapeHtml(d.company.name)}</p>
+                                <p>${escapeHtml(d.company.phone)}</p>
+                            </div>
+                            <div class="col">
+                                <h4>Bank Account (2)</h4>
+                                <p>International Bank Name</p>
+                                <p>${escapeHtml(d.company.name)}</p>
+                                <p>${escapeHtml(d.company.phone)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // ============================================================
-        //  PDF DOWNLOAD
+        //  PDF DOWNLOAD — fixed to capture all content
         // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
@@ -2455,7 +2628,7 @@
 
                 try {
                     const clone = element.cloneNode(true);
-                    clone.style.padding = '40px 40px 36px';
+                    clone.style.padding = '40px';
                     clone.style.backgroundColor = '#ffffff';
                     clone.style.borderRadius = '0';
                     clone.style.border = 'none';
@@ -2463,14 +2636,25 @@
                     clone.style.width = '100%';
                     clone.style.maxWidth = '100%';
                     clone.style.boxSizing = 'border-box';
+                    clone.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                    clone.style.color = '#1e293b';
+                    clone.style.fontSize = '14px';
+                    clone.style.lineHeight = '1.6';
 
                     const imgs = clone.querySelectorAll('img');
                     await Promise.all(Array.from(imgs).map(img => {
                         return new Promise((resolve) => {
-                            if (img.complete) resolve();
+                            if (img.complete && img.naturalWidth > 0) resolve();
                             else {
                                 img.onload = resolve;
                                 img.onerror = resolve;
+                            }
+                            if (img.src && !img.complete) {
+                                // already loading
+                            } else if (img.src) {
+                                resolve();
+                            } else {
+                                resolve();
                             }
                         });
                     }));
@@ -2488,9 +2672,9 @@
                     document.body.appendChild(container);
 
                     await new Promise(r => requestAnimationFrame(r));
-                    await new Promise(r => setTimeout(r, 100));
+                    await new Promise(r => setTimeout(r, 150));
 
-                    const height = clone.scrollHeight + 20;
+                    const height = Math.max(clone.scrollHeight + 30, 400);
                     const width = 794;
 
                     const opt = {
@@ -2504,11 +2688,15 @@
                             width: width,
                             height: height,
                             windowHeight: height,
+                            scrollY: 0,
+                            scrollX: 0,
+                            windowWidth: width,
                         },
                         jsPDF: {
                             unit: 'px',
                             format: [width, height],
                             orientation: 'portrait',
+                            compress: true,
                         },
                         pagebreak: { mode: 'avoid-all' }
                     };
@@ -2610,6 +2798,8 @@
             discountRate.value = 0;
             amountPaid.value = 0;
             notes.value = '';
+            accentColor.value = '#ffc107';
+            accentColorText.value = '#ffc107';
 
             addItem('', 1, 0);
             updateLogoPreview();
@@ -2749,15 +2939,28 @@
                 debounceSave();
             });
 
+            accentColor.addEventListener('input', () => {
+                accentColorText.value = accentColor.value;
+                renderPreview();
+                debounceSave();
+            });
+
+            accentColorText.addEventListener('input', () => {
+                let val = accentColorText.value.trim();
+                if (val.startsWith('#')) {
+                    accentColor.value = val;
+                    renderPreview();
+                    debounceSave();
+                }
+            });
+
             invDate.addEventListener('change', () => { renderPreview();
                 debounceSave(); });
             invDueDate.addEventListener('change', () => { renderPreview();
                 debounceSave(); });
 
-            // Plus button
             $('plusBtn').addEventListener('click', handlePlus);
 
-            // Backup
             $('downloadBackupBtn').addEventListener('click', downloadBackup);
             $('restoreBackupInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -2782,6 +2985,7 @@
                 addItem('Web design service', 1, 450);
                 addItem('Consultation', 2, 120);
                 companyName.value = 'Studio Nine';
+                accentColorText.value = accentColor.value;
                 debounceSave();
             }
 
