@@ -31,7 +31,7 @@
             -webkit-text-size-adjust: 100%;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap');
 
         input,
         textarea,
@@ -67,6 +67,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-shrink: 0;
         }
 
         .app-header h1 .fa-file-invoice {
@@ -89,6 +90,8 @@
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
+            flex-shrink: 0;
+            margin-left: auto;
         }
 
         .header-actions .btn-plus {
@@ -690,32 +693,57 @@
 
         .invoice-preview .inv-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 36px;
-            flex-wrap: wrap;
-            gap: 20px;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
-        .invoice-preview .inv-brand {
+        .invoice-preview .inv-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .invoice-preview .inv-row-top .inv-logo-area {
             display: flex;
             align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
-        .invoice-preview .inv-brand .logo-wrap {
+        .invoice-preview .inv-row-top .inv-logo-area .logo-wrap {
             flex-shrink: 0;
             display: block;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
             background: transparent;
             border: none;
             outline: none;
         }
 
-        .invoice-preview .inv-brand .brand-text h2 {
+        .invoice-preview .inv-row-top .inv-title {
+            font-size: 44px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            color: #1e293b;
+            line-height: 1.1;
+            text-transform: uppercase;
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        .invoice-preview .inv-row-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px 30px;
+        }
+
+        .invoice-preview .inv-row-bottom .brand-text {
+            flex: 1 1 200px;
+        }
+
+        .invoice-preview .inv-row-bottom .brand-text h2 {
             font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.6px;
@@ -724,61 +752,39 @@
             line-height: 1.2;
         }
 
-        .invoice-preview .inv-brand .brand-text .sub {
+        .invoice-preview .inv-row-bottom .brand-text .sub {
             font-size: 14px;
             color: #64748b;
             margin-top: 2px;
         }
 
-        .inv-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .balance-box {
+        .invoice-preview .inv-row-bottom .balance-box {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 36px;
+            padding: 20px 32px;
             border-radius: 14px;
-            min-width: 210px;
+            min-width: 180px;
             text-align: center;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+            flex-shrink: 0;
+            align-self: flex-start;
         }
 
-        .balance-box .balance-label {
+        .invoice-preview .inv-row-bottom .balance-box .balance-label {
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             opacity: 0.85;
         }
 
-        .balance-box .balance-amount {
+        .invoice-preview .inv-row-bottom .balance-box .balance-amount {
             font-size: 30px;
             font-weight: 700;
             line-height: 1.2;
-        }
-
-        .invoice-preview .inv-meta {
-            text-align: right;
-            flex-shrink: 0;
-        }
-
-        .invoice-preview .inv-meta .inv-number {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .invoice-preview .inv-meta .inv-date {
-            color: #64748b;
-            font-size: 14px;
         }
 
         .invoice-preview .inv-parties {
@@ -1113,24 +1119,20 @@
                 gap: 16px;
             }
 
-            .invoice-preview .inv-header {
+            .invoice-preview .inv-row-bottom {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
 
-            .invoice-preview .inv-meta {
-                text-align: right; /* CHANGED: was left */
-                width: 100%;
+            .invoice-preview .inv-row-bottom .balance-box {
+                align-self: stretch;
+                min-width: unset;
+                padding: 16px 20px;
             }
 
-            .inv-right {
-                align-items: flex-end; /* CHANGED: was flex-start */
-                width: 100%;
-            }
-
-            .balance-box {
-                min-width: 180px;
-                padding: 18px 24px;
+            .invoice-preview .inv-row-top .inv-title {
+                font-size: 32px;
+                letter-spacing: 4px;
             }
 
             .summary-line {
@@ -1148,8 +1150,19 @@
             }
 
             .app-header {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .app-header h1 {
+                flex-shrink: 0;
+            }
+
+            .header-actions {
+                margin-left: auto;
+                flex-shrink: 0;
             }
 
             .tab-btn {
@@ -1217,6 +1230,44 @@
             .logo-preview {
                 width: 60px;
                 height: 60px;
+            }
+
+            .invoice-preview .inv-row-top .inv-title {
+                font-size: 24px;
+                letter-spacing: 3px;
+            }
+
+            .invoice-preview .inv-row-bottom .balance-box .balance-amount {
+                font-size: 24px;
+            }
+
+            .app-header {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .app-header h1 {
+                font-size: 20px;
+                flex-shrink: 0;
+            }
+
+            .header-actions {
+                margin-left: auto;
+                flex-shrink: 0;
+                gap: 6px;
+            }
+
+            .header-actions .btn-plus {
+                width: 32px;
+                height: 32px;
+                font-size: 16px !important;
+            }
+
+            .header-actions .btn-secondary {
+                padding: 4px 12px;
+                font-size: 12px !important;
             }
 
             .balance-box {
@@ -2455,11 +2506,14 @@
                 const bgProps = `background-image: url('${d.logo}'); background-size: contain; background-repeat: no-repeat; background-position: center;`;
 
                 if (d.logoAspect === 'circle') {
-                    logoStyle = `width: ${size}px; height: ${size}px; border-radius: 50%; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
+                    logoStyle =
+                        `width: ${size}px; height: ${size}px; border-radius: 50%; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 } else if (d.logoAspect === 'square') {
-                    logoStyle = `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
+                    logoStyle =
+                        `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 } else {
-                    logoStyle = `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
+                    logoStyle =
+                        `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 }
             }
 
@@ -2522,30 +2576,42 @@
             const boxColor = d.balanceBoxColor || '#000000';
             const boxTextColor = getContrastColor(boxColor);
 
+            // Build the new two-row header
+            const topRow = `
+                        <div class="inv-row-top">
+                            <div class="inv-logo-area">
+                                ${logoHtml}
+                            </div>
+                            <div class="inv-title">INVOICE</div>
+                        </div>
+                    `;
+
+            const bottomRow = `
+                        <div class="inv-row-bottom">
+                            <div class="brand-text">
+                                ${companyNameHtml}
+                                ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
+                                ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
+                                ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
+                                ${!d.company.name && !d.company.address && !d.company.email && !d.company.phone ? '<div class="sub" style="color:#94a3b8;">—</div>' : ''}
+                            </div>
+                            <div class="balance-box" style="background-color: ${boxColor}; color: ${boxTextColor};">
+                                <div class="balance-label">BALANCE DUE</div>
+                                <div class="balance-amount">${formatMoney(d.balance)}</div>
+                            </div>
+                        </div>
+                    `;
+
+            const invHeader = `
+                        <div class="inv-header">
+                            ${topRow}
+                            ${bottomRow}
+                        </div>
+                    `;
+
             return `
                             <div class="invoice-preview" id="invoiceToPdf">
-                                <div class="inv-header">
-                                    <div class="inv-brand">
-                                        ${logoHtml}
-                                        <div class="brand-text">
-                                            ${companyNameHtml}
-                                            ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
-                                            ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
-                                            ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="inv-right">
-                                        <div class="balance-box" style="background-color: ${boxColor}; color: ${boxTextColor};">
-                                            <div class="balance-label">BALANCE DUE</div>
-                                            <div class="balance-amount">${formatMoney(d.balance)}</div>
-                                        </div>
-                                        <div class="inv-meta">
-                                            ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
-                                            ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
-                                            ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
-                                        </div>
-                                    </div>
-                                </div>
+                                ${invHeader}
 
                                 <div class="inv-parties">
                                     <div class="party">
