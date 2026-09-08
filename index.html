@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Invoice Generator — ₦</title>
 
-    <!-- html2pdf library for PDF generation -->
+    <!-- html2pdf library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
 
@@ -33,13 +33,11 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
 
-        /* prevent zoom on input focus */
         input,
         textarea,
         select,
         button {
             font-size: 16px !important;
-            /* iOS zoom prevention */
             touch-action: manipulation;
         }
 
@@ -89,6 +87,30 @@
             align-items: center;
         }
 
+        .header-actions .btn-plus {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #1e293b;
+            color: #fff;
+            font-size: 22px !important;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .header-actions .btn-plus:hover {
+            background: #0f172a;
+            transform: scale(1.05);
+        }
+
         /* ---------- TABS ---------- */
         .tabs {
             display: flex;
@@ -97,6 +119,7 @@
             border-radius: 14px;
             padding: 4px;
             margin-bottom: 32px;
+            flex-wrap: wrap;
         }
 
         .tab-btn {
@@ -122,6 +145,22 @@
             background: #ffffff;
             color: #0f172a;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab-btn .badge-tab {
+            display: inline-block;
+            background: #e9edf2;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0 8px;
+            border-radius: 100px;
+            margin-left: 4px;
+        }
+
+        .tab-btn.active .badge-tab {
+            background: #1e293b;
+            color: #fff;
         }
 
         /* ---------- TAB CONTENT ---------- */
@@ -425,7 +464,6 @@
             box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.06);
         }
 
-        /* force left alignment for qty & rate */
         .items-table .col-qty input,
         .items-table .col-rate input {
             text-align: left !important;
@@ -542,12 +580,18 @@
             font-weight: 700;
         }
 
+        .summary-line.balance .value {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
         .summary-inputs {
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
             justify-content: flex-end;
             margin-bottom: 4px;
+            width: 100%;
         }
 
         .summary-inputs .form-group {
@@ -616,7 +660,7 @@
             background: #e2e8f0;
         }
 
-        /* ---------- INVOICE PREVIEW (print/PDF layout) ---------- */
+        /* ---------- INVOICE PREVIEW ---------- */
         .invoice-preview {
             background: #ffffff;
             border-radius: 16px;
@@ -780,6 +824,19 @@
             margin-top: 4px;
         }
 
+        .invoice-preview .inv-summary .sum-line.balance {
+            font-weight: 700;
+            font-size: 18px;
+            color: #0f172a;
+            border-top: 2px solid #1e293b;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+
+        .invoice-preview .inv-summary .sum-line.paid {
+            color: #22c55e;
+        }
+
         .invoice-preview .inv-notes {
             margin-top: 32px;
             padding-top: 20px;
@@ -810,6 +867,163 @@
 
         .empty-state p {
             font-size: 15px;
+        }
+
+        /* ---------- HISTORY ---------- */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #fafbfc;
+            border-radius: 12px;
+            border: 1.5px solid #e9edf2;
+            transition: all 0.2s;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .history-item:hover {
+            border-color: #cbd5e1;
+        }
+
+        .history-item .info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .history-item .info .name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-item .info .meta {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .history-item .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .history-item .actions .btn-sm {
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+            touch-action: manipulation;
+            background: transparent;
+            color: #64748b;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-item .actions .btn-sm:hover {
+            background: #f1f4f9;
+            color: #0f172a;
+        }
+
+        .history-item .actions .btn-sm.delete:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .history-item .actions .btn-sm.rename:hover {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .history-item .rename-input {
+            font-size: 15px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border: 1.5px solid #1e293b;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 300px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: #94a3b8;
+        }
+
+        .history-empty .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        /* ---------- BACKUP ---------- */
+        .backup-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            padding: 20px 0;
+        }
+
+        .backup-section .card {
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1.5px solid #e9edf2;
+        }
+
+        .backup-section .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #0f172a;
+        }
+
+        .backup-section .card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .backup-section .card .file-input-wrap {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .backup-section .card .file-input-wrap input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            font-size: 0;
         }
 
         /* ---------- RESPONSIVE ---------- */
@@ -890,6 +1104,15 @@
             .logo-options .form-group {
                 justify-content: space-between;
             }
+
+            .history-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .history-item .actions {
+                justify-content: flex-start;
+            }
         }
 
         @media (max-width: 480px) {
@@ -946,6 +1169,12 @@
                 display: block !important;
             }
             .tab-content#edit-tab {
+                display: none !important;
+            }
+            .tab-content#history-tab {
+                display: none !important;
+            }
+            .tab-content#backup-tab {
                 display: none !important;
             }
             .invoice-preview {
@@ -1048,11 +1277,49 @@
         .logo-preview.has-logo .remove-logo-overlay {
             display: flex;
         }
+
+        /* ---------- TOAST ---------- */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1e293b;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            pointer-events: none;
+            max-width: 90%;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background: #065f46;
+        }
+        .toast.error {
+            background: #991b1b;
+        }
+        .toast.info {
+            background: #1e293b;
+        }
     </style>
 </head>
 <body>
 
     <div class="app" id="app">
+
+        <!-- TOAST -->
+        <div class="toast" id="toast"></div>
 
         <!-- HEADER -->
         <header class="app-header">
@@ -1063,6 +1330,7 @@
                 <span class="save-indicator" id="saveIndicator">
                     <span class="dot"></span> <span id="saveText">Saved</span>
                 </span>
+                <button class="btn-plus" id="plusBtn" title="Save current invoice to history and start fresh">+</button>
                 <button class="btn-secondary" onclick="resetInvoice()" style="padding:6px 16px;font-size:13px;">
                     ↻ Reset
                 </button>
@@ -1073,6 +1341,8 @@
         <div class="tabs" role="tablist">
             <button class="tab-btn active" data-tab="edit-tab" role="tab">✎ Edit</button>
             <button class="tab-btn" data-tab="preview-tab" role="tab">👁 Preview</button>
+            <button class="tab-btn" data-tab="history-tab" role="tab">📂 History <span class="badge-tab" id="historyBadge">0</span></button>
+            <button class="tab-btn" data-tab="backup-tab" role="tab">💾 Backup</button>
         </div>
 
         <!-- ========== EDIT TAB ========== -->
@@ -1096,7 +1366,6 @@
                             <span class="text-muted" style="font-size:12px;">PNG, JPG, SVG · max 200px</span>
                         </div>
                     </div>
-                    <!-- Logo Options: Aspect Ratio & Scale -->
                     <div class="logo-options">
                         <div class="form-group">
                             <label for="logoAspect">Aspect ratio</label>
@@ -1111,6 +1380,15 @@
                             <input type="range" id="logoScale" min="20" max="200" value="100" />
                             <span id="logoScaleLabel">100%</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Name -->
+                <div class="full-width">
+                    <div class="form-group">
+                        <label for="invoiceName">Invoice Name</label>
+                        <input type="text" id="invoiceName" placeholder="e.g. Q1 Project Report" inputmode="text" />
+                        <span class="text-muted" style="font-size:12px;">Used as the display name in history and backups</span>
                     </div>
                 </div>
 
@@ -1146,10 +1424,10 @@
                     <input type="date" id="invDueDate" inputmode="text" />
                 </div>
                 <div class="form-group">
-                    <!-- placeholder for alignment -->
+                    <!-- placeholder -->
                 </div>
 
-                <!-- Client (full width) -->
+                <!-- Client -->
                 <div class="full-width">
                     <div class="section-title">Client <span class="badge">bill to</span></div>
                     <div class="edit-grid" style="grid-template-columns:1fr 1fr;gap:16px 24px;margin-top:4px;">
@@ -1172,7 +1450,7 @@
                     </div>
                 </div>
 
-                <!-- Line Items (full width) -->
+                <!-- Line Items -->
                 <div class="full-width">
                     <div class="section-title">Line items <span class="badge" id="itemCount">0 items</span></div>
                     <div class="items-table-wrap">
@@ -1187,14 +1465,13 @@
                                 </tr>
                             </thead>
                             <tbody id="itemsBody">
-                                <!-- rows inserted by JS -->
                             </tbody>
                         </table>
                     </div>
                     <button class="btn-add-item" id="addItemBtn">+ Add line</button>
                 </div>
 
-                <!-- Summary (full width) -->
+                <!-- Summary -->
                 <div class="full-width">
                     <div class="summary-row">
                         <div class="summary-inputs">
@@ -1205,6 +1482,10 @@
                             <div class="form-group">
                                 <label for="discountRate">Discount (%)</label>
                                 <input type="number" id="discountRate" value="0" min="0" step="0.5" inputmode="decimal" />
+                            </div>
+                            <div class="form-group">
+                                <label for="amountPaid">Amount paid (₦)</label>
+                                <input type="number" id="amountPaid" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                         </div>
                         <div class="summary-line">
@@ -1223,10 +1504,18 @@
                             <span class="label">Total</span>
                             <span class="value" id="editTotal">₦0.00</span>
                         </div>
+                        <div class="summary-line total balance">
+                            <span class="label">Amount paid</span>
+                            <span class="value" id="editAmountPaid">₦0.00</span>
+                        </div>
+                        <div class="summary-line total balance" style="border-top-color:#1e293b;border-top-width:2px;font-size:19px;">
+                            <span class="label">Balance due</span>
+                            <span class="value" id="editBalance">₦0.00</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Notes (full width) -->
+                <!-- Notes -->
                 <div class="full-width">
                     <div class="form-group">
                         <label for="notes">Notes / Terms</label>
@@ -1234,8 +1523,8 @@
                     </div>
                 </div>
 
-            </div><!-- /edit-grid -->
-        </div><!-- /edit-tab -->
+            </div>
+        </div>
 
         <!-- ========== PREVIEW TAB ========== -->
         <div class="tab-content" id="preview-tab" role="tabpanel">
@@ -1249,28 +1538,61 @@
                 </button>
             </div>
 
-            <!-- Invoice preview container -->
             <div id="invoicePreviewContainer">
                 <!-- populated by JS -->
             </div>
 
-        </div><!-- /preview-tab -->
+        </div>
 
-    </div><!-- /app -->
+        <!-- ========== HISTORY TAB ========== -->
+        <div class="tab-content" id="history-tab" role="tabpanel">
 
+            <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                <span style="font-size:14px;color:#64748b;">Saved invoices</span>
+                <button class="btn-small" onclick="clearAllHistory()" style="color:#b91c1c;">Clear all</button>
+            </div>
+
+            <div id="historyList" class="history-list">
+                <!-- populated by JS -->
+            </div>
+
+        </div>
+
+        <!-- ========== BACKUP TAB ========== -->
+        <div class="tab-content" id="backup-tab" role="tabpanel">
+            <div class="backup-section">
+                <div class="card">
+                    <h3>📥 Download Backup</h3>
+                    <p>Export all invoices, history, and settings as a JSON file.</p>
+                    <button class="btn-primary" id="downloadBackupBtn">⬇ Download Backup</button>
+                </div>
+                <div class="card">
+                    <h3>📤 Restore Backup</h3>
+                    <p>Upload a JSON backup file to restore all data. This will overwrite current data.</p>
+                    <div class="file-input-wrap">
+                        <button class="btn-secondary">📂 Choose Backup File</button>
+                        <input type="file" id="restoreBackupInput" accept=".json" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <script>
         // ============================================================
         //  STATE
         // ============================================================
         const state = {
-            items: [], // { id, description, qty, rate }
+            items: [],
             nextId: 1,
             taxRate: 0,
             discountRate: 0,
-            logoData: null, // base64 data URL
-            logoAspect: 'original', // original, square, circle
-            logoScale: 100, // percentage
+            amountPaid: 0,
+            logoData: null,
+            logoAspect: 'original',
+            logoScale: 100,
+            invoiceName: '',
         };
 
         // ============================================================
@@ -1278,6 +1600,7 @@
         // ============================================================
         const $ = (id) => document.getElementById(id);
 
+        const invoiceNameInput = $('invoiceName');
         const companyName = $('companyName');
         const companyAddress = $('companyAddress');
         const companyEmail = $('companyEmail');
@@ -1291,6 +1614,7 @@
         const invDueDate = $('invDueDate');
         const taxRate = $('taxRate');
         const discountRate = $('discountRate');
+        const amountPaid = $('amountPaid');
         const notes = $('notes');
         const itemsBody = $('itemsBody');
         const addItemBtn = $('addItemBtn');
@@ -1300,6 +1624,8 @@
         const editTax = $('editTax');
         const editDiscount = $('editDiscount');
         const editTotal = $('editTotal');
+        const editAmountPaid = $('editAmountPaid');
+        const editBalance = $('editBalance');
 
         const previewContainer = $('invoicePreviewContainer');
         const downloadBtn = $('downloadPdfBtn');
@@ -1313,11 +1639,15 @@
 
         const saveIndicator = $('saveIndicator');
         const saveText = $('saveText');
+        const historyList = $('historyList');
+        const historyBadge = $('historyBadge');
+        const toast = $('toast');
 
         let saveTimeout = null;
+        let toastTimeout = null;
 
         // ============================================================
-        //  CURRENCY & FORMATTING
+        //  CURRENCY
         // ============================================================
         const CURRENCY = '₦';
 
@@ -1328,10 +1658,26 @@
         }
 
         // ============================================================
+        //  TOAST
+        // ============================================================
+        function showToast(message, type = 'info', duration = 3000) {
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            clearTimeout(toastTimeout);
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // ============================================================
         //  AUTO-SAVE (localStorage)
         // ============================================================
         function saveState() {
             const data = {
+                invoiceName: invoiceNameInput.value,
                 companyName: companyName.value,
                 companyAddress: companyAddress.value,
                 companyEmail: companyEmail.value,
@@ -1345,6 +1691,7 @@
                 invDueDate: invDueDate.value,
                 taxRate: taxRate.value,
                 discountRate: discountRate.value,
+                amountPaid: amountPaid.value,
                 notes: notes.value,
                 items: state.items,
                 nextId: state.nextId,
@@ -1378,6 +1725,7 @@
                 if (!raw) return false;
                 const data = JSON.parse(raw);
 
+                invoiceNameInput.value = data.invoiceName || '';
                 companyName.value = data.companyName || '';
                 companyAddress.value = data.companyAddress || '';
                 companyEmail.value = data.companyEmail || '';
@@ -1391,6 +1739,7 @@
                 invDueDate.value = data.invDueDate || '';
                 taxRate.value = data.taxRate ?? 0;
                 discountRate.value = data.discountRate ?? 0;
+                amountPaid.value = data.amountPaid ?? 0;
                 notes.value = data.notes || '';
 
                 state.items = data.items || [];
@@ -1399,7 +1748,6 @@
                 state.logoAspect = data.logoAspect || 'original';
                 state.logoScale = data.logoScale || 100;
 
-                // Update UI controls for logo
                 logoAspect.value = state.logoAspect;
                 logoScale.value = state.logoScale;
                 logoScaleLabel.textContent = state.logoScale + '%';
@@ -1438,6 +1786,264 @@
         }
 
         // ============================================================
+        //  HISTORY (localStorage)
+        // ============================================================
+        function getHistory() {
+            try {
+                const raw = localStorage.getItem('invoiceHistory');
+                return raw ? JSON.parse(raw) : [];
+            } catch { return []; }
+        }
+
+        function setHistory(history) {
+            localStorage.setItem('invoiceHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function saveToHistory() {
+            const data = collectData();
+            // Only save if there's at least some content
+            const hasContent = state.items.length > 0 || data.company.name || data.client.name;
+            if (!hasContent) {
+                showToast('Nothing to save — invoice is empty.', 'info');
+                return false;
+            }
+
+            const history = getHistory();
+            const name = data.invoice.name || (data.company.name || 'Unnamed') + ' — ' + (data.invoice.number || 'Draft');
+
+            const snapshot = {
+                invoiceName: invoiceNameInput.value,
+                companyName: companyName.value,
+                companyAddress: companyAddress.value,
+                companyEmail: companyEmail.value,
+                companyPhone: companyPhone.value,
+                clientName: clientName.value,
+                clientAddress: clientAddress.value,
+                clientEmail: clientEmail.value,
+                clientPhone: clientPhone.value,
+                invNumber: invNumber.value,
+                invDate: invDate.value,
+                invDueDate: invDueDate.value,
+                taxRate: taxRate.value,
+                discountRate: discountRate.value,
+                amountPaid: amountPaid.value,
+                notes: notes.value,
+                items: JSON.parse(JSON.stringify(state.items)),
+                nextId: state.nextId,
+                logoData: state.logoData,
+                logoAspect: logoAspect.value,
+                logoScale: parseInt(logoScale.value, 10),
+            };
+
+            history.unshift({
+                id: 'hist_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                name: name,
+                timestamp: Date.now(),
+                data: snapshot,
+            });
+
+            setHistory(history);
+            showToast('Invoice saved to history ✓', 'success');
+            return true;
+        }
+
+        function loadFromHistory(id) {
+            const history = getHistory();
+            const entry = history.find(h => h.id === id);
+            if (!entry) {
+                showToast('Invoice not found.', 'error');
+                return;
+            }
+
+            const d = entry.data;
+
+            invoiceNameInput.value = d.invoiceName || '';
+            companyName.value = d.companyName || '';
+            companyAddress.value = d.companyAddress || '';
+            companyEmail.value = d.companyEmail || '';
+            companyPhone.value = d.companyPhone || '';
+            clientName.value = d.clientName || '';
+            clientAddress.value = d.clientAddress || '';
+            clientEmail.value = d.clientEmail || '';
+            clientPhone.value = d.clientPhone || '';
+            invNumber.value = d.invNumber || '';
+            invDate.value = d.invDate || '';
+            invDueDate.value = d.invDueDate || '';
+            taxRate.value = d.taxRate ?? 0;
+            discountRate.value = d.discountRate ?? 0;
+            amountPaid.value = d.amountPaid ?? 0;
+            notes.value = d.notes || '';
+
+            state.items = d.items || [];
+            state.nextId = d.nextId || 1;
+            state.logoData = d.logoData || null;
+            state.logoAspect = d.logoAspect || 'original';
+            state.logoScale = d.logoScale || 100;
+
+            logoAspect.value = state.logoAspect;
+            logoScale.value = state.logoScale;
+            logoScaleLabel.textContent = state.logoScale + '%';
+
+            updateLogoPreview();
+            renderItems();
+            updateSummary();
+            renderPreview();
+            debounceSave();
+
+            switchTab('edit-tab');
+            showToast('Invoice loaded for editing ✓', 'success');
+        }
+
+        function duplicateHistory(id) {
+            const history = getHistory();
+            const entry = history.find(h => h.id === id);
+            if (!entry) {
+                showToast('Invoice not found.', 'error');
+                return;
+            }
+
+            const d = entry.data;
+            const newName = (d.invoiceName || d.companyName || 'Unnamed') + ' (copy)';
+
+            const snapshot = {
+                invoiceName: d.invoiceName || '',
+                companyName: d.companyName || '',
+                companyAddress: d.companyAddress || '',
+                companyEmail: d.companyEmail || '',
+                companyPhone: d.companyPhone || '',
+                clientName: d.clientName || '',
+                clientAddress: d.clientAddress || '',
+                clientEmail: d.clientEmail || '',
+                clientPhone: d.clientPhone || '',
+                invNumber: d.invNumber || '',
+                invDate: d.invDate || '',
+                invDueDate: d.invDueDate || '',
+                taxRate: d.taxRate ?? 0,
+                discountRate: d.discountRate ?? 0,
+                amountPaid: d.amountPaid ?? 0,
+                notes: d.notes || '',
+                items: JSON.parse(JSON.stringify(d.items || [])),
+                nextId: d.nextId || 1,
+                logoData: d.logoData || null,
+                logoAspect: d.logoAspect || 'original',
+                logoScale: d.logoScale || 100,
+            };
+
+            history.unshift({
+                id: 'hist_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                name: newName,
+                timestamp: Date.now(),
+                data: snapshot,
+            });
+
+            setHistory(history);
+            showToast('Invoice duplicated ✓', 'success');
+        }
+
+        function deleteHistory(id) {
+            if (!confirm('Delete this invoice from history?')) return;
+            let history = getHistory();
+            history = history.filter(h => h.id !== id);
+            setHistory(history);
+            showToast('Invoice deleted.', 'info');
+        }
+
+        function clearAllHistory() {
+            if (!confirm('Delete all invoices from history?')) return;
+            setHistory([]);
+            showToast('All history cleared.', 'info');
+        }
+
+        function renameHistory(id, newName) {
+            let history = getHistory();
+            const entry = history.find(h => h.id === id);
+            if (entry) {
+                entry.name = newName.trim() || 'Unnamed';
+                setHistory(history);
+                showToast('Renamed ✓', 'success');
+            }
+        }
+
+        function startRename(id) {
+            const item = document.querySelector(`.history-item[data-id="${id}"]`);
+            if (!item) return;
+            const nameSpan = item.querySelector('.name');
+            if (!nameSpan) return;
+            const currentName = nameSpan.textContent;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentName;
+            input.className = 'rename-input';
+            input.setAttribute('aria-label', 'Rename invoice');
+
+            const saveRename = () => {
+                const newName = input.value.trim() || 'Unnamed';
+                renameHistory(id, newName);
+            };
+
+            input.addEventListener('blur', saveRename);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+                if (e.key === 'Escape') {
+                    input.value = currentName;
+                    input.blur();
+                }
+            });
+
+            // Replace the name span with the input
+            nameSpan.replaceWith(input);
+            input.focus();
+            input.select();
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            historyBadge.textContent = history.length;
+
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                            <div class="history-empty">
+                                <div class="icon">📭</div>
+                                <p>No invoices saved yet.</p>
+                                <p style="font-size:13px;margin-top:4px;">Click the <strong>+</strong> button to save the current invoice.</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            let html = '';
+            history.forEach(entry => {
+                const date = new Date(entry.timestamp);
+                const dateStr = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                html += `
+                            <div class="history-item" data-id="${entry.id}">
+                                <div class="info">
+                                    <span class="name">${escapeHtml(entry.name)}</span>
+                                    <span class="meta">${dateStr}</span>
+                                </div>
+                                <div class="actions">
+                                    <button class="btn-sm" onclick="duplicateHistory('${entry.id}')" title="Duplicate">📋</button>
+                                    <button class="btn-sm" onclick="loadFromHistory('${entry.id}')" title="Edit">✎</button>
+                                    <button class="btn-sm rename" onclick="startRename('${entry.id}')" title="Rename">✏️</button>
+                                    <button class="btn-sm delete" onclick="deleteHistory('${entry.id}')" title="Delete">🗑️</button>
+                                </div>
+                            </div>
+                        `;
+            });
+            historyList.innerHTML = html;
+        }
+
+        // ============================================================
         //  LOGO
         // ============================================================
         function updateLogoPreview() {
@@ -1467,7 +2073,7 @@
         function handleLogoUpload(file) {
             if (!file) return;
             if (file.size > 1024 * 1024) {
-                alert('Logo file is large (>1MB). Please use a smaller image for better performance.');
+                showToast('Logo is large (>1MB). Using smaller image for performance.', 'info');
             }
 
             const reader = new FileReader();
@@ -1494,6 +2100,7 @@
                     state.logoData = compressed;
                     updateLogoPreview();
                     debounceSave();
+                    showToast('Logo uploaded ✓', 'success');
                 };
                 img.src = dataUrl;
             };
@@ -1504,10 +2111,11 @@
             state.logoData = null;
             updateLogoPreview();
             debounceSave();
+            showToast('Logo removed.', 'info');
         }
 
         // ============================================================
-        //  ITEMS
+        //  ITEMS — with focus‑safe updates
         // ============================================================
         function addItem(desc = '', qty = 1, rate = 0) {
             state.items.push({
@@ -1524,6 +2132,7 @@
 
         function removeItem(id) {
             if (state.items.length <= 1) {
+                showToast('At least one line item is required.', 'info');
                 return;
             }
             state.items = state.items.filter(item => item.id !== id);
@@ -1559,7 +2168,6 @@
                         `;
             });
             itemsBody.innerHTML = html;
-
             itemCount.textContent = state.items.length + ' items';
 
             itemsBody.querySelectorAll('.item-desc').forEach((el, i) => {
@@ -1569,32 +2177,46 @@
                     debounceSave();
                 });
             });
+
             itemsBody.querySelectorAll('.item-qty').forEach((el, i) => {
                 el.addEventListener('input', () => {
                     const val = parseFloat(el.value) || 0;
                     state.items[i].qty = val;
-                    renderItems();
+                    updateRowAmount(i);
                     updateSummary();
                     renderPreview();
                     debounceSave();
                 });
             });
+
             itemsBody.querySelectorAll('.item-rate').forEach((el, i) => {
                 el.addEventListener('input', () => {
                     const val = parseFloat(el.value) || 0;
                     state.items[i].rate = val;
-                    renderItems();
+                    updateRowAmount(i);
                     updateSummary();
                     renderPreview();
                     debounceSave();
                 });
             });
+
             itemsBody.querySelectorAll('.btn-remove-item').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const id = parseInt(btn.dataset.id);
                     removeItem(id);
                 });
             });
+        }
+
+        function updateRowAmount(index) {
+            const item = state.items[index];
+            if (!item) return;
+            const row = itemsBody.querySelector(`tr[data-id="${item.id}"]`);
+            if (!row) return;
+            const display = row.querySelector('.amount-display');
+            if (display) {
+                display.textContent = formatMoney(item.qty * item.rate);
+            }
         }
 
         // ============================================================
@@ -1605,11 +2227,15 @@
             const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
             const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
             const total = subtotal + taxVal - discountVal;
+            const paid = parseFloat(amountPaid.value) || 0;
+            const balance = total - paid;
 
             editSubtotal.textContent = formatMoney(subtotal);
             editTax.textContent = formatMoney(taxVal);
             editDiscount.textContent = formatMoney(discountVal);
             editTotal.textContent = formatMoney(total);
+            editAmountPaid.textContent = formatMoney(paid);
+            editBalance.textContent = formatMoney(balance);
         }
 
         // ============================================================
@@ -1626,6 +2252,8 @@
             const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
             const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
             const total = subtotal + taxVal - discountVal;
+            const paid = parseFloat(amountPaid.value) || 0;
+            const balance = total - paid;
 
             return {
                 company: {
@@ -1641,6 +2269,7 @@
                     phone: clientPhone.value || '',
                 },
                 invoice: {
+                    name: invoiceNameInput.value || '',
                     number: invNumber.value || '',
                     date: invDate.value ? formatDate(invDate.value) : '',
                     dueDate: invDueDate.value ? formatDate(invDueDate.value) : '',
@@ -1657,6 +2286,8 @@
                 discount: discountVal,
                 discountRate: parseFloat(discountRate.value) || 0,
                 total: total,
+                amountPaid: paid,
+                balance: balance,
                 notes: notes.value || '',
                 logo: state.logoData,
                 logoAspect: state.logoAspect,
@@ -1671,7 +2302,6 @@
             const size = baseSize * scale;
 
             let logoStyle = '';
-            let logoClass = 'logo-wrap';
             if (hasLogo) {
                 if (d.logoAspect === 'circle') {
                     logoStyle =
@@ -1680,14 +2310,13 @@
                     logoStyle =
                         `width: ${size}px; height: ${size}px; border-radius: 0; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
                 } else {
-                    // original aspect ratio
                     logoStyle =
                         `width: ${size}px; height: auto; max-height: ${size * 1.5}px; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
                 }
             }
 
             const logoHtml = hasLogo ?
-                `<div class="${logoClass}" style="${logoStyle}"><img src="${d.logo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" /></div>` :
+                `<div class="logo-wrap" style="${logoStyle}"><img src="${d.logo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" /></div>` :
                 '';
 
             const itemsRows = d.items.map(item => `
@@ -1700,6 +2329,49 @@
                         `).join('');
 
             const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
+
+            let summaryLines = `
+                            <div class="sum-line">
+                                <span>Subtotal</span>
+                                <span>${formatMoney(d.subtotal)}</span>
+                            </div>
+                        `;
+            if (d.taxRate > 0) {
+                summaryLines += `
+                            <div class="sum-line">
+                                <span>Tax (${d.taxRate}%)</span>
+                                <span>${formatMoney(d.tax)}</span>
+                            </div>
+                        `;
+            }
+            if (d.discountRate > 0) {
+                summaryLines += `
+                            <div class="sum-line">
+                                <span>Discount (${d.discountRate}%)</span>
+                                <span>-${formatMoney(d.discount)}</span>
+                            </div>
+                        `;
+            }
+            summaryLines += `
+                            <div class="sum-line total">
+                                <span>Total</span>
+                                <span>${formatMoney(d.total)}</span>
+                            </div>
+                        `;
+            if (d.amountPaid > 0) {
+                summaryLines += `
+                            <div class="sum-line paid">
+                                <span>Amount paid</span>
+                                <span>${formatMoney(d.amountPaid)}</span>
+                            </div>
+                        `;
+            }
+            summaryLines += `
+                            <div class="sum-line balance">
+                                <span>Balance due</span>
+                                <span>${formatMoney(d.balance)}</span>
+                            </div>
+                        `;
 
             return `
                             <div class="invoice-preview" id="invoiceToPdf">
@@ -1753,26 +2425,7 @@
                                 </table>
 
                                 <div class="inv-summary">
-                                    <div class="sum-line">
-                                        <span>Subtotal</span>
-                                        <span>${formatMoney(d.subtotal)}</span>
-                                    </div>
-                                    ${d.taxRate > 0 ? `
-                                            <div class="sum-line">
-                                                <span>Tax (${d.taxRate}%)</span>
-                                                <span>${formatMoney(d.tax)}</span>
-                                            </div>
-                                        ` : ''}
-                                    ${d.discountRate > 0 ? `
-                                            <div class="sum-line">
-                                                <span>Discount (${d.discountRate}%)</span>
-                                                <span>-${formatMoney(d.discount)}</span>
-                                            </div>
-                                        ` : ''}
-                                    <div class="sum-line total">
-                                        <span>Total</span>
-                                        <span>${formatMoney(d.total)}</span>
-                                    </div>
+                                    ${summaryLines}
                                 </div>
 
                                 ${d.notes ? `
@@ -1786,13 +2439,13 @@
         }
 
         // ============================================================
-        //  PDF DOWNLOAD — dynamic height to prevent clipping
+        //  PDF DOWNLOAD
         // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
                 const element = document.getElementById('invoiceToPdf');
                 if (!element) {
-                    alert('Please add some items to generate a PDF.');
+                    showToast('Please add some items to generate a PDF.', 'error');
                     return;
                 }
 
@@ -1862,10 +2515,11 @@
 
                     await html2pdf().set(opt).from(clone).save();
                     document.body.removeChild(container);
+                    showToast('PDF downloaded ✓', 'success');
 
                 } catch (err) {
                     console.error(err);
-                    alert('Could not generate PDF. Please try again.');
+                    showToast('Could not generate PDF. Please try again.', 'error');
                 } finally {
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
@@ -1876,25 +2530,158 @@
         // ============================================================
         //  TABS
         // ============================================================
-        function setupTabs() {
+        function switchTab(tabId) {
             const tabs = document.querySelectorAll('.tab-btn');
             const contents = {
                 'edit-tab': document.getElementById('edit-tab'),
                 'preview-tab': document.getElementById('preview-tab'),
+                'history-tab': document.getElementById('history-tab'),
+                'backup-tab': document.getElementById('backup-tab'),
             };
 
+            tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+            Object.keys(contents).forEach(key => {
+                contents[key].classList.toggle('active', key === tabId);
+            });
+
+            if (tabId === 'preview-tab') renderPreview();
+            if (tabId === 'history-tab') renderHistory();
+        }
+
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
             tabs.forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const tabId = btn.dataset.tab;
-                    tabs.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    Object.keys(contents).forEach(key => {
-                        contents[key].classList.toggle('active', key === tabId);
-                    });
-                    if (tabId === 'preview-tab') {
-                        renderPreview();
-                    }
+                    switchTab(btn.dataset.tab);
                 });
+            });
+        }
+
+        // ============================================================
+        //  PLUS BUTTON — save to history + reset
+        // ============================================================
+        function handlePlus() {
+            const hasContent = state.items.length > 0 ||
+                companyName.value.trim() ||
+                clientName.value.trim() ||
+                invNumber.value.trim();
+
+            if (hasContent) {
+                const saved = saveToHistory();
+                if (!saved) return;
+            } else {
+                showToast('Nothing to save — invoice is empty.', 'info');
+                return;
+            }
+
+            resetInvoiceData(true);
+            showToast('New invoice created ✓', 'success');
+        }
+
+        // ============================================================
+        //  RESET
+        // ============================================================
+        function resetInvoiceData(silent = false) {
+            state.items = [];
+            state.nextId = 1;
+            state.logoData = null;
+            state.logoAspect = 'original';
+            state.logoScale = 100;
+            logoAspect.value = 'original';
+            logoScale.value = 100;
+            logoScaleLabel.textContent = '100%';
+
+            invoiceNameInput.value = '';
+            companyName.value = '';
+            companyAddress.value = '';
+            companyEmail.value = '';
+            companyPhone.value = '';
+            clientName.value = '';
+            clientAddress.value = '';
+            clientEmail.value = '';
+            clientPhone.value = '';
+            invNumber.value = '';
+            const today = new Date().toISOString().split('T')[0];
+            invDate.value = today;
+            const due = new Date();
+            due.setDate(due.getDate() + 30);
+            invDueDate.value = due.toISOString().split('T')[0];
+            taxRate.value = 0;
+            discountRate.value = 0;
+            amountPaid.value = 0;
+            notes.value = '';
+
+            addItem('', 1, 0);
+            updateLogoPreview();
+            renderItems();
+            updateSummary();
+            renderPreview();
+            if (!silent) debounceSave();
+        }
+
+        function resetInvoice() {
+            if (!confirm('Reset all invoice data? Unsaved changes will be lost.')) return;
+            resetInvoiceData(false);
+            showToast('Invoice reset.', 'info');
+        }
+        window.resetInvoice = resetInvoice;
+
+        // ============================================================
+        //  BACKUP
+        // ============================================================
+        function downloadBackup() {
+            const data = {
+                invoiceState: localStorage.getItem('invoiceState'),
+                invoiceHistory: localStorage.getItem('invoiceHistory'),
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Backup downloaded ✓', 'success');
+        }
+
+        function restoreBackup(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.invoiceState) localStorage.setItem('invoiceState', data.invoiceState);
+                    if (data.invoiceHistory) localStorage.setItem('invoiceHistory', data.invoiceHistory);
+                    showToast('Backup restored ✓ Reloading...', 'success');
+                    setTimeout(() => location.reload(), 1200);
+                } catch (err) {
+                    showToast('Invalid backup file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        //  HELPERS
+        // ============================================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T00:00:00');
+            return d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
             });
         }
 
@@ -1903,6 +2690,7 @@
         // ============================================================
         function attachInputListeners() {
             const fields = [
+                invoiceNameInput,
                 companyName, companyAddress, companyEmail, companyPhone,
                 clientName, clientAddress, clientEmail, clientPhone,
                 invNumber, invDate, invDueDate, notes,
@@ -1910,9 +2698,7 @@
             fields.forEach(field => {
                 field.addEventListener('input', () => {
                     renderPreview();
-                    if (field === notes || field === taxRate || field === discountRate) {
-                        updateSummary();
-                    }
+                    if (field === notes) updateSummary();
                     debounceSave();
                 });
                 field.addEventListener('change', () => {
@@ -1931,6 +2717,11 @@
                 renderPreview();
                 debounceSave();
             });
+            amountPaid.addEventListener('input', () => {
+                updateSummary();
+                renderPreview();
+                debounceSave();
+            });
 
             addItemBtn.addEventListener('click', () => {
                 addItem('', 1, 0);
@@ -1938,9 +2729,7 @@
 
             logoUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
-                if (file) {
-                    handleLogoUpload(file);
-                }
+                if (file) handleLogoUpload(file);
                 logoUpload.value = '';
             });
 
@@ -1964,65 +2753,16 @@
                 debounceSave(); });
             invDueDate.addEventListener('change', () => { renderPreview();
                 debounceSave(); });
-        }
 
-        // ============================================================
-        //  RESET
-        // ============================================================
-        function resetInvoice() {
-            if (!confirm('Reset all invoice data?')) return;
-            state.items = [];
-            state.nextId = 1;
-            state.logoData = null;
-            state.logoAspect = 'original';
-            state.logoScale = 100;
-            logoAspect.value = 'original';
-            logoScale.value = 100;
-            logoScaleLabel.textContent = '100%';
+            // Plus button
+            $('plusBtn').addEventListener('click', handlePlus);
 
-            companyName.value = '';
-            companyAddress.value = '';
-            companyEmail.value = '';
-            companyPhone.value = '';
-            clientName.value = '';
-            clientAddress.value = '';
-            clientEmail.value = '';
-            clientPhone.value = '';
-            invNumber.value = '';
-            const today = new Date().toISOString().split('T')[0];
-            invDate.value = today;
-            const due = new Date();
-            due.setDate(due.getDate() + 30);
-            invDueDate.value = due.toISOString().split('T')[0];
-            taxRate.value = 0;
-            discountRate.value = 0;
-            notes.value = '';
-            addItem('', 1, 0);
-            updateLogoPreview();
-            renderItems();
-            updateSummary();
-            renderPreview();
-            debounceSave();
-        }
-        window.resetInvoice = resetInvoice;
-
-        // ============================================================
-        //  HELPERS
-        // ============================================================
-        function escapeHtml(str) {
-            if (!str) return '';
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr + 'T00:00:00');
-            return d.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
+            // Backup
+            $('downloadBackupBtn').addEventListener('click', downloadBackup);
+            $('restoreBackupInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) restoreBackup(file);
+                e.target.value = '';
             });
         }
 
@@ -2048,12 +2788,22 @@
             attachInputListeners();
             setupTabs();
             setupDownload();
+            renderHistory();
             renderPreview();
 
             setTimeout(() => {
                 saveIndicator.classList.remove('visible');
             }, 1000);
         }
+
+        // Expose functions globally for onclick
+        window.loadFromHistory = loadFromHistory;
+        window.duplicateHistory = duplicateHistory;
+        window.deleteHistory = deleteHistory;
+        window.clearAllHistory = clearAllHistory;
+        window.switchTab = switchTab;
+        window.startRename = startRename;
+        window.renameHistory = renameHistory;
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
