@@ -86,6 +86,7 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         /* ---------- TABS ---------- */
@@ -169,10 +170,10 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             font-family: inherit;
             font-size: 16px !important;
-            /* prevent zoom */
             padding: 10px 14px;
             border: 1.5px solid #e2e8f0;
             border-radius: 10px;
@@ -185,7 +186,8 @@
         }
 
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             border-color: #1e293b;
             box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
             background: #ffffff;
@@ -314,6 +316,51 @@
 
         .btn-small.primary:hover {
             background: #0f172a;
+        }
+
+        .logo-options {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e9edf2;
+        }
+
+        .logo-options .form-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+
+        .logo-options .form-group label {
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .logo-options .form-group select,
+        .logo-options .form-group input[type="range"] {
+            width: auto;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 14px !important;
+        }
+
+        .logo-options .form-group input[type="range"] {
+            width: 120px;
+            padding: 0;
+        }
+
+        .logo-options .form-group span {
+            font-size: 13px;
+            min-width: 36px;
+            font-weight: 500;
         }
 
         /* ---------- LINE ITEMS TABLE ---------- */
@@ -597,15 +644,12 @@
         }
 
         .invoice-preview .inv-brand .logo-wrap {
-            width: 70px;
-            height: 70px;
             flex-shrink: 0;
-            border-radius: 8px;
-            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #fafbfc;
+            overflow: hidden;
         }
 
         .invoice-preview .inv-brand .logo-wrap img {
@@ -836,6 +880,16 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .logo-options {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .logo-options .form-group {
+                justify-content: space-between;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1042,38 +1096,54 @@
                             <span class="text-muted" style="font-size:12px;">PNG, JPG, SVG · max 200px</span>
                         </div>
                     </div>
+                    <!-- Logo Options: Aspect Ratio & Scale -->
+                    <div class="logo-options">
+                        <div class="form-group">
+                            <label for="logoAspect">Aspect ratio</label>
+                            <select id="logoAspect">
+                                <option value="original">Original</option>
+                                <option value="square">Square</option>
+                                <option value="circle">Circle</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="logoScale">Scale</label>
+                            <input type="range" id="logoScale" min="20" max="200" value="100" />
+                            <span id="logoScaleLabel">100%</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Company -->
                 <div class="form-group">
                     <label for="companyName">Company name</label>
-                    <input type="text" id="companyName" placeholder="Your company" />
+                    <input type="text" id="companyName" placeholder="Your company" inputmode="text" />
                 </div>
                 <div class="form-group">
                     <label for="companyAddress">Address</label>
-                    <input type="text" id="companyAddress" placeholder="Street, city, postal" />
+                    <input type="text" id="companyAddress" placeholder="Street, city, postal" inputmode="text" />
                 </div>
                 <div class="form-group">
                     <label for="companyEmail">Email</label>
-                    <input type="email" id="companyEmail" placeholder="company@example.com" />
+                    <input type="email" id="companyEmail" placeholder="company@example.com" inputmode="email" />
                 </div>
                 <div class="form-group">
                     <label for="companyPhone">Phone</label>
-                    <input type="text" id="companyPhone" placeholder="+234 800 000 0000" />
+                    <input type="text" id="companyPhone" placeholder="+234 800 000 0000" inputmode="tel" />
                 </div>
 
                 <!-- Invoice meta -->
                 <div class="form-group">
                     <label for="invNumber">Invoice #</label>
-                    <input type="text" id="invNumber" placeholder="INV-001" />
+                    <input type="text" id="invNumber" placeholder="INV-001" inputmode="text" />
                 </div>
                 <div class="form-group">
                     <label for="invDate">Date</label>
-                    <input type="date" id="invDate" />
+                    <input type="date" id="invDate" inputmode="text" />
                 </div>
                 <div class="form-group">
                     <label for="invDueDate">Due date</label>
-                    <input type="date" id="invDueDate" />
+                    <input type="date" id="invDueDate" inputmode="text" />
                 </div>
                 <div class="form-group">
                     <!-- placeholder for alignment -->
@@ -1085,19 +1155,19 @@
                     <div class="edit-grid" style="grid-template-columns:1fr 1fr;gap:16px 24px;margin-top:4px;">
                         <div class="form-group">
                             <label for="clientName">Name</label>
-                            <input type="text" id="clientName" placeholder="Client name" />
+                            <input type="text" id="clientName" placeholder="Client name" inputmode="text" />
                         </div>
                         <div class="form-group">
                             <label for="clientAddress">Address</label>
-                            <input type="text" id="clientAddress" placeholder="Street, city, postal" />
+                            <input type="text" id="clientAddress" placeholder="Street, city, postal" inputmode="text" />
                         </div>
                         <div class="form-group">
                             <label for="clientEmail">Email</label>
-                            <input type="email" id="clientEmail" placeholder="client@example.com" />
+                            <input type="email" id="clientEmail" placeholder="client@example.com" inputmode="email" />
                         </div>
                         <div class="form-group">
                             <label for="clientPhone">Phone</label>
-                            <input type="text" id="clientPhone" placeholder="+234 800 000 0000" />
+                            <input type="text" id="clientPhone" placeholder="+234 800 000 0000" inputmode="tel" />
                         </div>
                     </div>
                 </div>
@@ -1130,11 +1200,11 @@
                         <div class="summary-inputs">
                             <div class="form-group">
                                 <label for="taxRate">Tax (%)</label>
-                                <input type="number" id="taxRate" value="0" min="0" step="0.5" />
+                                <input type="number" id="taxRate" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                             <div class="form-group">
                                 <label for="discountRate">Discount (%)</label>
-                                <input type="number" id="discountRate" value="0" min="0" step="0.5" />
+                                <input type="number" id="discountRate" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
                         </div>
                         <div class="summary-line">
@@ -1160,7 +1230,7 @@
                 <div class="full-width">
                     <div class="form-group">
                         <label for="notes">Notes / Terms</label>
-                        <textarea id="notes" rows="3" placeholder="Payment terms, thanks, etc."></textarea>
+                        <textarea id="notes" rows="3" placeholder="Payment terms, thanks, etc." inputmode="text"></textarea>
                     </div>
                 </div>
 
@@ -1199,6 +1269,8 @@
             taxRate: 0,
             discountRate: 0,
             logoData: null, // base64 data URL
+            logoAspect: 'original', // original, square, circle
+            logoScale: 100, // percentage
         };
 
         // ============================================================
@@ -1235,6 +1307,9 @@
         const logoUpload = $('logoUpload');
         const logoPreview = $('logoPreview');
         const removeLogoBtn = $('removeLogoBtn');
+        const logoAspect = $('logoAspect');
+        const logoScale = $('logoScale');
+        const logoScaleLabel = $('logoScaleLabel');
 
         const saveIndicator = $('saveIndicator');
         const saveText = $('saveText');
@@ -1242,12 +1317,14 @@
         let saveTimeout = null;
 
         // ============================================================
-        //  CURRENCY
+        //  CURRENCY & FORMATTING
         // ============================================================
         const CURRENCY = '₦';
 
         function formatMoney(amount) {
-            return CURRENCY + amount.toFixed(2);
+            let parts = amount.toFixed(2).split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return CURRENCY + parts.join('.');
         }
 
         // ============================================================
@@ -1272,15 +1349,15 @@
                 items: state.items,
                 nextId: state.nextId,
                 logoData: state.logoData,
+                logoAspect: logoAspect.value,
+                logoScale: parseInt(logoScale.value, 10),
             };
             try {
                 localStorage.setItem('invoiceState', JSON.stringify(data));
                 showSaveIndicator('Saved', false);
             } catch (e) {
-                // if storage is full, try to clear logo to save space
                 if (e.name === 'QuotaExceededError' || e.code === 22) {
                     try {
-                        // remove logo from storage and retry
                         const dataWithoutLogo = { ...data, logoData: null };
                         localStorage.setItem('invoiceState', JSON.stringify(dataWithoutLogo));
                         state.logoData = null;
@@ -1319,10 +1396,15 @@
                 state.items = data.items || [];
                 state.nextId = data.nextId || 1;
                 state.logoData = data.logoData || null;
+                state.logoAspect = data.logoAspect || 'original';
+                state.logoScale = data.logoScale || 100;
 
-                // Restore logo
+                // Update UI controls for logo
+                logoAspect.value = state.logoAspect;
+                logoScale.value = state.logoScale;
+                logoScaleLabel.textContent = state.logoScale + '%';
+
                 updateLogoPreview();
-
                 renderItems();
                 updateSummary();
                 renderPreview();
@@ -1364,7 +1446,6 @@
             const img = preview.querySelector('img');
             const removeBtn = removeLogoBtn;
 
-            // Remove existing img
             if (img) img.remove();
 
             if (state.logoData) {
@@ -1380,13 +1461,11 @@
                 if (placeholder) placeholder.style.display = 'flex';
                 removeBtn.style.display = 'none';
             }
-            // re-render preview to show logo
             renderPreview();
         }
 
         function handleLogoUpload(file) {
             if (!file) return;
-            // Check size - warn if > 1MB
             if (file.size > 1024 * 1024) {
                 alert('Logo file is large (>1MB). Please use a smaller image for better performance.');
             }
@@ -1394,10 +1473,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const dataUrl = e.target.result;
-                // Compress the image using canvas
                 const img = new Image();
                 img.onload = function() {
-                    // Resize to max 200px width/height
                     let width = img.width;
                     let height = img.height;
                     const maxSize = 200;
@@ -1413,7 +1490,6 @@
                     ctx.imageSmoothingEnabled = true;
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, 0, 0, width, height);
-                    // Use JPEG with 0.8 quality for smaller size
                     const compressed = canvas.toDataURL('image/jpeg', 0.8);
                     state.logoData = compressed;
                     updateLogoPreview();
@@ -1448,7 +1524,6 @@
 
         function removeItem(id) {
             if (state.items.length <= 1) {
-                // keep at least one row
                 return;
             }
             state.items = state.items.filter(item => item.id !== id);
@@ -1464,30 +1539,29 @@
             state.items.forEach((item) => {
                 const amount = (item.qty * item.rate);
                 html += `
-                        <tr data-id="${item.id}">
-                            <td class="col-desc">
-                                <input type="text" class="item-desc" value="${escapeHtml(item.description)}" placeholder="Description" />
-                            </td>
-                            <td class="col-qty">
-                                <input type="number" class="item-qty" value="${item.qty}" min="0" step="1" />
-                            </td>
-                            <td class="col-rate">
-                                <input type="number" class="item-rate" value="${item.rate}" min="0" step="0.5" />
-                            </td>
-                            <td class="col-amount">
-                                <span class="amount-display">${formatMoney(amount)}</span>
-                            </td>
-                            <td class="col-action">
-                                <button class="btn-remove-item" data-id="${item.id}" title="Remove">✕</button>
-                            </td>
-                        </tr>
-                    `;
+                            <tr data-id="${item.id}">
+                                <td class="col-desc">
+                                    <input type="text" class="item-desc" value="${escapeHtml(item.description)}" placeholder="Description" inputmode="text" />
+                                </td>
+                                <td class="col-qty">
+                                    <input type="number" class="item-qty" value="${item.qty}" min="0" step="1" inputmode="decimal" />
+                                </td>
+                                <td class="col-rate">
+                                    <input type="number" class="item-rate" value="${item.rate}" min="0" step="0.5" inputmode="decimal" />
+                                </td>
+                                <td class="col-amount">
+                                    <span class="amount-display">${formatMoney(amount)}</span>
+                                </td>
+                                <td class="col-action">
+                                    <button class="btn-remove-item" data-id="${item.id}" title="Remove">✕</button>
+                                </td>
+                            </tr>
+                        `;
             });
             itemsBody.innerHTML = html;
 
             itemCount.textContent = state.items.length + ' items';
 
-            // Attach events to inputs
             itemsBody.querySelectorAll('.item-desc').forEach((el, i) => {
                 el.addEventListener('input', () => {
                     state.items[i].description = el.value;
@@ -1585,113 +1659,134 @@
                 total: total,
                 notes: notes.value || '',
                 logo: state.logoData,
+                logoAspect: state.logoAspect,
+                logoScale: state.logoScale,
             };
         }
 
         function buildInvoiceHtml(d) {
             const hasLogo = d.logo && d.logo.length > 0;
+            const scale = d.logoScale / 100;
+            const baseSize = 70;
+            const size = baseSize * scale;
+
+            let logoStyle = '';
+            let logoClass = 'logo-wrap';
+            if (hasLogo) {
+                if (d.logoAspect === 'circle') {
+                    logoStyle =
+                        `width: ${size}px; height: ${size}px; border-radius: 50%; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                } else if (d.logoAspect === 'square') {
+                    logoStyle =
+                        `width: ${size}px; height: ${size}px; border-radius: 0; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                } else {
+                    // original aspect ratio
+                    logoStyle =
+                        `width: ${size}px; height: auto; max-height: ${size * 1.5}px; background: #fafbfc; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;`;
+                }
+            }
+
             const logoHtml = hasLogo ?
-                `<div class="logo-wrap"><img src="${d.logo}" alt="Logo" /></div>` :
+                `<div class="${logoClass}" style="${logoStyle}"><img src="${d.logo}" alt="Logo" style="width:100%;height:100%;object-fit:contain;" /></div>` :
                 '';
 
             const itemsRows = d.items.map(item => `
-                        <tr>
-                            <td>${escapeHtml(item.description)}</td>
-                            <td style="text-align:left;">${item.qty}</td>
-                            <td style="text-align:left;">${formatMoney(item.rate)}</td>
-                            <td>${formatMoney(item.amount)}</td>
-                        </tr>
-                    `).join('');
+                            <tr>
+                                <td>${escapeHtml(item.description)}</td>
+                                <td style="text-align:left;">${item.qty}</td>
+                                <td style="text-align:left;">${formatMoney(item.rate)}</td>
+                                <td>${formatMoney(item.amount)}</td>
+                            </tr>
+                        `).join('');
 
-            // Company name - show blank if empty
             const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
 
             return `
-                        <div class="invoice-preview" id="invoiceToPdf">
-                            <div class="inv-header">
-                                <div class="inv-brand">
-                                    ${logoHtml}
-                                    <div class="brand-text">
-                                        ${companyNameHtml}
-                                        ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
-                                        ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
-                                        ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
+                            <div class="invoice-preview" id="invoiceToPdf">
+                                <div class="inv-header">
+                                    <div class="inv-brand">
+                                        ${logoHtml}
+                                        <div class="brand-text">
+                                            ${companyNameHtml}
+                                            ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
+                                            ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
+                                            ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="inv-meta">
+                                        ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
+                                        ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
+                                        ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
                                     </div>
                                 </div>
-                                <div class="inv-meta">
-                                    ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
-                                    ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
-                                    ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
-                                </div>
-                            </div>
 
-                            <div class="inv-parties">
-                                <div class="party">
-                                    <h4>Bill to</h4>
-                                    ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
-                                    ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
-                                    ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
-                                    ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
-                                    ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                </div>
-                                <div class="party" style="text-align:right;">
-                                    <h4>Invoice details</h4>
-                                    ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
-                                    ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
-                                    ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
-                                    ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                </div>
-                            </div>
-
-                            <table class="inv-items">
-                                <thead>
-                                    <tr>
-                                        <th>Description</th>
-                                        <th style="text-align:left;">Qty</th>
-                                        <th style="text-align:left;">Rate</th>
-                                        <th style="text-align:right;">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
-                                </tbody>
-                            </table>
-
-                            <div class="inv-summary">
-                                <div class="sum-line">
-                                    <span>Subtotal</span>
-                                    <span>${formatMoney(d.subtotal)}</span>
-                                </div>
-                                ${d.taxRate > 0 ? `
-                                        <div class="sum-line">
-                                            <span>Tax (${d.taxRate}%)</span>
-                                            <span>${formatMoney(d.tax)}</span>
-                                        </div>
-                                    ` : ''}
-                                ${d.discountRate > 0 ? `
-                                        <div class="sum-line">
-                                            <span>Discount (${d.discountRate}%)</span>
-                                            <span>-${formatMoney(d.discount)}</span>
-                                        </div>
-                                    ` : ''}
-                                <div class="sum-line total">
-                                    <span>Total</span>
-                                    <span>${formatMoney(d.total)}</span>
-                                </div>
-                            </div>
-
-                            ${d.notes ? `
-                                    <div class="inv-notes">
-                                        <strong>Notes</strong>
-                                        <p>${escapeHtml(d.notes)}</p>
+                                <div class="inv-parties">
+                                    <div class="party">
+                                        <h4>Bill to</h4>
+                                        ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
+                                        ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
+                                        ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
+                                        ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
+                                        ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
                                     </div>
-                                ` : ''}
-                        </div>
-                    `;
+                                    <div class="party" style="text-align:right;">
+                                        <h4>Invoice details</h4>
+                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
+                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
+                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
+                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                    </div>
+                                </div>
+
+                                <table class="inv-items">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th style="text-align:left;">Qty</th>
+                                            <th style="text-align:left;">Rate</th>
+                                            <th style="text-align:right;">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
+                                    </tbody>
+                                </table>
+
+                                <div class="inv-summary">
+                                    <div class="sum-line">
+                                        <span>Subtotal</span>
+                                        <span>${formatMoney(d.subtotal)}</span>
+                                    </div>
+                                    ${d.taxRate > 0 ? `
+                                            <div class="sum-line">
+                                                <span>Tax (${d.taxRate}%)</span>
+                                                <span>${formatMoney(d.tax)}</span>
+                                            </div>
+                                        ` : ''}
+                                    ${d.discountRate > 0 ? `
+                                            <div class="sum-line">
+                                                <span>Discount (${d.discountRate}%)</span>
+                                                <span>-${formatMoney(d.discount)}</span>
+                                            </div>
+                                        ` : ''}
+                                    <div class="sum-line total">
+                                        <span>Total</span>
+                                        <span>${formatMoney(d.total)}</span>
+                                    </div>
+                                </div>
+
+                                ${d.notes ? `
+                                        <div class="inv-notes">
+                                            <strong>Notes</strong>
+                                            <p>${escapeHtml(d.notes)}</p>
+                                        </div>
+                                    ` : ''}
+                            </div>
+                        `;
         }
 
         // ============================================================
-        //  PDF DOWNLOAD — no cut off
+        //  PDF DOWNLOAD — dynamic height to prevent clipping
         // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
@@ -1706,7 +1801,6 @@
                 downloadBtn.disabled = true;
 
                 try {
-                    // Use a clone to avoid affecting the displayed preview
                     const clone = element.cloneNode(true);
                     clone.style.padding = '40px 40px 36px';
                     clone.style.backgroundColor = '#ffffff';
@@ -1715,8 +1809,8 @@
                     clone.style.margin = '0';
                     clone.style.width = '100%';
                     clone.style.maxWidth = '100%';
+                    clone.style.boxSizing = 'border-box';
 
-                    // Ensure all images are loaded
                     const imgs = clone.querySelectorAll('img');
                     await Promise.all(Array.from(imgs).map(img => {
                         return new Promise((resolve) => {
@@ -1732,7 +1826,7 @@
                     container.style.position = 'fixed';
                     container.style.left = '-9999px';
                     container.style.top = '0';
-                    container.style.width = '794px'; // A4 width in px at 72dpi
+                    container.style.width = '794px';
                     container.style.backgroundColor = '#ffffff';
                     container.style.padding = '0';
                     container.style.margin = '0';
@@ -1740,33 +1834,33 @@
                     container.appendChild(clone);
                     document.body.appendChild(container);
 
-                    // Wait for layout
                     await new Promise(r => requestAnimationFrame(r));
                     await new Promise(r => setTimeout(r, 100));
 
+                    const height = clone.scrollHeight + 20;
+                    const width = 794;
+
                     const opt = {
-                        margin: [12, 12, 12, 12],
+                        margin: [0, 0, 0, 0],
                         filename: `invoice-${invNumber.value || 'draft'}.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: {
                             scale: 2,
                             useCORS: true,
                             logging: false,
-                            width: 794,
-                            height: clone.scrollHeight + 40,
-                            windowHeight: clone.scrollHeight + 40,
+                            width: width,
+                            height: height,
+                            windowHeight: height,
                         },
                         jsPDF: {
-                            unit: 'mm',
-                            format: 'a4',
+                            unit: 'px',
+                            format: [width, height],
                             orientation: 'portrait',
                         },
-                        pagebreak: { mode: ['avoid-all'] }
+                        pagebreak: { mode: 'avoid-all' }
                     };
 
                     await html2pdf().set(opt).from(clone).save();
-
-                    // Cleanup
                     document.body.removeChild(container);
 
                 } catch (err) {
@@ -1842,7 +1936,6 @@
                 addItem('', 1, 0);
             });
 
-            // Logo upload
             logoUpload.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -1853,7 +1946,20 @@
 
             removeLogoBtn.addEventListener('click', removeLogo);
 
-            // Also re-render on any change to date inputs
+            logoAspect.addEventListener('change', () => {
+                state.logoAspect = logoAspect.value;
+                renderPreview();
+                debounceSave();
+            });
+
+            logoScale.addEventListener('input', () => {
+                const val = parseInt(logoScale.value, 10);
+                logoScaleLabel.textContent = val + '%';
+                state.logoScale = val;
+                renderPreview();
+                debounceSave();
+            });
+
             invDate.addEventListener('change', () => { renderPreview();
                 debounceSave(); });
             invDueDate.addEventListener('change', () => { renderPreview();
@@ -1868,6 +1974,12 @@
             state.items = [];
             state.nextId = 1;
             state.logoData = null;
+            state.logoAspect = 'original';
+            state.logoScale = 100;
+            logoAspect.value = 'original';
+            logoScale.value = 100;
+            logoScaleLabel.textContent = '100%';
+
             companyName.value = '';
             companyAddress.value = '';
             companyEmail.value = '';
@@ -1892,7 +2004,6 @@
             renderPreview();
             debounceSave();
         }
-        // expose reset to global
         window.resetInvoice = resetInvoice;
 
         // ============================================================
@@ -1919,35 +2030,26 @@
         //  INIT
         // ============================================================
         function init() {
-            // Set default date
             const today = new Date().toISOString().split('T')[0];
             if (!invDate.value) invDate.value = today;
             const due = new Date();
             due.setDate(due.getDate() + 30);
             if (!invDueDate.value) invDueDate.value = due.toISOString().split('T')[0];
 
-            // Try to load saved state
             const loaded = loadState();
 
             if (!loaded) {
-                // Default items
                 addItem('Web design service', 1, 450);
                 addItem('Consultation', 2, 120);
-                // Default company name
                 companyName.value = 'Studio Nine';
-                // Save initial state
                 debounceSave();
             }
 
-            // Setup events
             attachInputListeners();
             setupTabs();
             setupDownload();
-
-            // Initial render
             renderPreview();
 
-            // Hide save indicator after a moment
             setTimeout(() => {
                 saveIndicator.classList.remove('visible');
             }, 1000);
