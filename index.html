@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Invoice Generator — ₦</title>
 
-    <!-- html2pdf library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
     </script>
 
-    <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <style>
-        /* ---------- RESET & BASE ---------- */
         *,
         *::before,
         *::after {
@@ -54,7 +51,6 @@
             transition: all 0.2s;
         }
 
-        /* ---------- HEADER ---------- */
         .app-header {
             display: flex;
             align-items: center;
@@ -122,7 +118,6 @@
             font-size: 18px;
         }
 
-        /* ---------- TABS ---------- */
         .tabs {
             display: flex;
             gap: 4px;
@@ -181,7 +176,6 @@
             font-size: 16px;
         }
 
-        /* ---------- TAB CONTENT ---------- */
         .tab-content {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -202,7 +196,6 @@
             }
         }
 
-        /* ---------- EDIT TAB LAYOUT ---------- */
         .edit-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -275,7 +268,6 @@
             border-radius: 100px;
         }
 
-        /* ---------- LOGO UPLOAD ---------- */
         .logo-section {
             display: flex;
             align-items: center;
@@ -402,8 +394,7 @@
         }
 
         .logo-options .form-group select,
-        .logo-options .form-group input[type="range"],
-        .logo-options .form-group input[type="text"] {
+        .logo-options .form-group input[type="range"] {
             width: auto;
             padding: 4px 8px;
             border-radius: 6px;
@@ -423,7 +414,6 @@
             font-weight: 500;
         }
 
-        /* ---------- LINE ITEMS TABLE ---------- */
         .items-table-wrap {
             overflow-x: auto;
             margin: 6px 0 4px 0;
@@ -563,7 +553,6 @@
             font-size: 14px;
         }
 
-        /* ---------- SUMMARY (edit) ---------- */
         .summary-row {
             display: flex;
             flex-direction: column;
@@ -620,7 +609,7 @@
         }
 
         .summary-inputs .form-group {
-            width: 140px;
+            width: 150px;
         }
 
         .summary-inputs .form-group label {
@@ -632,7 +621,6 @@
             font-size: 16px !important;
         }
 
-        /* ---------- PREVIEW TAB ---------- */
         .preview-toolbar {
             display: flex;
             justify-content: flex-end;
@@ -690,30 +678,33 @@
             font-size: 16px;
         }
 
-        /* ---------- INVOICE PREVIEW (NEW DESIGN) ---------- */
         .invoice-preview {
             background: #ffffff;
-            border-radius: 0;
-            border: none;
-            padding: 40px;
-            font-family: inherit;
+            border-radius: 16px;
+            border: 1.5px solid #e9edf2;
+            padding: 48px 48px 40px;
+            font-size: 14px;
+            line-height: 1.6;
             color: #1e293b;
         }
 
-        .new-header {
+        .invoice-preview .inv-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 20px;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        .new-brand {
+        .invoice-preview .inv-brand {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .new-brand .logo-wrap {
+        .invoice-preview .inv-brand .logo-wrap {
             flex-shrink: 0;
             display: block;
             align-items: center;
@@ -724,213 +715,191 @@
             outline: none;
         }
 
-        .new-brand-text h2 {
-            font-size: 28px;
-            font-weight: 800;
+        .invoice-preview .inv-brand .brand-text h2 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+            color: #0f172a;
             margin: 0;
-            color: #000;
+            line-height: 1.2;
         }
 
-        .tagline {
-            font-size: 12px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #666;
+        .invoice-preview .inv-brand .brand-text .sub {
+            font-size: 14px;
+            color: #64748b;
             margin-top: 2px;
         }
 
-        .new-invoice-title {
-            font-size: 54px;
-            color: #ddd;
-            font-weight: 400;
-            line-height: 1;
-            letter-spacing: 2px;
-        }
-
-        .hero-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #2d2d2d;
-            margin-bottom: 20px;
-        }
-
-        .hero-left h4 {
-            text-transform: uppercase;
-            font-size: 12px;
-            color: #bbb;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-
-        .hero-left .client-name {
-            font-weight: 700;
-            font-size: 18px;
-            margin: 0 0 5px 0;
-            color: #fff;
-        }
-
-        .hero-left .client-address {
-            color: #ddd;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .hero-right {
+        /* BALANCE BOX */
+        .inv-right {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
-        .grand-total-box {
-            padding: 15px 25px;
-            text-align: right;
-            margin-bottom: 10px;
-            color: #000;
-            background-color: var(--accent);
-        }
-
-        .grand-total-box .label {
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            opacity: 0.7;
-        }
-
-        .grand-total-box .total {
-            font-size: 34px;
-            font-weight: 800;
-            line-height: 1;
-        }
-
-        .hero-meta {
+        .balance-box {
             display: flex;
-            gap: 20px;
-            font-size: 12px;
-            color: #ddd;
-            margin-top: 10px;
-        }
-
-        .new-items {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .new-items th {
-            padding: 12px;
-            text-align: right;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            background-color: var(--accent);
-            color: #000;
-        }
-
-        .new-items th:first-child,
-        .new-items td:first-child {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 36px;
+            border-radius: 14px;
+            min-width: 210px;
             text-align: center;
-            width: 40px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
         }
 
-        .new-items th:nth-child(2),
-        .new-items td:nth-child(2) {
-            text-align: left;
-        }
-
-        .new-items td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            text-align: right;
-            font-size: 14px;
-            background-color: inherit;
-        }
-
-        .new-items td:first-child {
-            color: #666;
-        }
-
-        .new-items td:nth-child(2) {
+        .balance-box .balance-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
             font-weight: 600;
+            margin-bottom: 6px;
+            opacity: 0.85;
         }
 
-        .new-summary {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 40px;
+        .balance-box .balance-amount {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.2;
         }
 
-        .summary-box {
-            width: 320px;
-            padding: 20px;
+        .invoice-preview .inv-meta {
             text-align: right;
-            background-color: var(--accent);
-            color: #000;
+            flex-shrink: 0;
         }
 
-        .sum-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
+        .invoice-preview .inv-meta .inv-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .invoice-preview .inv-meta .inv-date {
+            color: #64748b;
             font-size: 14px;
         }
 
-        .sum-line.total {
-            font-weight: 800;
-            font-size: 20px;
-            border-top: 1px solid rgba(0,0,0,0.2);
-            margin-top: 5px;
-            padding-top: 10px;
+        .invoice-preview .inv-parties {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 32px;
         }
 
-        .new-footer {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
+        .invoice-preview .inv-parties .party h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            font-weight: 600;
+            margin: 0 0 4px 0;
         }
 
-        .thank-you {
-            max-width: 300px;
-            font-size: 14px;
-            color: #333;
+        .invoice-preview .inv-parties .party p {
+            margin: 2px 0;
+            color: #1e293b;
         }
 
-        .thank-you strong {
-            display: block;
-            margin-bottom: 5px;
+        .invoice-preview .inv-parties .party .name {
+            font-weight: 600;
             font-size: 16px;
         }
 
-        .thank-you p {
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        .bank-info {
-            display: flex;
-            gap: 30px;
-            text-align: left;
-        }
-
-        .bank-info .col {
-            font-size: 12px;
-            color: #333;
-            max-width: 180px;
-        }
-
-        .bank-info .col h4 {
+        .invoice-preview table.inv-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0 24px;
             font-size: 14px;
-            margin-bottom: 8px;
-            color: #000;
         }
 
-        .bank-info .col p {
-            margin: 2px 0;
-            color: #555;
+        .invoice-preview table.inv-items th {
+            text-align: left;
+            padding: 10px 8px 10px 0;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #64748b;
+        }
+
+        .invoice-preview table.inv-items th:last-child {
+            text-align: right;
+            padding-right: 0;
+        }
+
+        .invoice-preview table.inv-items td {
+            padding: 10px 8px 10px 0;
+            border-bottom: 1px solid #f1f4f9;
+        }
+
+        .invoice-preview table.inv-items td:last-child {
+            text-align: right;
+            padding-right: 0;
+            font-weight: 500;
+        }
+
+        .invoice-preview table.inv-items tr:last-child td {
+            border-bottom: none;
+        }
+
+        .invoice-preview .inv-summary {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .invoice-preview .inv-summary .sum-line {
+            display: flex;
+            justify-content: space-between;
+            width: 320px;
+            padding: 3px 0;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .invoice-preview .inv-summary .sum-line.total {
+            font-weight: 700;
+            font-size: 18px;
+            color: #0f172a;
+            border-top: 1.5px solid #e2e8f0;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+
+        .invoice-preview .inv-summary .sum-line.balance {
+            font-weight: 700;
+            font-size: 18px;
+            color: #0f172a;
+            border-top: 2px solid #1e293b;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+
+        .invoice-preview .inv-summary .sum-line.paid {
+            color: #475569;
+        }
+
+        .invoice-preview .inv-notes {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1.5px solid #e9edf2;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .invoice-preview .inv-notes strong {
+            color: #475569;
+        }
+
+        .invoice-preview .inv-notes p {
+            margin: 4px 0 0 0;
         }
 
         .empty-state {
@@ -949,7 +918,6 @@
             font-size: 15px;
         }
 
-        /* ---------- HISTORY ---------- */
         .history-list {
             display: flex;
             flex-direction: column;
@@ -1079,7 +1047,6 @@
             opacity: 0.4;
         }
 
-        /* ---------- BACKUP ---------- */
         .backup-section {
             display: flex;
             flex-direction: column;
@@ -1128,7 +1095,6 @@
             margin-right: 4px;
         }
 
-        /* ---------- RESPONSIVE ---------- */
         @media (max-width: 820px) {
             .app {
                 padding: 20px 16px 28px;
@@ -1156,6 +1122,16 @@
             .invoice-preview .inv-meta {
                 text-align: left;
                 width: 100%;
+            }
+
+            .inv-right {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .balance-box {
+                min-width: 180px;
+                padding: 18px 24px;
             }
 
             .summary-line {
@@ -1190,6 +1166,11 @@
             .preview-toolbar .btn-secondary {
                 flex: 1;
                 justify-content: center;
+            }
+
+            .invoice-preview .inv-brand {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
             .logo-options {
@@ -1238,9 +1219,16 @@
                 width: 60px;
                 height: 60px;
             }
+
+            .balance-box {
+                min-width: 150px;
+                padding: 14px 18px;
+            }
+            .balance-box .balance-amount {
+                font-size: 24px;
+            }
         }
 
-        /* ---------- PRINT STYLES ---------- */
         @media print {
             body {
                 background: #fff;
@@ -1316,7 +1304,6 @@
             gap: 4px;
         }
 
-        /* ---------- AUTO-SAVE INDICATOR ---------- */
         .save-indicator {
             font-size: 12px;
             color: #94a3b8;
@@ -1375,7 +1362,6 @@
             display: flex;
         }
 
-        /* ---------- TOAST ---------- */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -1410,7 +1396,6 @@
             background: #1e293b;
         }
 
-        /* Fix icon alignment */
         .fa-icon {
             font-size: 1em;
             line-height: 1;
@@ -1466,10 +1451,8 @@
 
     <div class="app" id="app">
 
-        <!-- TOAST -->
         <div class="toast" id="toast"></div>
 
-        <!-- HEADER -->
         <header class="app-header">
             <h1>
                 <i class="fas fa-file-invoice fa-icon"></i> Invoice <span>₦</span>
@@ -1487,7 +1470,6 @@
             </div>
         </header>
 
-        <!-- TABS -->
         <div class="tabs" role="tablist">
             <button class="tab-btn active" data-tab="edit-tab" role="tab">
                 <i class="fas fa-pen fa-icon"></i> Edit
@@ -1539,14 +1521,6 @@
                             <label for="logoScale">Scale</label>
                             <input type="range" id="logoScale" min="10" max="400" value="100" />
                             <span id="logoScaleLabel">100%</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="accentColor"><i class="fas fa-palette fa-icon"></i> Accent Color</label>
-                            <input type="color" id="accentColor" value="#ffc107" style="padding: 4px; width: 60px; height: 40px; cursor: pointer;" />
-                        </div>
-                        <div class="form-group">
-                            <label for="accentColorText">Hex Code</label>
-                            <input type="text" id="accentColorText" value="#ffc107" maxlength="7" placeholder="#ffc107" />
                         </div>
                     </div>
                 </div>
@@ -1661,6 +1635,11 @@
                                 <label for="amountPaid"><i class="fas fa-money-bill-wave fa-icon"></i> Amount paid (₦)</label>
                                 <input type="number" id="amountPaid" value="0" min="0" step="0.5" inputmode="decimal" />
                             </div>
+                            <!-- NEW: Balance box color picker -->
+                            <div class="form-group">
+                                <label for="balanceBoxColor"><i class="fas fa-palette fa-icon"></i> Box color</label>
+                                <input type="color" id="balanceBoxColor" value="#000000" />
+                            </div>
                         </div>
                         <div class="summary-line">
                             <span class="label">Subtotal</span>
@@ -1773,7 +1752,7 @@
             logoAspect: 'original',
             logoScale: 100,
             invoiceName: '',
-            accentColor: '#ffc107',
+            balanceBoxColor: '#000000',
         };
 
         // ============================================================
@@ -1800,6 +1779,7 @@
         const itemsBody = $('itemsBody');
         const addItemBtn = $('addItemBtn');
         const itemCount = $('itemCount');
+        const balanceBoxColorInput = $('balanceBoxColor');
 
         const editSubtotal = $('editSubtotal');
         const editTax = $('editTax');
@@ -1817,9 +1797,6 @@
         const logoAspect = $('logoAspect');
         const logoScale = $('logoScale');
         const logoScaleLabel = $('logoScaleLabel');
-
-        const accentColor = $('accentColor');
-        const accentColorText = $('accentColorText');
 
         const saveIndicator = $('saveIndicator');
         const saveText = $('saveText');
@@ -1839,6 +1816,22 @@
             let parts = amount.toFixed(2).split('.');
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return CURRENCY + parts.join('.');
+        }
+
+        // ============================================================
+        //  CONTRAST COLOR HELPER
+        // ============================================================
+        function getContrastColor(hexColor) {
+            if (!hexColor) return '#ffffff';
+            let hex = hexColor.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+            const r = parseInt(hex.slice(0, 2), 16);
+            const g = parseInt(hex.slice(2, 4), 16);
+            const b = parseInt(hex.slice(4, 6), 16);
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.5 ? '#000000' : '#ffffff';
         }
 
         // ============================================================
@@ -1882,7 +1875,7 @@
                 logoData: state.logoData,
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
-                accentColor: accentColor.value,
+                balanceBoxColor: balanceBoxColorInput.value || '#000000',
             };
             try {
                 localStorage.setItem('invoiceState', JSON.stringify(data));
@@ -1932,15 +1925,12 @@
                 state.logoData = data.logoData || null;
                 state.logoAspect = data.logoAspect || 'original';
                 state.logoScale = data.logoScale || 100;
+                state.balanceBoxColor = data.balanceBoxColor || '#000000';
 
                 logoAspect.value = state.logoAspect;
                 logoScale.value = state.logoScale;
                 logoScaleLabel.textContent = state.logoScale + '%';
-
-                if (data.accentColor) {
-                    accentColor.value = data.accentColor;
-                    accentColorText.value = data.accentColor;
-                }
+                balanceBoxColorInput.value = state.balanceBoxColor;
 
                 updateLogoPreview();
                 renderItems();
@@ -2023,7 +2013,7 @@
                 logoData: state.logoData,
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
-                accentColor: accentColor.value,
+                balanceBoxColor: balanceBoxColorInput.value || '#000000',
             };
 
             history.unshift({
@@ -2070,15 +2060,12 @@
             state.logoData = d.logoData || null;
             state.logoAspect = d.logoAspect || 'original';
             state.logoScale = d.logoScale || 100;
+            state.balanceBoxColor = d.balanceBoxColor || '#000000';
 
             logoAspect.value = state.logoAspect;
             logoScale.value = state.logoScale;
             logoScaleLabel.textContent = state.logoScale + '%';
-
-            if (d.accentColor) {
-                accentColor.value = d.accentColor;
-                accentColorText.value = d.accentColor;
-            }
+            balanceBoxColorInput.value = state.balanceBoxColor;
 
             updateLogoPreview();
             renderItems();
@@ -2123,7 +2110,7 @@
                 logoData: d.logoData || null,
                 logoAspect: d.logoAspect || 'original',
                 logoScale: d.logoScale || 100,
-                accentColor: d.accentColor || '#ffc107',
+                balanceBoxColor: d.balanceBoxColor || '#000000',
             };
 
             history.unshift({
@@ -2310,7 +2297,7 @@
         }
 
         // ============================================================
-        //  ITEMS — with focus‑safe updates
+        //  ITEMS
         // ============================================================
         function addItem(desc = '', qty = 1, rate = 0) {
             state.items.push({
@@ -2487,7 +2474,7 @@
                 logo: state.logoData,
                 logoAspect: state.logoAspect,
                 logoScale: state.logoScale,
-                accentColor: accentColor.value || '#ffc107',
+                balanceBoxColor: state.balanceBoxColor || '#000000',
             };
         }
 
@@ -2500,6 +2487,7 @@
             let logoStyle = '';
             if (hasLogo) {
                 const bgProps = `background-image: url('${d.logo}'); background-size: contain; background-repeat: no-repeat; background-position: center;`;
+
                 if (d.logoAspect === 'circle') {
                     logoStyle = `width: ${size}px; height: ${size}px; border-radius: 50%; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 } else if (d.logoAspect === 'square') {
@@ -2508,111 +2496,140 @@
                     logoStyle = `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
                 }
             }
+
             const logoHtml = hasLogo ? `<div class="logo-wrap" style="${logoStyle}"></div>` : '';
 
-            const itemsRows = d.items.map((item, index) => `
-                <tr style="background-color: ${index % 2 === 0 ? '#ffffff' : '#f8f8f8'};">
-                    <td>${index + 1}</td>
-                    <td><strong>${escapeHtml(item.description)}</strong></td>
-                    <td>${formatMoney(item.rate)}</td>
-                    <td>${item.qty}</td>
-                    <td>${formatMoney(item.amount)}</td>
-                </tr>
-            `).join('');
+            const itemsRows = d.items.map(item => `
+                            <tr>
+                                <td>${escapeHtml(item.description)}</td>
+                                <td style="text-align:left;">${item.qty}</td>
+                                <td style="text-align:left;">${formatMoney(item.rate)}</td>
+                                <td>${formatMoney(item.amount)}</td>
+                            </tr>
+                        `).join('');
 
-            const accent = d.accentColor || '#ffc107';
-            const tagline = d.invoice.name ? escapeHtml(d.invoice.name) : 'Tagline Here';
+            const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
 
             let summaryLines = `
-                <div class="sum-line"><span>Subtotal</span><span>${formatMoney(d.subtotal)}</span></div>
-            `;
+                            <div class="sum-line">
+                                <span>Subtotal</span>
+                                <span>${formatMoney(d.subtotal)}</span>
+                            </div>
+                        `;
             if (d.taxRate > 0) {
-                summaryLines += `<div class="sum-line"><span>Tax</span><span>${formatMoney(d.tax)}</span></div>`;
+                summaryLines += `
+                            <div class="sum-line">
+                                <span>Tax (${d.taxRate}%)</span>
+                                <span>${formatMoney(d.tax)}</span>
+                            </div>
+                        `;
             }
             if (d.discountRate > 0) {
-                summaryLines += `<div class="sum-line"><span>Discount</span><span>-${formatMoney(d.discount)}</span></div>`;
+                summaryLines += `
+                            <div class="sum-line">
+                                <span>Discount (${d.discountRate}%)</span>
+                                <span>-${formatMoney(d.discount)}</span>
+                            </div>
+                        `;
             }
-            summaryLines += `<div class="sum-line total"><span>Grand Total</span><span>${formatMoney(d.total)}</span></div>`;
+            summaryLines += `
+                            <div class="sum-line total">
+                                <span>Total</span>
+                                <span>${formatMoney(d.total)}</span>
+                            </div>
+                        `;
+            if (d.amountPaid > 0) {
+                summaryLines += `
+                            <div class="sum-line paid">
+                                <span>Amount paid</span>
+                                <span>${formatMoney(d.amountPaid)}</span>
+                            </div>
+                        `;
+            }
+            summaryLines += `
+                            <div class="sum-line balance">
+                                <span>Balance due</span>
+                                <span>${formatMoney(d.balance)}</span>
+                            </div>
+                        `;
+
+            // Balance box with contrast color
+            const boxColor = d.balanceBoxColor || '#000000';
+            const boxTextColor = getContrastColor(boxColor);
 
             return `
-                <div class="invoice-preview" id="invoiceToPdf" style="--accent: ${accent};">
-                    <div class="new-header">
-                        <div class="new-brand">
-                            ${logoHtml}
-                            <div class="new-brand-text">
-                                <h2>${escapeHtml(d.company.name)}</h2>
-                                <div class="tagline">${tagline}</div>
-                            </div>
-                        </div>
-                        <div class="new-invoice-title">INVOICE</div>
-                    </div>
+                            <div class="invoice-preview" id="invoiceToPdf">
+                                <div class="inv-header">
+                                    <div class="inv-brand">
+                                        ${logoHtml}
+                                        <div class="brand-text">
+                                            ${companyNameHtml}
+                                            ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
+                                            ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
+                                            ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="inv-right">
+                                        <div class="balance-box" style="background-color: ${boxColor}; color: ${boxTextColor};">
+                                            <div class="balance-label">BALANCE DUE</div>
+                                            <div class="balance-amount">${formatMoney(d.balance)}</div>
+                                        </div>
+                                        <div class="inv-meta">
+                                            ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
+                                            ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
+                                            ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div class="hero-section">
-                        <div class="hero-left">
-                            <h4>Invoice To:</h4>
-                            <p class="client-name">${escapeHtml(d.client.name)}</p>
-                            <p class="client-address">${escapeHtml(d.client.address)}</p>
-                        </div>
-                        <div class="hero-right">
-                            <div class="grand-total-box">
-                                <div class="label">GRAND TOTAL</div>
-                                <div class="total">${formatMoney(d.total)}</div>
-                            </div>
-                            <div class="hero-meta">
-                                ${d.invoice.number ? `<div>Invoice no: <strong>${escapeHtml(d.invoice.number)}</strong></div>` : ''}
-                                ${d.invoice.date ? `<div>Invoice date: <strong>${d.invoice.date}</strong></div>` : ''}
-                                ${d.invoice.dueDate ? `<div>Due date: <strong>${d.invoice.dueDate}</strong></div>` : ''}
-                            </div>
-                        </div>
-                    </div>
+                                <div class="inv-parties">
+                                    <div class="party">
+                                        <h4>Bill to</h4>
+                                        ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
+                                        ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
+                                        ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
+                                        ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
+                                        ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                    </div>
+                                    <div class="party" style="text-align:right;">
+                                        <h4>Invoice details</h4>
+                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
+                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
+                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
+                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                    </div>
+                                </div>
 
-                    <table class="new-items">
-                        <thead>
-                            <tr>
-                                <th>No.</th>
-                                <th>Item Description</th>
-                                <th>Unit Price</th>
-                                <th>QTY</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsRows || `<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
-                        </tbody>
-                    </table>
+                                <table class="inv-items">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th style="text-align:left;">Qty</th>
+                                            <th style="text-align:left;">Rate</th>
+                                            <th style="text-align:right;">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
+                                    </tbody>
+                                </table>
 
-                    <div class="new-summary">
-                        <div class="summary-box">
-                            ${summaryLines}
-                        </div>
-                    </div>
+                                <div class="inv-summary">
+                                    ${summaryLines}
+                                </div>
 
-                    <div class="new-footer">
-                        <div class="thank-you">
-                            <strong>Thank you!</strong>
-                            <p>${d.notes ? escapeHtml(d.notes) : 'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod amet consectetur adipiscing.'}</p>
-                        </div>
-                        <div class="bank-info">
-                            <div class="col">
-                                <h4>Bank Account (1)</h4>
-                                <p>International Bank Name</p>
-                                <p>${escapeHtml(d.company.name)}</p>
-                                <p>${escapeHtml(d.company.phone)}</p>
+                                ${d.notes ? `
+                                        <div class="inv-notes">
+                                            <strong>Notes</strong>
+                                            <p>${escapeHtml(d.notes)}</p>
+                                        </div>
+                                    ` : ''}
                             </div>
-                            <div class="col">
-                                <h4>Bank Account (2)</h4>
-                                <p>International Bank Name</p>
-                                <p>${escapeHtml(d.company.name)}</p>
-                                <p>${escapeHtml(d.company.phone)}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+                        `;
         }
 
         // ============================================================
-        //  PDF DOWNLOAD — fixed to capture all content
+        //  PDF DOWNLOAD
         // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
@@ -2628,7 +2645,7 @@
 
                 try {
                     const clone = element.cloneNode(true);
-                    clone.style.padding = '40px';
+                    clone.style.padding = '48px 48px 40px';
                     clone.style.backgroundColor = '#ffffff';
                     clone.style.borderRadius = '0';
                     clone.style.border = 'none';
@@ -2746,7 +2763,7 @@
         }
 
         // ============================================================
-        //  PLUS BUTTON — save to history + reset
+        //  PLUS BUTTON
         // ============================================================
         function handlePlus() {
             const hasContent = state.items.length > 0 ||
@@ -2775,9 +2792,11 @@
             state.logoData = null;
             state.logoAspect = 'original';
             state.logoScale = 100;
+            state.balanceBoxColor = '#000000';
             logoAspect.value = 'original';
             logoScale.value = 100;
             logoScaleLabel.textContent = '100%';
+            balanceBoxColorInput.value = '#000000';
 
             invoiceNameInput.value = '';
             companyName.value = '';
@@ -2798,8 +2817,6 @@
             discountRate.value = 0;
             amountPaid.value = 0;
             notes.value = '';
-            accentColor.value = '#ffc107';
-            accentColorText.value = '#ffc107';
 
             addItem('', 1, 0);
             updateLogoPreview();
@@ -2913,6 +2930,13 @@
                 debounceSave();
             });
 
+            // Balance box color listener
+            balanceBoxColorInput.addEventListener('input', () => {
+                state.balanceBoxColor = balanceBoxColorInput.value;
+                renderPreview();
+                debounceSave();
+            });
+
             addItemBtn.addEventListener('click', () => {
                 addItem('', 1, 0);
             });
@@ -2937,21 +2961,6 @@
                 state.logoScale = val;
                 renderPreview();
                 debounceSave();
-            });
-
-            accentColor.addEventListener('input', () => {
-                accentColorText.value = accentColor.value;
-                renderPreview();
-                debounceSave();
-            });
-
-            accentColorText.addEventListener('input', () => {
-                let val = accentColorText.value.trim();
-                if (val.startsWith('#')) {
-                    accentColor.value = val;
-                    renderPreview();
-                    debounceSave();
-                }
             });
 
             invDate.addEventListener('change', () => { renderPreview();
@@ -2985,7 +2994,6 @@
                 addItem('Web design service', 1, 450);
                 addItem('Consultation', 2, 120);
                 companyName.value = 'Studio Nine';
-                accentColorText.value = accentColor.value;
                 debounceSave();
             }
 
@@ -3000,7 +3008,7 @@
             }, 1000);
         }
 
-        // Expose functions globally for onclick
+        // Expose functions globally
         window.loadFromHistory = loadFromHistory;
         window.duplicateHistory = duplicateHistory;
         window.deleteHistory = deleteHistory;
