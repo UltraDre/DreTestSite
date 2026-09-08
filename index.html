@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Invoice Generator — ₦</title>
 
     <!-- html2pdf library for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
@@ -28,10 +28,20 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            -webkit-text-size-adjust: 100%;
         }
 
-        /* fallback if Inter isn't loaded */
         @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
+
+        /* prevent zoom on input focus */
+        input,
+        textarea,
+        select,
+        button {
+            font-size: 16px !important;
+            /* iOS zoom prevention */
+            touch-action: manipulation;
+        }
 
         .app {
             max-width: 1200px;
@@ -75,6 +85,7 @@
         .header-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         /* ---------- TABS ---------- */
@@ -99,6 +110,7 @@
             transition: all 0.25s;
             font-family: inherit;
             letter-spacing: -0.2px;
+            touch-action: manipulation;
         }
 
         .tab-btn:hover {
@@ -159,7 +171,8 @@
         .form-group input,
         .form-group textarea {
             font-family: inherit;
-            font-size: 14px;
+            font-size: 16px !important;
+            /* prevent zoom */
             padding: 10px 14px;
             border: 1.5px solid #e2e8f0;
             border-radius: 10px;
@@ -168,6 +181,7 @@
             outline: none;
             color: #0f172a;
             width: 100%;
+            touch-action: manipulation;
         }
 
         .form-group input:focus,
@@ -200,6 +214,106 @@
             color: #475569;
             padding: 0 10px;
             border-radius: 100px;
+        }
+
+        /* ---------- LOGO UPLOAD ---------- */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            padding: 12px 0 4px 0;
+        }
+
+        .logo-preview {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed #dce1e8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #fafbfc;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .logo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-preview .placeholder {
+            font-size: 28px;
+            color: #cbd5e1;
+            opacity: 0.6;
+        }
+
+        .logo-preview.has-logo {
+            border-color: #1e293b;
+            border-style: solid;
+        }
+
+        .logo-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo-actions .file-input-wrap {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .logo-actions .file-input-wrap input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            font-size: 0;
+        }
+
+        .btn-small {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            background: #f1f4f9;
+            color: #1e293b;
+        }
+
+        .btn-small:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-small.danger {
+            color: #b91c1c;
+        }
+
+        .btn-small.danger:hover {
+            background: #fee2e2;
+        }
+
+        .btn-small.primary {
+            background: #1e293b;
+            color: #fff;
+        }
+
+        .btn-small.primary:hover {
+            background: #0f172a;
         }
 
         /* ---------- LINE ITEMS TABLE ---------- */
@@ -241,7 +355,7 @@
 
         .items-table input {
             font-family: inherit;
-            font-size: 14px;
+            font-size: 16px !important;
             padding: 8px 10px;
             border: 1.5px solid transparent;
             border-radius: 8px;
@@ -250,6 +364,8 @@
             outline: none;
             width: 100%;
             color: #0f172a;
+            touch-action: manipulation;
+            text-align: left !important;
         }
 
         .items-table input:hover {
@@ -260,6 +376,12 @@
             background: #ffffff;
             border-color: #1e293b;
             box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.06);
+        }
+
+        /* force left alignment for qty & rate */
+        .items-table .col-qty input,
+        .items-table .col-rate input {
+            text-align: left !important;
         }
 
         .items-table .col-desc {
@@ -301,6 +423,7 @@
             border-radius: 6px;
             transition: all 0.15s;
             line-height: 1;
+            touch-action: manipulation;
         }
 
         .btn-remove-item:hover {
@@ -323,6 +446,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            touch-action: manipulation;
         }
 
         .btn-add-item:hover {
@@ -389,7 +513,7 @@
 
         .summary-inputs .form-group input {
             padding: 6px 10px;
-            font-size: 13px;
+            font-size: 16px !important;
         }
 
         /* ---------- PREVIEW TAB ---------- */
@@ -415,6 +539,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            touch-action: manipulation;
         }
 
         .btn-primary:hover {
@@ -437,6 +562,7 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            touch-action: manipulation;
         }
 
         .btn-secondary:hover {
@@ -463,15 +589,41 @@
             gap: 20px;
         }
 
-        .invoice-preview .inv-brand h2 {
-            font-size: 28px;
+        .invoice-preview .inv-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .invoice-preview .inv-brand .logo-wrap {
+            width: 70px;
+            height: 70px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafbfc;
+        }
+
+        .invoice-preview .inv-brand .logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .invoice-preview .inv-brand .brand-text h2 {
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.6px;
             color: #0f172a;
             margin: 0;
+            line-height: 1.2;
         }
 
-        .invoice-preview .inv-brand .sub {
+        .invoice-preview .inv-brand .brand-text .sub {
             font-size: 14px;
             color: #64748b;
             margin-top: 2px;
@@ -479,6 +631,7 @@
 
         .invoice-preview .inv-meta {
             text-align: right;
+            flex-shrink: 0;
         }
 
         .invoice-preview .inv-meta .inv-number {
@@ -599,7 +752,6 @@
             margin: 4px 0 0 0;
         }
 
-        /* empty state */
         .empty-state {
             text-align: center;
             padding: 48px 20px;
@@ -679,6 +831,11 @@
                 flex: 1;
                 justify-content: center;
             }
+
+            .invoice-preview .inv-brand {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
 
         @media (max-width: 480px) {
@@ -701,6 +858,11 @@
             }
             .items-table .col-desc {
                 min-width: 120px;
+            }
+
+            .logo-preview {
+                width: 60px;
+                height: 60px;
             }
         }
 
@@ -755,12 +917,10 @@
             }
         }
 
-        /* scrollable table container */
         .table-scroll {
             overflow-x: auto;
         }
 
-        /* small helpers */
         .text-muted {
             color: #94a3b8;
             font-size: 13px;
@@ -775,6 +935,65 @@
         .gap-4 {
             gap: 4px;
         }
+
+        /* ---------- AUTO-SAVE INDICATOR ---------- */
+        .save-indicator {
+            font-size: 12px;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .save-indicator.visible {
+            opacity: 1;
+        }
+        .save-indicator .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+        .save-indicator.saving .dot {
+            background: #f59e0b;
+            animation: pulse-dot 0.8s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.4);
+                opacity: 0.6;
+            }
+        }
+
+        .logo-preview .remove-logo-overlay {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            touch-action: manipulation;
+        }
+        .logo-preview.has-logo .remove-logo-overlay {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -784,9 +1003,12 @@
         <!-- HEADER -->
         <header class="app-header">
             <h1>
-                <span>📄</span> Invoice <span>v1</span>
+                <span>📄</span> Invoice <span>₦</span>
             </h1>
             <div class="header-actions">
+                <span class="save-indicator" id="saveIndicator">
+                    <span class="dot"></span> <span id="saveText">Saved</span>
+                </span>
                 <button class="btn-secondary" onclick="resetInvoice()" style="padding:6px 16px;font-size:13px;">
                     ↻ Reset
                 </button>
@@ -804,6 +1026,24 @@
 
             <div class="edit-grid">
 
+                <!-- Logo -->
+                <div class="full-width">
+                    <div class="section-title">Logo <span class="badge">optional</span></div>
+                    <div class="logo-section">
+                        <div class="logo-preview" id="logoPreview">
+                            <span class="placeholder">🖼</span>
+                            <button class="remove-logo-overlay" id="removeLogoBtn" title="Remove logo">✕</button>
+                        </div>
+                        <div class="logo-actions">
+                            <div class="file-input-wrap">
+                                <button class="btn-small primary">Upload logo</button>
+                                <input type="file" id="logoUpload" accept="image/*" />
+                            </div>
+                            <span class="text-muted" style="font-size:12px;">PNG, JPG, SVG · max 200px</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Company -->
                 <div class="form-group">
                     <label for="companyName">Company name</label>
@@ -819,7 +1059,7 @@
                 </div>
                 <div class="form-group">
                     <label for="companyPhone">Phone</label>
-                    <input type="text" id="companyPhone" placeholder="+1 234 567 890" />
+                    <input type="text" id="companyPhone" placeholder="+234 800 000 0000" />
                 </div>
 
                 <!-- Invoice meta -->
@@ -857,7 +1097,7 @@
                         </div>
                         <div class="form-group">
                             <label for="clientPhone">Phone</label>
-                            <input type="text" id="clientPhone" placeholder="+1 234 567 890" />
+                            <input type="text" id="clientPhone" placeholder="+234 800 000 0000" />
                         </div>
                     </div>
                 </div>
@@ -871,7 +1111,7 @@
                                 <tr>
                                     <th class="col-desc">Description</th>
                                     <th class="col-qty">Qty</th>
-                                    <th class="col-rate">Rate</th>
+                                    <th class="col-rate">Rate (₦)</th>
                                     <th class="col-amount">Amount</th>
                                     <th class="col-action"></th>
                                 </tr>
@@ -899,19 +1139,19 @@
                         </div>
                         <div class="summary-line">
                             <span class="label">Subtotal</span>
-                            <span class="value" id="editSubtotal">$0.00</span>
+                            <span class="value" id="editSubtotal">₦0.00</span>
                         </div>
                         <div class="summary-line">
                             <span class="label">Tax</span>
-                            <span class="value" id="editTax">$0.00</span>
+                            <span class="value" id="editTax">₦0.00</span>
                         </div>
                         <div class="summary-line">
                             <span class="label">Discount</span>
-                            <span class="value" id="editDiscount">$0.00</span>
+                            <span class="value" id="editDiscount">₦0.00</span>
                         </div>
                         <div class="summary-line total">
                             <span class="label">Total</span>
-                            <span class="value" id="editTotal">$0.00</span>
+                            <span class="value" id="editTotal">₦0.00</span>
                         </div>
                     </div>
                 </div>
@@ -958,7 +1198,7 @@
             nextId: 1,
             taxRate: 0,
             discountRate: 0,
-            // other fields stored in DOM
+            logoData: null, // base64 data URL
         };
 
         // ============================================================
@@ -992,32 +1232,202 @@
         const previewContainer = $('invoicePreviewContainer');
         const downloadBtn = $('downloadPdfBtn');
 
+        const logoUpload = $('logoUpload');
+        const logoPreview = $('logoPreview');
+        const removeLogoBtn = $('removeLogoBtn');
+
+        const saveIndicator = $('saveIndicator');
+        const saveText = $('saveText');
+
+        let saveTimeout = null;
+
         // ============================================================
-        //  INIT
+        //  CURRENCY
         // ============================================================
-        function init() {
-            // Set default date
-            const today = new Date().toISOString().split('T')[0];
-            invDate.value = today;
-            const due = new Date();
-            due.setDate(due.getDate() + 30);
-            invDueDate.value = due.toISOString().split('T')[0];
+        const CURRENCY = '₦';
 
-            // Add two default items
-            addItem('Web design service', 1, 450);
-            addItem('Consultation', 2, 120);
+        function formatMoney(amount) {
+            return CURRENCY + amount.toFixed(2);
+        }
 
-            // Set default company name
-            companyName.value = 'Studio Nine';
+        // ============================================================
+        //  AUTO-SAVE (localStorage)
+        // ============================================================
+        function saveState() {
+            const data = {
+                companyName: companyName.value,
+                companyAddress: companyAddress.value,
+                companyEmail: companyEmail.value,
+                companyPhone: companyPhone.value,
+                clientName: clientName.value,
+                clientAddress: clientAddress.value,
+                clientEmail: clientEmail.value,
+                clientPhone: clientPhone.value,
+                invNumber: invNumber.value,
+                invDate: invDate.value,
+                invDueDate: invDueDate.value,
+                taxRate: taxRate.value,
+                discountRate: discountRate.value,
+                notes: notes.value,
+                items: state.items,
+                nextId: state.nextId,
+                logoData: state.logoData,
+            };
+            try {
+                localStorage.setItem('invoiceState', JSON.stringify(data));
+                showSaveIndicator('Saved', false);
+            } catch (e) {
+                // if storage is full, try to clear logo to save space
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    try {
+                        // remove logo from storage and retry
+                        const dataWithoutLogo = { ...data, logoData: null };
+                        localStorage.setItem('invoiceState', JSON.stringify(dataWithoutLogo));
+                        state.logoData = null;
+                        updateLogoPreview();
+                        showSaveIndicator('Saved (logo removed - storage full)', false);
+                    } catch (e2) {
+                        showSaveIndicator('Save failed', false);
+                    }
+                } else {
+                    showSaveIndicator('Save failed', false);
+                }
+            }
+        }
 
-            renderItems();
-            updateSummary();
+        function loadState() {
+            try {
+                const raw = localStorage.getItem('invoiceState');
+                if (!raw) return false;
+                const data = JSON.parse(raw);
+
+                companyName.value = data.companyName || '';
+                companyAddress.value = data.companyAddress || '';
+                companyEmail.value = data.companyEmail || '';
+                companyPhone.value = data.companyPhone || '';
+                clientName.value = data.clientName || '';
+                clientAddress.value = data.clientAddress || '';
+                clientEmail.value = data.clientEmail || '';
+                clientPhone.value = data.clientPhone || '';
+                invNumber.value = data.invNumber || '';
+                invDate.value = data.invDate || '';
+                invDueDate.value = data.invDueDate || '';
+                taxRate.value = data.taxRate ?? 0;
+                discountRate.value = data.discountRate ?? 0;
+                notes.value = data.notes || '';
+
+                state.items = data.items || [];
+                state.nextId = data.nextId || 1;
+                state.logoData = data.logoData || null;
+
+                // Restore logo
+                updateLogoPreview();
+
+                renderItems();
+                updateSummary();
+                renderPreview();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showSaveIndicator(text, saving) {
+            saveText.textContent = text;
+            if (saving) {
+                saveIndicator.classList.add('saving');
+                saveIndicator.classList.add('visible');
+            } else {
+                saveIndicator.classList.remove('saving');
+                saveIndicator.classList.add('visible');
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    saveIndicator.classList.remove('visible');
+                }, 2500);
+            }
+        }
+
+        function debounceSave() {
+            showSaveIndicator('Saving…', true);
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                saveState();
+            }, 300);
+        }
+
+        // ============================================================
+        //  LOGO
+        // ============================================================
+        function updateLogoPreview() {
+            const preview = logoPreview;
+            const placeholder = preview.querySelector('.placeholder');
+            const img = preview.querySelector('img');
+            const removeBtn = removeLogoBtn;
+
+            // Remove existing img
+            if (img) img.remove();
+
+            if (state.logoData) {
+                const newImg = document.createElement('img');
+                newImg.src = state.logoData;
+                newImg.alt = 'Logo';
+                preview.prepend(newImg);
+                preview.classList.add('has-logo');
+                if (placeholder) placeholder.style.display = 'none';
+                removeBtn.style.display = 'flex';
+            } else {
+                preview.classList.remove('has-logo');
+                if (placeholder) placeholder.style.display = 'flex';
+                removeBtn.style.display = 'none';
+            }
+            // re-render preview to show logo
             renderPreview();
+        }
 
-            // Event listeners
-            attachInputListeners();
-            setupTabs();
-            setupDownload();
+        function handleLogoUpload(file) {
+            if (!file) return;
+            // Check size - warn if > 1MB
+            if (file.size > 1024 * 1024) {
+                alert('Logo file is large (>1MB). Please use a smaller image for better performance.');
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                // Compress the image using canvas
+                const img = new Image();
+                img.onload = function() {
+                    // Resize to max 200px width/height
+                    let width = img.width;
+                    let height = img.height;
+                    const maxSize = 200;
+                    if (width > maxSize || height > maxSize) {
+                        const ratio = Math.min(maxSize / width, maxSize / height);
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+                    // Use JPEG with 0.8 quality for smaller size
+                    const compressed = canvas.toDataURL('image/jpeg', 0.8);
+                    state.logoData = compressed;
+                    updateLogoPreview();
+                    debounceSave();
+                };
+                img.src = dataUrl;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeLogo() {
+            state.logoData = null;
+            updateLogoPreview();
+            debounceSave();
         }
 
         // ============================================================
@@ -1033,6 +1443,7 @@
             renderItems();
             updateSummary();
             renderPreview();
+            debounceSave();
         }
 
         function removeItem(id) {
@@ -1044,36 +1455,36 @@
             renderItems();
             updateSummary();
             renderPreview();
+            debounceSave();
         }
 
         function renderItems() {
             if (!itemsBody) return;
             let html = '';
-            state.items.forEach((item, index) => {
-                const amount = (item.qty * item.rate).toFixed(2);
+            state.items.forEach((item) => {
+                const amount = (item.qty * item.rate);
                 html += `
-                    <tr data-id="${item.id}">
-                        <td class="col-desc">
-                            <input type="text" class="item-desc" value="${escapeHtml(item.description)}" placeholder="Description" />
-                        </td>
-                        <td class="col-qty">
-                            <input type="number" class="item-qty" value="${item.qty}" min="0" step="1" />
-                        </td>
-                        <td class="col-rate">
-                            <input type="number" class="item-rate" value="${item.rate}" min="0" step="0.5" />
-                        </td>
-                        <td class="col-amount">
-                            <span class="amount-display">$${amount}</span>
-                        </td>
-                        <td class="col-action">
-                            <button class="btn-remove-item" data-id="${item.id}" title="Remove">✕</button>
-                        </td>
-                    </tr>
-                `;
+                        <tr data-id="${item.id}">
+                            <td class="col-desc">
+                                <input type="text" class="item-desc" value="${escapeHtml(item.description)}" placeholder="Description" />
+                            </td>
+                            <td class="col-qty">
+                                <input type="number" class="item-qty" value="${item.qty}" min="0" step="1" />
+                            </td>
+                            <td class="col-rate">
+                                <input type="number" class="item-rate" value="${item.rate}" min="0" step="0.5" />
+                            </td>
+                            <td class="col-amount">
+                                <span class="amount-display">${formatMoney(amount)}</span>
+                            </td>
+                            <td class="col-action">
+                                <button class="btn-remove-item" data-id="${item.id}" title="Remove">✕</button>
+                            </td>
+                        </tr>
+                    `;
             });
             itemsBody.innerHTML = html;
 
-            // Update count
             itemCount.textContent = state.items.length + ' items';
 
             // Attach events to inputs
@@ -1081,6 +1492,7 @@
                 el.addEventListener('input', () => {
                     state.items[i].description = el.value;
                     renderPreview();
+                    debounceSave();
                 });
             });
             itemsBody.querySelectorAll('.item-qty').forEach((el, i) => {
@@ -1090,6 +1502,7 @@
                     renderItems();
                     updateSummary();
                     renderPreview();
+                    debounceSave();
                 });
             });
             itemsBody.querySelectorAll('.item-rate').forEach((el, i) => {
@@ -1099,6 +1512,7 @@
                     renderItems();
                     updateSummary();
                     renderPreview();
+                    debounceSave();
                 });
             });
             itemsBody.querySelectorAll('.btn-remove-item').forEach(btn => {
@@ -1114,14 +1528,14 @@
         // ============================================================
         function updateSummary() {
             const subtotal = state.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-            const tax = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
-            const discount = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
-            const total = subtotal + tax - discount;
+            const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
+            const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
+            const total = subtotal + taxVal - discountVal;
 
-            editSubtotal.textContent = '$' + subtotal.toFixed(2);
-            editTax.textContent = '$' + tax.toFixed(2);
-            editDiscount.textContent = '$' + discount.toFixed(2);
-            editTotal.textContent = '$' + total.toFixed(2);
+            editSubtotal.textContent = formatMoney(subtotal);
+            editTax.textContent = formatMoney(taxVal);
+            editDiscount.textContent = formatMoney(discountVal);
+            editTotal.textContent = formatMoney(total);
         }
 
         // ============================================================
@@ -1141,19 +1555,19 @@
 
             return {
                 company: {
-                    name: companyName.value || 'Your Company',
+                    name: companyName.value || '',
                     address: companyAddress.value || '',
                     email: companyEmail.value || '',
                     phone: companyPhone.value || '',
                 },
                 client: {
-                    name: clientName.value || 'Client Name',
+                    name: clientName.value || '',
                     address: clientAddress.value || '',
                     email: clientEmail.value || '',
                     phone: clientPhone.value || '',
                 },
                 invoice: {
-                    number: invNumber.value || 'INV-001',
+                    number: invNumber.value || '',
                     date: invDate.value ? formatDate(invDate.value) : '',
                     dueDate: invDueDate.value ? formatDate(invDueDate.value) : '',
                 },
@@ -1170,100 +1584,114 @@
                 discountRate: parseFloat(discountRate.value) || 0,
                 total: total,
                 notes: notes.value || '',
+                logo: state.logoData,
             };
         }
 
         function buildInvoiceHtml(d) {
+            const hasLogo = d.logo && d.logo.length > 0;
+            const logoHtml = hasLogo ?
+                `<div class="logo-wrap"><img src="${d.logo}" alt="Logo" /></div>` :
+                '';
+
             const itemsRows = d.items.map(item => `
-                    <tr>
-                        <td>${escapeHtml(item.description)}</td>
-                        <td>${item.qty}</td>
-                        <td>$${item.rate.toFixed(2)}</td>
-                        <td>$${item.amount.toFixed(2)}</td>
-                    </tr>
-                `).join('');
+                        <tr>
+                            <td>${escapeHtml(item.description)}</td>
+                            <td style="text-align:left;">${item.qty}</td>
+                            <td style="text-align:left;">${formatMoney(item.rate)}</td>
+                            <td>${formatMoney(item.amount)}</td>
+                        </tr>
+                    `).join('');
+
+            // Company name - show blank if empty
+            const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
 
             return `
-                    <div class="invoice-preview" id="invoiceToPdf">
-                        <div class="inv-header">
-                            <div class="inv-brand">
-                                <h2>${escapeHtml(d.company.name)}</h2>
-                                ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
-                                ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
-                                ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
-                            </div>
-                            <div class="inv-meta">
-                                <div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>
-                                ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
-                                ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
-                            </div>
-                        </div>
-
-                        <div class="inv-parties">
-                            <div class="party">
-                                <h4>Bill to</h4>
-                                <p class="name">${escapeHtml(d.client.name)}</p>
-                                ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
-                                ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
-                                ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
-                            </div>
-                            <div class="party" style="text-align:right;">
-                                <h4>Invoice details</h4>
-                                <p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>
-                                ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
-                                ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
-                            </div>
-                        </div>
-
-                        <table class="inv-items">
-                            <thead>
-                                <tr>
-                                    <th>Description</th>
-                                    <th style="text-align:center;">Qty</th>
-                                    <th style="text-align:right;">Rate</th>
-                                    <th style="text-align:right;">Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
-                            </tbody>
-                        </table>
-
-                        <div class="inv-summary">
-                            <div class="sum-line">
-                                <span>Subtotal</span>
-                                <span>$${d.subtotal.toFixed(2)}</span>
-                            </div>
-                            ${d.taxRate > 0 ? `
-                                <div class="sum-line">
-                                    <span>Tax (${d.taxRate}%)</span>
-                                    <span>$${d.tax.toFixed(2)}</span>
+                        <div class="invoice-preview" id="invoiceToPdf">
+                            <div class="inv-header">
+                                <div class="inv-brand">
+                                    ${logoHtml}
+                                    <div class="brand-text">
+                                        ${companyNameHtml}
+                                        ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
+                                        ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
+                                        ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
+                                    </div>
                                 </div>
-                            ` : ''}
-                            ${d.discountRate > 0 ? `
-                                <div class="sum-line">
-                                    <span>Discount (${d.discountRate}%)</span>
-                                    <span>-$${d.discount.toFixed(2)}</span>
+                                <div class="inv-meta">
+                                    ${d.invoice.number ? `<div class="inv-number"># ${escapeHtml(d.invoice.number)}</div>` : ''}
+                                    ${d.invoice.date ? `<div class="inv-date">Date: ${d.invoice.date}</div>` : ''}
+                                    ${d.invoice.dueDate ? `<div class="inv-date">Due: ${d.invoice.dueDate}</div>` : ''}
                                 </div>
-                            ` : ''}
-                            <div class="sum-line total">
-                                <span>Total</span>
-                                <span>$${d.total.toFixed(2)}</span>
                             </div>
-                        </div>
 
-                        ${d.notes ? `
-                            <div class="inv-notes">
-                                <strong>Notes</strong>
-                                <p>${escapeHtml(d.notes)}</p>
+                            <div class="inv-parties">
+                                <div class="party">
+                                    <h4>Bill to</h4>
+                                    ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
+                                    ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
+                                    ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
+                                    ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
+                                    ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                </div>
+                                <div class="party" style="text-align:right;">
+                                    <h4>Invoice details</h4>
+                                    ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
+                                    ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
+                                    ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
+                                    ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                </div>
                             </div>
-                        ` : ''}
-                    </div>
-                `;
+
+                            <table class="inv-items">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th style="text-align:left;">Qty</th>
+                                        <th style="text-align:left;">Rate</th>
+                                        <th style="text-align:right;">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
+                                </tbody>
+                            </table>
+
+                            <div class="inv-summary">
+                                <div class="sum-line">
+                                    <span>Subtotal</span>
+                                    <span>${formatMoney(d.subtotal)}</span>
+                                </div>
+                                ${d.taxRate > 0 ? `
+                                        <div class="sum-line">
+                                            <span>Tax (${d.taxRate}%)</span>
+                                            <span>${formatMoney(d.tax)}</span>
+                                        </div>
+                                    ` : ''}
+                                ${d.discountRate > 0 ? `
+                                        <div class="sum-line">
+                                            <span>Discount (${d.discountRate}%)</span>
+                                            <span>-${formatMoney(d.discount)}</span>
+                                        </div>
+                                    ` : ''}
+                                <div class="sum-line total">
+                                    <span>Total</span>
+                                    <span>${formatMoney(d.total)}</span>
+                                </div>
+                            </div>
+
+                            ${d.notes ? `
+                                    <div class="inv-notes">
+                                        <strong>Notes</strong>
+                                        <p>${escapeHtml(d.notes)}</p>
+                                    </div>
+                                ` : ''}
+                        </div>
+                    `;
         }
 
         // ============================================================
-        //  PDF DOWNLOAD
+        //  PDF DOWNLOAD — no cut off
         // ============================================================
         function setupDownload() {
             downloadBtn.addEventListener('click', async () => {
@@ -1273,30 +1701,74 @@
                     return;
                 }
 
-                // Show a loading state
                 const originalText = downloadBtn.innerHTML;
                 downloadBtn.innerHTML = '⏳ Generating…';
                 downloadBtn.disabled = true;
 
                 try {
+                    // Use a clone to avoid affecting the displayed preview
+                    const clone = element.cloneNode(true);
+                    clone.style.padding = '40px 40px 36px';
+                    clone.style.backgroundColor = '#ffffff';
+                    clone.style.borderRadius = '0';
+                    clone.style.border = 'none';
+                    clone.style.margin = '0';
+                    clone.style.width = '100%';
+                    clone.style.maxWidth = '100%';
+
+                    // Ensure all images are loaded
+                    const imgs = clone.querySelectorAll('img');
+                    await Promise.all(Array.from(imgs).map(img => {
+                        return new Promise((resolve) => {
+                            if (img.complete) resolve();
+                            else {
+                                img.onload = resolve;
+                                img.onerror = resolve;
+                            }
+                        });
+                    }));
+
+                    const container = document.createElement('div');
+                    container.style.position = 'fixed';
+                    container.style.left = '-9999px';
+                    container.style.top = '0';
+                    container.style.width = '794px'; // A4 width in px at 72dpi
+                    container.style.backgroundColor = '#ffffff';
+                    container.style.padding = '0';
+                    container.style.margin = '0';
+                    container.style.boxSizing = 'border-box';
+                    container.appendChild(clone);
+                    document.body.appendChild(container);
+
+                    // Wait for layout
+                    await new Promise(r => requestAnimationFrame(r));
+                    await new Promise(r => setTimeout(r, 100));
+
                     const opt = {
-                        margin: [10, 10, 10, 10],
+                        margin: [12, 12, 12, 12],
                         filename: `invoice-${invNumber.value || 'draft'}.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: {
                             scale: 2,
-                            letterRendering: true,
                             useCORS: true,
                             logging: false,
+                            width: 794,
+                            height: clone.scrollHeight + 40,
+                            windowHeight: clone.scrollHeight + 40,
                         },
                         jsPDF: {
                             unit: 'mm',
                             format: 'a4',
                             orientation: 'portrait',
                         },
-                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                        pagebreak: { mode: ['avoid-all'] }
                     };
-                    await html2pdf().set(opt).from(element).save();
+
+                    await html2pdf().set(opt).from(clone).save();
+
+                    // Cleanup
+                    document.body.removeChild(container);
+
                 } catch (err) {
                     console.error(err);
                     alert('Could not generate PDF. Please try again.');
@@ -1320,14 +1792,11 @@
             tabs.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const tabId = btn.dataset.tab;
-                    // update active class
                     tabs.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    // show content
                     Object.keys(contents).forEach(key => {
                         contents[key].classList.toggle('active', key === tabId);
                     });
-                    // re-render preview if switching to preview tab
                     if (tabId === 'preview-tab') {
                         renderPreview();
                     }
@@ -1347,29 +1816,48 @@
             fields.forEach(field => {
                 field.addEventListener('input', () => {
                     renderPreview();
-                    if (field === notes) updateSummary();
+                    if (field === notes || field === taxRate || field === discountRate) {
+                        updateSummary();
+                    }
+                    debounceSave();
                 });
                 field.addEventListener('change', () => {
                     renderPreview();
+                    debounceSave();
                 });
             });
 
             taxRate.addEventListener('input', () => {
                 updateSummary();
                 renderPreview();
+                debounceSave();
             });
             discountRate.addEventListener('input', () => {
                 updateSummary();
                 renderPreview();
+                debounceSave();
             });
 
             addItemBtn.addEventListener('click', () => {
                 addItem('', 1, 0);
             });
 
+            // Logo upload
+            logoUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    handleLogoUpload(file);
+                }
+                logoUpload.value = '';
+            });
+
+            removeLogoBtn.addEventListener('click', removeLogo);
+
             // Also re-render on any change to date inputs
-            invDate.addEventListener('change', renderPreview);
-            invDueDate.addEventListener('change', renderPreview);
+            invDate.addEventListener('change', () => { renderPreview();
+                debounceSave(); });
+            invDueDate.addEventListener('change', () => { renderPreview();
+                debounceSave(); });
         }
 
         // ============================================================
@@ -1379,6 +1867,7 @@
             if (!confirm('Reset all invoice data?')) return;
             state.items = [];
             state.nextId = 1;
+            state.logoData = null;
             companyName.value = '';
             companyAddress.value = '';
             companyEmail.value = '';
@@ -1397,10 +1886,14 @@
             discountRate.value = 0;
             notes.value = '';
             addItem('', 1, 0);
+            updateLogoPreview();
             renderItems();
             updateSummary();
             renderPreview();
+            debounceSave();
         }
+        // expose reset to global
+        window.resetInvoice = resetInvoice;
 
         // ============================================================
         //  HELPERS
@@ -1423,8 +1916,43 @@
         }
 
         // ============================================================
-        //  START
+        //  INIT
         // ============================================================
+        function init() {
+            // Set default date
+            const today = new Date().toISOString().split('T')[0];
+            if (!invDate.value) invDate.value = today;
+            const due = new Date();
+            due.setDate(due.getDate() + 30);
+            if (!invDueDate.value) invDueDate.value = due.toISOString().split('T')[0];
+
+            // Try to load saved state
+            const loaded = loadState();
+
+            if (!loaded) {
+                // Default items
+                addItem('Web design service', 1, 450);
+                addItem('Consultation', 2, 120);
+                // Default company name
+                companyName.value = 'Studio Nine';
+                // Save initial state
+                debounceSave();
+            }
+
+            // Setup events
+            attachInputListeners();
+            setupTabs();
+            setupDownload();
+
+            // Initial render
+            renderPreview();
+
+            // Hide save indicator after a moment
+            setTimeout(() => {
+                saveIndicator.classList.remove('visible');
+            }, 1000);
+        }
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 
