@@ -2976,55 +2976,28 @@
                 downloadBtn.disabled = true;
 
                 try {
-                    const clone = element.cloneNode(true);
+                    // Switch to Preview tab to ensure the element is visible and laid out
+                    const previewTab = document.getElementById('preview-tab');
+                    const editTab = document.getElementById('edit-tab');
+                    const historyTab = document.getElementById('history-tab');
+                    const backupTab = document.getElementById('backup-tab');
+                    const tabBtns = document.querySelectorAll('.tab-btn');
 
-                    // Explicitly reset the clone's styles for consistent rendering
-                    clone.style.padding = '48px 48px 40px';
-                    clone.style.backgroundColor = '#ffffff';
-                    clone.style.borderRadius = '0';
-                    clone.style.border = 'none';
-                    clone.style.margin = '0';
-                    clone.style.width = '794px';
-                    clone.style.maxWidth = 'none';
-                    clone.style.boxSizing = 'border-box';
-                    clone.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-                    clone.style.color = '#1e293b';
-                    clone.style.fontSize = '14px';
-                    clone.style.lineHeight = '1.6';
+                    // Activate preview tab
+                    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'preview-tab'));
+                    previewTab.classList.add('active');
+                    editTab.classList.remove('active');
+                    historyTab.classList.remove('active');
+                    backupTab.classList.remove('active');
 
-                    // Wait for all images (logos) to load
-                    const imgs = clone.querySelectorAll('img');
-                    await Promise.all(Array.from(imgs).map(img => {
-                        return new Promise((resolve) => {
-                            if (img.complete && img.naturalWidth > 0) {
-                                resolve();
-                            } else {
-                                img.onload = resolve;
-                                img.onerror = resolve;
-                            }
-                        });
-                    }));
-
-                    // Create an invisible container that stays in the layout
-                    const container = document.createElement('div');
-                    container.style.position = 'fixed';
-                    container.style.left = '0';
-                    container.style.top = '0';
-                    container.style.width = '794px';
-                    container.style.opacity = '0';
-                    container.style.pointerEvents = 'none';
-                    container.style.zIndex = '-1';
-                    container.appendChild(clone);
-                    document.body.appendChild(container);
-
-                    // Give the browser a moment to compute the layout
+                    // Wait for layout to settle
                     await new Promise(r => requestAnimationFrame(r));
                     await new Promise(r => setTimeout(r, 150));
 
-                    // Measure the true height using multiple methods
-                    const rect = clone.getBoundingClientRect();
-                    const height = Math.max(rect.height, clone.offsetHeight, clone.scrollHeight) + 30;
-                    const width = 794;
+                    // Measure the real dimensions
+                    const rect = element.getBoundingClientRect();
+                    const width = Math.max(rect.width, element.offsetWidth, 794);
+                    const height = Math.max(rect.height, element.offsetHeight, element.scrollHeight) + 30;
 
                     const opt = {
                         margin: [0, 0, 0, 0],
@@ -3047,18 +3020,16 @@
                             orientation: 'portrait',
                             compress: true,
                         },
-                        // Allow breaking if the content is unexpectedly taller than the calculated height
                         pagebreak: { mode: ['css', 'legacy'] }
                     };
 
-                    await html2pdf().set(opt).from(clone).save();
-                    document.body.removeChild(container);
+                    await html2pdf().set(opt).from(element).save();
                     showToast('PDF downloaded ✓', 'success');
-
                 } catch (err) {
                     console.error(err);
                     showToast('Could not generate PDF. Please try again.', 'error');
                 } finally {
+                    // Restore button state
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
                 }
