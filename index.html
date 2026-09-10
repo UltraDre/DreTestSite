@@ -689,6 +689,46 @@
             font-size: 16px;
         }
 
+        /* ── PAID toggle button ───────────────────────────── */
+        .btn-paid-toggle {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1.5px solid #a7f3d0;
+            padding: 9px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            touch-action: manipulation;
+        }
+
+        .btn-paid-toggle:hover {
+            background: #d1fae5;
+            border-color: #6ee7b7;
+            transform: translateY(-1px);
+        }
+
+        .btn-paid-toggle.active {
+            background: #059669;
+            color: #ffffff;
+            border-color: #059669;
+        }
+
+        .btn-paid-toggle.active:hover {
+            background: #047857;
+            border-color: #047857;
+            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.25);
+        }
+
+        .btn-paid-toggle .fa-icon {
+            font-size: 16px;
+        }
+
         .invoice-preview {
             background: #ffffff;
             border-radius: 16px;
@@ -697,6 +737,11 @@
             font-size: 14px;
             line-height: 1.6;
             color: #1e293b;
+        }
+
+        .invoice-preview.receipt {
+            border-color: #a7f3d0;
+            box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.08);
         }
 
         .invoice-preview .inv-header {
@@ -728,6 +773,14 @@
             outline: none;
         }
 
+        .invoice-preview .inv-row-top .inv-title-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
         .invoice-preview .inv-row-top .inv-title {
             font-size: 44px;
             font-weight: 300;
@@ -737,6 +790,32 @@
             text-transform: uppercase;
             opacity: 0.75;
             flex-shrink: 0;
+        }
+
+        .invoice-preview.receipt .inv-row-top .inv-title {
+            color: #059669;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .invoice-preview .paid-stamp {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 16px;
+            border-radius: 100px;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1.5px solid #a7f3d0;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+
+        .invoice-preview .paid-stamp .fa-icon {
+            font-size: 12px;
         }
 
         .invoice-preview .inv-row-bottom {
@@ -895,6 +974,11 @@
             margin-top: 4px;
         }
 
+        .invoice-preview.receipt .inv-summary .sum-line.balance {
+            border-top-color: #059669;
+            color: #065f46;
+        }
+
         .invoice-preview .inv-summary .sum-line.paid {
             color: #475569;
         }
@@ -913,6 +997,24 @@
 
         .invoice-preview .inv-notes p {
             margin: 4px 0 0 0;
+        }
+
+        .invoice-preview .receipt-thanks {
+            margin-top: 24px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .invoice-preview .receipt-thanks .fa-icon {
+            font-size: 18px;
         }
 
         .empty-state {
@@ -974,6 +1076,21 @@
         .history-item .info .meta {
             font-size: 13px;
             color: #94a3b8;
+        }
+
+        .history-item .paid-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            padding: 1px 8px;
+            border-radius: 100px;
+            text-transform: uppercase;
         }
 
         .history-item .actions {
@@ -1331,7 +1448,8 @@
             }
 
             .preview-toolbar .btn-primary,
-            .preview-toolbar .btn-secondary {
+            .preview-toolbar .btn-secondary,
+            .preview-toolbar .btn-paid-toggle {
                 flex: 1;
                 justify-content: center;
             }
@@ -1455,7 +1573,8 @@
             .header-actions,
             .tab-btn,
             .btn-primary,
-            .btn-secondary {
+            .btn-secondary,
+            .btn-paid-toggle {
                 display: none !important;
             }
             .tab-content {
@@ -1902,6 +2021,11 @@
                             <span class="label">Balance due</span>
                             <span class="value" id="editBalance">₦0.00</span>
                         </div>
+                        <div style="width:100%;display:flex;justify-content:flex-end;margin-top:10px;">
+                            <button class="btn-paid-toggle" id="paidToggleBtnEdit" type="button">
+                                <i class="fas fa-check-circle fa-icon"></i> Mark as paid
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1920,6 +2044,9 @@
         <div class="tab-content" id="preview-tab" role="tabpanel">
 
             <div class="preview-toolbar">
+                <button class="btn-paid-toggle" id="paidToggleBtnPreview" type="button">
+                    <i class="fas fa-check-circle fa-icon"></i> Mark as paid
+                </button>
                 <button class="btn-secondary" onclick="window.print()">
                     <i class="fas fa-print fa-icon"></i> Print
                 </button>
@@ -2074,6 +2201,9 @@
             logoScale: 100,
             invoiceName: '',
             balanceBoxColor: '#000000',
+            isPaid: false,
+            paidDate: null,
+            prevAmountPaid: null,
         };
 
         const $ = (id) => document.getElementById(id);
@@ -2177,6 +2307,26 @@
             });
         }
 
+        function todayISO() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function computeTotals() {
+            const subtotal = state.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
+            const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
+            const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
+            const total = subtotal + taxVal - discountVal;
+            const paid = parseFloat(amountPaid.value) || 0;
+            return {
+                subtotal,
+                taxVal,
+                discountVal,
+                total,
+                paid,
+                balance: total - paid,
+            };
+        }
+
         // ─── localStorage ──────────────────────────────────────
 
         function saveState() {
@@ -2203,6 +2353,9 @@
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
                 balanceBoxColor: balanceBoxColorInput.value || '#000000',
+                isPaid: state.isPaid,
+                paidDate: state.paidDate,
+                prevAmountPaid: state.prevAmountPaid,
             };
             try {
                 localStorage.setItem('invoiceState', JSON.stringify(data));
@@ -2253,6 +2406,9 @@
                 state.logoAspect = data.logoAspect || 'original';
                 state.logoScale = data.logoScale || 100;
                 state.balanceBoxColor = data.balanceBoxColor || '#000000';
+                state.isPaid = !!data.isPaid;
+                state.paidDate = data.paidDate || null;
+                state.prevAmountPaid = (data.prevAmountPaid === undefined) ? null : data.prevAmountPaid;
 
                 logoAspect.value = state.logoAspect;
                 logoScale.value = state.logoScale;
@@ -2262,6 +2418,7 @@
                 updateLogoPreview();
                 renderItems();
                 updateSummary();
+                updatePaidButton();
                 renderPreview();
                 return true;
             } catch (e) {
@@ -2340,6 +2497,9 @@
                 logoAspect: logoAspect.value,
                 logoScale: parseInt(logoScale.value, 10),
                 balanceBoxColor: balanceBoxColorInput.value || '#000000',
+                isPaid: state.isPaid,
+                paidDate: state.paidDate,
+                prevAmountPaid: state.prevAmountPaid,
             };
 
             history.unshift({
@@ -2387,6 +2547,9 @@
             state.logoAspect = d.logoAspect || 'original';
             state.logoScale = d.logoScale || 100;
             state.balanceBoxColor = d.balanceBoxColor || '#000000';
+            state.isPaid = !!d.isPaid;
+            state.paidDate = d.paidDate || null;
+            state.prevAmountPaid = (d.prevAmountPaid === undefined) ? null : d.prevAmountPaid;
 
             logoAspect.value = state.logoAspect;
             logoScale.value = state.logoScale;
@@ -2396,6 +2559,7 @@
             updateLogoPreview();
             renderItems();
             updateSummary();
+            updatePaidButton();
             renderPreview();
             debounceSave();
 
@@ -2437,6 +2601,9 @@
                 logoAspect: d.logoAspect || 'original',
                 logoScale: d.logoScale || 100,
                 balanceBoxColor: d.balanceBoxColor || '#000000',
+                isPaid: !!d.isPaid,
+                paidDate: d.paidDate || null,
+                prevAmountPaid: (d.prevAmountPaid === undefined) ? null : d.prevAmountPaid,
             };
 
             history.unshift({
@@ -2533,10 +2700,12 @@
                     hour: '2-digit',
                     minute: '2-digit'
                 });
+                const paidChip = entry.data && entry.data.isPaid ?
+                    '<span class="paid-chip"><i class="fas fa-check-circle fa-icon"></i> Paid</span>' : '';
                 html += `
                             <div class="history-item" data-id="${entry.id}">
                                 <div class="info">
-                                    <span class="name">${escapeHtml(entry.name)}</span>
+                                    <span class="name">${escapeHtml(entry.name)} ${paidChip}</span>
                                     <span class="meta">${dateStr}</span>
                                 </div>
                                 <div class="actions">
@@ -2726,19 +2895,76 @@
         }
 
         function updateSummary() {
-            const subtotal = state.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-            const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
-            const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
-            const total = subtotal + taxVal - discountVal;
-            const paid = parseFloat(amountPaid.value) || 0;
-            const balance = total - paid;
+            const t = computeTotals();
 
-            editSubtotal.textContent = formatMoney(subtotal);
-            editTax.textContent = formatMoney(taxVal);
-            editDiscount.textContent = formatMoney(discountVal);
-            editTotal.textContent = formatMoney(total);
-            editAmountPaid.textContent = formatMoney(paid);
-            editBalance.textContent = formatMoney(balance);
+            editSubtotal.textContent = formatMoney(t.subtotal);
+            editTax.textContent = formatMoney(t.taxVal);
+            editDiscount.textContent = formatMoney(t.discountVal);
+            editTotal.textContent = formatMoney(t.total);
+            editAmountPaid.textContent = formatMoney(t.paid);
+            editBalance.textContent = formatMoney(t.balance);
+        }
+
+        // ─── paid / receipt toggle ────────────────────────────
+
+        function updatePaidButton() {
+            const buttons = document.querySelectorAll('.btn-paid-toggle');
+            buttons.forEach(btn => {
+                if (state.isPaid) {
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fas fa-undo fa-icon"></i> Undo payment';
+                    btn.title = 'Undo payment and go back to invoice view';
+                } else {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '<i class="fas fa-check-circle fa-icon"></i> Mark as paid';
+                    btn.title = 'Mark this invoice as paid and switch to receipt view';
+                }
+            });
+        }
+
+        function togglePaid() {
+            if (!state.isPaid) {
+                // Mark as paid → switch preview to receipt
+                const t = computeTotals();
+                state.prevAmountPaid = amountPaid.value;
+                if (t.paid < t.total) {
+                    amountPaid.value = t.total.toFixed(2);
+                }
+                state.isPaid = true;
+                state.paidDate = todayISO();
+
+                updateSummary();
+                updatePaidButton();
+                renderPreview();
+                debounceSave();
+
+                showToast('Marked as paid — receipt ready ✓', 'success');
+                if (currentTabId() !== 'preview-tab') {
+                    switchTab('preview-tab');
+                }
+            } else {
+                // Undo payment → back to invoice
+                state.isPaid = false;
+                if (state.prevAmountPaid !== null && state.prevAmountPaid !== undefined && state.prevAmountPaid !== '') {
+                    amountPaid.value = state.prevAmountPaid;
+                } else {
+                    amountPaid.value = 0;
+                }
+                state.paidDate = null;
+                state.prevAmountPaid = null;
+
+                updateSummary();
+                updatePaidButton();
+                renderPreview();
+                debounceSave();
+
+                showToast('Payment undone — back to invoice.', 'info');
+            }
+        }
+
+        function currentTabId() {
+            const active = document.querySelector('.tab-btn.active');
+            return active ? active.dataset.tab : 'edit-tab';
         }
 
         // ─── preview ──────────────────────────────────────────
@@ -2750,12 +2976,7 @@
         }
 
         function collectData() {
-            const subtotal = state.items.reduce((sum, item) => sum + (item.qty * item.rate), 0);
-            const taxVal = (subtotal * (parseFloat(taxRate.value) || 0)) / 100;
-            const discountVal = (subtotal * (parseFloat(discountRate.value) || 0)) / 100;
-            const total = subtotal + taxVal - discountVal;
-            const paid = parseFloat(amountPaid.value) || 0;
-            const balance = total - paid;
+            const t = computeTotals();
 
             return {
                 company: {
@@ -2782,23 +3003,26 @@
                     rate: item.rate || 0,
                     amount: (item.qty || 0) * (item.rate || 0),
                 })),
-                subtotal: subtotal,
-                tax: taxVal,
+                subtotal: t.subtotal,
+                tax: t.taxVal,
                 taxRate: parseFloat(taxRate.value) || 0,
-                discount: discountVal,
+                discount: t.discountVal,
                 discountRate: parseFloat(discountRate.value) || 0,
-                total: total,
-                amountPaid: paid,
-                balance: balance,
+                total: t.total,
+                amountPaid: t.paid,
+                balance: t.balance,
                 notes: notes.value || '',
                 logo: state.logoData,
                 logoAspect: state.logoAspect,
                 logoScale: state.logoScale,
                 balanceBoxColor: state.balanceBoxColor || '#000000',
+                isPaid: state.isPaid,
+                paidDate: state.paidDate ? formatDate(state.paidDate) : '',
             };
         }
 
         function buildInvoiceHtml(d) {
+            const isReceipt = !!d.isPaid;
             const hasLogo = d.logo && d.logo.length > 0;
             const scale = d.logoScale / 100;
             const baseSize = 70;
@@ -2833,6 +3057,7 @@
 
             const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
 
+            // ── summary lines ──
             let summaryLines = `
                             <div class="sum-line">
                                 <span>Subtotal</span>
@@ -2861,30 +3086,51 @@
                                 <span>${formatMoney(d.total)}</span>
                             </div>
                         `;
-            if (d.amountPaid > 0) {
+
+            if (isReceipt) {
                 summaryLines += `
+                            <div class="sum-line paid">
+                                <span>Amount paid</span>
+                                <span>${formatMoney(d.total)}</span>
+                            </div>
+                            <div class="sum-line balance">
+                                <span>Balance due</span>
+                                <span>${formatMoney(0)}</span>
+                            </div>
+                        `;
+            } else {
+                if (d.amountPaid > 0) {
+                    summaryLines += `
                             <div class="sum-line paid">
                                 <span>Amount paid</span>
                                 <span>${formatMoney(d.amountPaid)}</span>
                             </div>
                         `;
-            }
-            summaryLines += `
+                }
+                summaryLines += `
                             <div class="sum-line balance">
                                 <span>Balance due</span>
                                 <span>${formatMoney(d.balance)}</span>
                             </div>
                         `;
+            }
 
             const boxColor = d.balanceBoxColor || '#000000';
             const boxTextColor = getContrastColor(boxColor);
+            const boxLabel = isReceipt ? 'PAID IN FULL' : 'BALANCE DUE';
+            const boxAmount = isReceipt ? formatMoney(d.total) : formatMoney(d.balance);
+
+            const docTitle = isReceipt ? 'RECEIPT' : 'INVOICE';
 
             const topRow = `
                         <div class="inv-row-top">
                             <div class="inv-logo-area">
                                 ${logoHtml}
                             </div>
-                            <div class="inv-title">INVOICE</div>
+                            <div class="inv-title-wrap">
+                                <div class="inv-title">${docTitle}</div>
+                                ${isReceipt ? '<div class="paid-stamp"><i class="fas fa-check-circle fa-icon"></i> Paid</div>' : ''}
+                            </div>
                         </div>
                     `;
 
@@ -2898,8 +3144,8 @@
                                 ${!d.company.name && !d.company.address && !d.company.email && !d.company.phone ? '<div class="sub" style="color:#94a3b8;">—</div>' : ''}
                             </div>
                             <div class="balance-box" style="background-color: ${boxColor}; color: ${boxTextColor};">
-                                <div class="balance-label">BALANCE DUE</div>
-                                <div class="balance-amount">${formatMoney(d.balance)}</div>
+                                <div class="balance-label">${boxLabel}</div>
+                                <div class="balance-amount">${boxAmount}</div>
                             </div>
                         </div>
                     `;
@@ -2911,8 +3157,20 @@
                         </div>
                     `;
 
+            const detailsTitle = isReceipt ? 'Receipt details' : 'Invoice details';
+            const detailsBlock = `
+                                    <div class="party" style="text-align:right;">
+                                        <h4>${detailsTitle}</h4>
+                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
+                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
+                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
+                                        ${isReceipt && d.paidDate ? `<p><strong>Paid</strong> ${d.paidDate}</p>` : ''}
+                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate && !(isReceipt && d.paidDate) ? '<p style="color:#94a3b8;">—</p>' : ''}
+                                    </div>
+                                `;
+
             return `
-                            <div class="invoice-preview" id="invoiceToPdf">
+                            <div class="invoice-preview${isReceipt ? ' receipt' : ''}" id="invoiceToPdf">
                                 ${invHeader}
 
                                 <div class="inv-parties">
@@ -2924,13 +3182,7 @@
                                         ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
                                         ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
                                     </div>
-                                    <div class="party" style="text-align:right;">
-                                        <h4>Invoice details</h4>
-                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
-                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
-                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
-                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                    </div>
+                                    ${detailsBlock}
                                 </div>
 
                                 <table class="inv-items">
@@ -2950,6 +3202,13 @@
                                 <div class="inv-summary">
                                     ${summaryLines}
                                 </div>
+
+                                ${isReceipt ? `
+                                        <div class="receipt-thanks">
+                                            <i class="fas fa-check-circle fa-icon"></i>
+                                            <span>Payment received with thanks. This receipt confirms that the balance above has been settled in full.</span>
+                                        </div>
+                                    ` : ''}
 
                                 ${d.notes ? `
                                         <div class="inv-notes">
@@ -2976,32 +3235,62 @@
                 downloadBtn.disabled = true;
 
                 try {
-                    // Switch to Preview tab to ensure the element is visible and laid out
-                    const previewTab = document.getElementById('preview-tab');
-                    const editTab = document.getElementById('edit-tab');
-                    const historyTab = document.getElementById('history-tab');
-                    const backupTab = document.getElementById('backup-tab');
-                    const tabBtns = document.querySelectorAll('.tab-btn');
+                    const clone = element.cloneNode(true);
+                    clone.style.padding = '48px 48px 40px';
+                    clone.style.backgroundColor = '#ffffff';
+                    clone.style.borderRadius = '0';
+                    clone.style.border = 'none';
+                    clone.style.boxShadow = 'none';
+                    clone.style.margin = '0';
+                    clone.style.width = '100%';
+                    clone.style.maxWidth = '100%';
+                    clone.style.boxSizing = 'border-box';
+                    clone.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+                    clone.style.color = '#1e293b';
+                    clone.style.fontSize = '14px';
+                    clone.style.lineHeight = '1.6';
 
-                    // Activate preview tab
-                    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'preview-tab'));
-                    previewTab.classList.add('active');
-                    editTab.classList.remove('active');
-                    historyTab.classList.remove('active');
-                    backupTab.classList.remove('active');
+                    const imgs = clone.querySelectorAll('img');
+                    await Promise.all(Array.from(imgs).map(img => {
+                        return new Promise((resolve) => {
+                            if (img.complete && img.naturalWidth > 0) resolve();
+                            else {
+                                img.onload = resolve;
+                                img.onerror = resolve;
+                            }
+                            if (img.src && !img.complete) {
+                                // already loading
+                            } else if (img.src) {
+                                resolve();
+                            } else {
+                                resolve();
+                            }
+                        });
+                    }));
 
-                    // Wait for layout to settle
+                    const container = document.createElement('div');
+                    container.style.position = 'fixed';
+                    container.style.left = '-9999px';
+                    container.style.top = '0';
+                    container.style.width = '794px';
+                    container.style.backgroundColor = '#ffffff';
+                    container.style.padding = '0';
+                    container.style.margin = '0';
+                    container.style.boxSizing = 'border-box';
+                    container.appendChild(clone);
+                    document.body.appendChild(container);
+
                     await new Promise(r => requestAnimationFrame(r));
                     await new Promise(r => setTimeout(r, 150));
 
-                    // Measure the real dimensions
-                    const rect = element.getBoundingClientRect();
-                    const width = Math.max(rect.width, element.offsetWidth, 794);
-                    const height = Math.max(rect.height, element.offsetHeight, element.scrollHeight) + 30;
+                    const height = Math.max(clone.scrollHeight + 30, 400);
+                    const width = 794;
+
+                    const filePrefix = state.isPaid ? 'receipt' : 'invoice';
 
                     const opt = {
                         margin: [0, 0, 0, 0],
-                        filename: `invoice-${invNumber.value || 'draft'}.pdf`,
+                        filename: `${filePrefix}-${invNumber.value || 'draft'}.pdf`,
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: {
                             scale: 2,
@@ -3020,16 +3309,17 @@
                             orientation: 'portrait',
                             compress: true,
                         },
-                        pagebreak: { mode: ['css', 'legacy'] }
+                        pagebreak: { mode: 'avoid-all' }
                     };
 
-                    await html2pdf().set(opt).from(element).save();
-                    showToast('PDF downloaded ✓', 'success');
+                    await html2pdf().set(opt).from(clone).save();
+                    document.body.removeChild(container);
+                    showToast(state.isPaid ? 'Receipt PDF downloaded ✓' : 'PDF downloaded ✓', 'success');
+
                 } catch (err) {
                     console.error(err);
                     showToast('Could not generate PDF. Please try again.', 'error');
                 } finally {
-                    // Restore button state
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;
                 }
@@ -3092,6 +3382,10 @@
             state.logoAspect = 'original';
             state.logoScale = 100;
             state.balanceBoxColor = '#000000';
+            state.isPaid = false;
+            state.paidDate = null;
+            state.prevAmountPaid = null;
+
             logoAspect.value = 'original';
             logoScale.value = 100;
             logoScaleLabel.textContent = '100%';
@@ -3121,6 +3415,7 @@
             updateLogoPreview();
             renderItems();
             updateSummary();
+            updatePaidButton();
             renderPreview();
             if (!silent) debounceSave();
         }
@@ -3556,6 +3851,11 @@
 
             $('plusBtn').addEventListener('click', handlePlus);
 
+            // ── PAID toggle buttons ──
+            document.querySelectorAll('.btn-paid-toggle').forEach(btn => {
+                btn.addEventListener('click', togglePaid);
+            });
+
             $('downloadBackupBtn').addEventListener('click', downloadBackup);
             $('restoreBackupInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
@@ -3586,6 +3886,7 @@
             setupTabs();
             setupDownload();
             setupCloudModal();
+            updatePaidButton();
             renderHistory();
             renderPreview();
 
@@ -3611,6 +3912,7 @@
         window.startRename = startRename;
         window.renameHistory = renameHistory;
         window.resetInvoice = resetInvoice;
+        window.togglePaid = togglePaid;
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
