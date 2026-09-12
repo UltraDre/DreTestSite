@@ -737,6 +737,10 @@
             font-size: 14px;
             line-height: 1.6;
             color: #1e293b;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .invoice-preview.receipt {
@@ -2168,8 +2172,8 @@
         // ═══════════════════════════════════════════════════════
         //  SUPABASE CONFIGURATION — EDIT THESE VALUES
         // ═══════════════════════════════════════════════════════
-        const SUPABASE_URL = 'https://hbvpnslzoulogjivoipv.supabase.co'; // <-- REPLACE with your Supabase URL
-        const SUPABASE_ANON_KEY = 'sb_publishable_UTf_89tttlvxQ0N4JAqQaw_iXl7ocpm'; // <-- REPLACE with your Supabase anon key
+        const SUPABASE_URL = 'https://hbvpnslzoulogjivoipv.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_UTf_89tttlvxQ0N4JAqQaw_iXl7ocpm';
         // ═══════════════════════════════════════════════════════
 
         // ─── Supabase client ───────────────────────────────────
@@ -2852,530 +2856,414 @@
                     debounceSave();
                 });
             });
-
             itemsBody.querySelectorAll('.item-qty').forEach((el, i) => {
                 el.addEventListener('input', () => {
                     const val = parseFloat(el.value) || 0;
                     state.items[i].qty = val;
-                    updateRowAmount(i);
+                    const row = el.closest('tr');
+                    if (row) {
+                        const amountSpan = row.querySelector('.amount-display');
+                        if (amountSpan) {
+                            amountSpan.textContent = formatMoney(val * state.items[i].rate);
+                        }
+                    }
                     updateSummary();
                     renderPreview();
                     debounceSave();
                 });
             });
-
             itemsBody.querySelectorAll('.item-rate').forEach((el, i) => {
                 el.addEventListener('input', () => {
                     const val = parseFloat(el.value) || 0;
                     state.items[i].rate = val;
-                    updateRowAmount(i);
+                    const row = el.closest('tr');
+                    if (row) {
+                        const amountSpan = row.querySelector('.amount-display');
+                        if (amountSpan) {
+                            amountSpan.textContent = formatMoney(val * state.items[i].qty);
+                        }
+                    }
                     updateSummary();
                     renderPreview();
                     debounceSave();
                 });
             });
-
-            itemsBody.querySelectorAll('.btn-remove-item').forEach(btn => {
+            itemsBody.querySelectorAll('.btn-remove-item').forEach((btn) => {
                 btn.addEventListener('click', () => {
-                    const id = parseInt(btn.dataset.id);
+                    const id = parseInt(btn.getAttribute('data-id'), 10);
                     removeItem(id);
                 });
             });
         }
 
-        function updateRowAmount(index) {
-            const item = state.items[index];
-            if (!item) return;
-            const row = itemsBody.querySelector(`tr[data-id="${item.id}"]`);
-            if (!row) return;
-            const display = row.querySelector('.amount-display');
-            if (display) {
-                display.textContent = formatMoney(item.qty * item.rate);
-            }
-        }
-
         function updateSummary() {
-            const t = computeTotals();
-
-            editSubtotal.textContent = formatMoney(t.subtotal);
-            editTax.textContent = formatMoney(t.taxVal);
-            editDiscount.textContent = formatMoney(t.discountVal);
-            editTotal.textContent = formatMoney(t.total);
-            editAmountPaid.textContent = formatMoney(t.paid);
-            editBalance.textContent = formatMoney(t.balance);
+            const totals = computeTotals();
+            editSubtotal.textContent = formatMoney(totals.subtotal);
+            editTax.textContent = formatMoney(totals.taxVal);
+            editDiscount.textContent = formatMoney(totals.discountVal);
+            editTotal.textContent = formatMoney(totals.total);
+            editAmountPaid.textContent = formatMoney(totals.paid);
+            editBalance.textContent = formatMoney(totals.balance);
         }
 
-        // ─── paid / receipt toggle ────────────────────────────
+        // ─── paid toggle ──────────────────────────────────────
+
+        function togglePaid() {
+            const totals = computeTotals();
+            if (!state.isPaid) {
+                state.prevAmountPaid = totals.paid;
+                amountPaid.value = totals.total.toFixed(2);
+                state.isPaid = true;
+                state.paidDate = todayISO();
+                showToast('Marked as PAID ✓', 'success');
+            } else {
+                if (state.prevAmountPaid !== null && state.prevAmountPaid !== undefined) {
+                    amountPaid.value = state.prevAmountPaid.toFixed(2);
+                } else {
+                    amountPaid.value = '0.00';
+                }
+                state.isPaid = false;
+                state.paidDate = null;
+                showToast('Marked as Unpaid.', 'info');
+            }
+            updateSummary();
+            updatePaidButton();
+            renderPreview();
+            debounceSave();
+        }
 
         function updatePaidButton() {
-            const buttons = document.querySelectorAll('.btn-paid-toggle');
-            buttons.forEach(btn => {
+            const btns = [$('paidToggleBtnEdit'), $('paidToggleBtnPreview')];
+            btns.forEach(btn => {
+                if (!btn) return;
                 if (state.isPaid) {
                     btn.classList.add('active');
-                    btn.innerHTML = '<i class="fas fa-undo fa-icon"></i> Undo payment';
-                    btn.title = 'Undo payment and go back to invoice view';
+                    btn.innerHTML = '<i class="fas fa-check-circle fa-icon"></i> Paid ✓';
                 } else {
                     btn.classList.remove('active');
                     btn.innerHTML = '<i class="fas fa-check-circle fa-icon"></i> Mark as paid';
-                    btn.title = 'Mark this invoice as paid and switch to receipt view';
                 }
             });
         }
 
-        function togglePaid() {
-            if (!state.isPaid) {
-                // Mark as paid → switch preview to receipt
-                const t = computeTotals();
-                state.prevAmountPaid = amountPaid.value;
-                if (t.paid < t.total) {
-                    amountPaid.value = t.total.toFixed(2);
+        // ─── collect data ─────────────────────────────────────
+
+        function collectData() {
+            const totals = computeTotals();
+            return {
+                invoice: {
+                    name: invoiceNameInput.value.trim(),
+                    number: invNumber.value.trim(),
+                    date: invDate.value,
+                    dueDate: invDueDate.value,
+                    notes: notes.value.trim(),
+                    isPaid: state.isPaid,
+                    paidDate: state.paidDate,
+                },
+                company: {
+                    name: companyName.value.trim(),
+                    address: companyAddress.value.trim(),
+                    email: companyEmail.value.trim(),
+                    phone: companyPhone.value.trim(),
+                },
+                client: {
+                    name: clientName.value.trim(),
+                    address: clientAddress.value.trim(),
+                    email: clientEmail.value.trim(),
+                    phone: clientPhone.value.trim(),
+                },
+                items: state.items,
+                totals: totals,
+                logo: {
+                    data: state.logoData,
+                    aspect: logoAspect.value,
+                    scale: parseInt(logoScale.value, 10),
+                },
+                styling: {
+                    balanceBoxColor: balanceBoxColorInput.value || '#000000',
                 }
-                state.isPaid = true;
-                state.paidDate = todayISO();
-
-                updateSummary();
-                updatePaidButton();
-                renderPreview();
-                debounceSave();
-
-                showToast('Marked as paid — receipt ready ✓', 'success');
-                if (currentTabId() !== 'preview-tab') {
-                    switchTab('preview-tab');
-                }
-            } else {
-                // Undo payment → back to invoice
-                state.isPaid = false;
-                if (state.prevAmountPaid !== null && state.prevAmountPaid !== undefined && state.prevAmountPaid !== '') {
-                    amountPaid.value = state.prevAmountPaid;
-                } else {
-                    amountPaid.value = 0;
-                }
-                state.paidDate = null;
-                state.prevAmountPaid = null;
-
-                updateSummary();
-                updatePaidButton();
-                renderPreview();
-                debounceSave();
-
-                showToast('Payment undone — back to invoice.', 'info');
-            }
+            };
         }
 
-        function currentTabId() {
-            const active = document.querySelector('.tab-btn.active');
-            return active ? active.dataset.tab : 'edit-tab';
-        }
-
-        // ─── preview ──────────────────────────────────────────
+        // ─── render preview ───────────────────────────────────
 
         function renderPreview() {
             const data = collectData();
-            const html = buildInvoiceHtml(data);
-            previewContainer.innerHTML = html;
-        }
-
-        function collectData() {
-            const t = computeTotals();
-
-            return {
-                company: {
-                    name: companyName.value || '',
-                    address: companyAddress.value || '',
-                    email: companyEmail.value || '',
-                    phone: companyPhone.value || '',
-                },
-                client: {
-                    name: clientName.value || '',
-                    address: clientAddress.value || '',
-                    email: clientEmail.value || '',
-                    phone: clientPhone.value || '',
-                },
-                invoice: {
-                    name: invoiceNameInput.value || '',
-                    number: invNumber.value || '',
-                    date: invDate.value ? formatDate(invDate.value) : '',
-                    dueDate: invDueDate.value ? formatDate(invDueDate.value) : '',
-                },
-                items: state.items.map(item => ({
-                    description: item.description || '—',
-                    qty: item.qty || 0,
-                    rate: item.rate || 0,
-                    amount: (item.qty || 0) * (item.rate || 0),
-                })),
-                subtotal: t.subtotal,
-                tax: t.taxVal,
-                taxRate: parseFloat(taxRate.value) || 0,
-                discount: t.discountVal,
-                discountRate: parseFloat(discountRate.value) || 0,
-                total: t.total,
-                amountPaid: t.paid,
-                balance: t.balance,
-                notes: notes.value || '',
-                logo: state.logoData,
-                logoAspect: state.logoAspect,
-                logoScale: state.logoScale,
-                balanceBoxColor: state.balanceBoxColor || '#000000',
-                isPaid: state.isPaid,
-                paidDate: state.paidDate ? formatDate(state.paidDate) : '',
-            };
-        }
-
-        function buildInvoiceHtml(d) {
-            const isReceipt = !!d.isPaid;
-            const hasLogo = d.logo && d.logo.length > 0;
-            const scale = d.logoScale / 100;
-            const baseSize = 70;
-            const size = baseSize * scale;
-
-            let logoStyle = '';
-            if (hasLogo) {
-                const bgProps = `background-image: url('${d.logo}'); background-size: contain; background-repeat: no-repeat; background-position: center;`;
-
-                if (d.logoAspect === 'circle') {
-                    logoStyle =
-                        `width: ${size}px; height: ${size}px; border-radius: 50%; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
-                } else if (d.logoAspect === 'square') {
-                    logoStyle =
-                        `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
-                } else {
-                    logoStyle =
-                        `width: ${size}px; height: ${size}px; display: block; flex-shrink: 0; border: none; outline: none; background-color: transparent; ${bgProps}`;
-                }
-            }
-
-            const logoHtml = hasLogo ? `<div class="logo-wrap" style="${logoStyle}"></div>` : '';
-
-            const itemsRows = d.items.map(item => `
-                            <tr>
-                                <td>${escapeHtml(item.description)}</td>
-                                <td style="text-align:left;">${item.qty}</td>
-                                <td style="text-align:left;">${formatMoney(item.rate)}</td>
-                                <td>${formatMoney(item.amount)}</td>
-                            </tr>
-                        `).join('');
-
-            const companyNameHtml = d.company.name ? `<h2>${escapeHtml(d.company.name)}</h2>` : '';
-
-            // ── summary lines ──
-            let summaryLines = `
-                            <div class="sum-line">
-                                <span>Subtotal</span>
-                                <span>${formatMoney(d.subtotal)}</span>
-                            </div>
-                        `;
-            if (d.taxRate > 0) {
-                summaryLines += `
-                            <div class="sum-line">
-                                <span>Tax (${d.taxRate}%)</span>
-                                <span>${formatMoney(d.tax)}</span>
-                            </div>
-                        `;
-            }
-            if (d.discountRate > 0) {
-                summaryLines += `
-                            <div class="sum-line">
-                                <span>Discount (${d.discountRate}%)</span>
-                                <span>-${formatMoney(d.discount)}</span>
-                            </div>
-                        `;
-            }
-            summaryLines += `
-                            <div class="sum-line total">
-                                <span>Total</span>
-                                <span>${formatMoney(d.total)}</span>
-                            </div>
-                        `;
-
-            if (isReceipt) {
-                summaryLines += `
-                            <div class="sum-line paid">
-                                <span>Amount paid</span>
-                                <span>${formatMoney(d.total)}</span>
-                            </div>
-                            <div class="sum-line balance">
-                                <span>Balance due</span>
-                                <span>${formatMoney(0)}</span>
-                            </div>
-                        `;
-            } else {
-                if (d.amountPaid > 0) {
-                    summaryLines += `
-                            <div class="sum-line paid">
-                                <span>Amount paid</span>
-                                <span>${formatMoney(d.amountPaid)}</span>
-                            </div>
-                        `;
-                }
-                summaryLines += `
-                            <div class="sum-line balance">
-                                <span>Balance due</span>
-                                <span>${formatMoney(d.balance)}</span>
-                            </div>
-                        `;
-            }
-
-            const boxColor = d.balanceBoxColor || '#000000';
-            const boxTextColor = getContrastColor(boxColor);
-            const boxLabel = isReceipt ? 'PAID IN FULL' : 'BALANCE DUE';
-            const boxAmount = isReceipt ? formatMoney(d.total) : formatMoney(d.balance);
-
+            const isReceipt = data.invoice.isPaid;
             const docTitle = isReceipt ? 'RECEIPT' : 'INVOICE';
 
-            const topRow = `
-                        <div class="inv-row-top">
-                            <div class="inv-logo-area">
-                                ${logoHtml}
-                            </div>
-                            <div class="inv-title-wrap">
-                                <div class="inv-title">${docTitle}</div>
-                                ${isReceipt ? '<div class="paid-stamp"><i class="fas fa-check-circle fa-icon"></i> Paid</div>' : ''}
-                            </div>
-                        </div>
-                    `;
+            const hasCompany = data.company.name || data.company.address || data.company.email || data.company.phone;
+            const hasClient = data.client.name || data.client.address || data.client.email || data.client.phone;
+            const hasItems = data.items.length > 0;
 
-            const bottomRow = `
-                        <div class="inv-row-bottom">
-                            <div class="brand-text">
-                                ${companyNameHtml}
-                                ${d.company.address ? `<div class="sub">${escapeHtml(d.company.address)}</div>` : ''}
-                                ${d.company.email ? `<div class="sub">${escapeHtml(d.company.email)}</div>` : ''}
-                                ${d.company.phone ? `<div class="sub">${escapeHtml(d.company.phone)}</div>` : ''}
-                                ${!d.company.name && !d.company.address && !d.company.email && !d.company.phone ? '<div class="sub" style="color:#94a3b8;">—</div>' : ''}
-                            </div>
-                            <div class="balance-box" style="background-color: ${boxColor}; color: ${boxTextColor};">
-                                <div class="balance-label">${boxLabel}</div>
-                                <div class="balance-amount">${boxAmount}</div>
-                            </div>
-                        </div>
-                    `;
-
-            const invHeader = `
-                        <div class="inv-header">
-                            ${topRow}
-                            ${bottomRow}
-                        </div>
-                    `;
-
-            const detailsTitle = isReceipt ? 'Receipt details' : 'Invoice details';
-            const detailsBlock = `
-                                    <div class="party" style="text-align:right;">
-                                        <h4>${detailsTitle}</h4>
-                                        ${d.invoice.number ? `<p><strong>#</strong> ${escapeHtml(d.invoice.number)}</p>` : ''}
-                                        ${d.invoice.date ? `<p><strong>Date</strong> ${d.invoice.date}</p>` : ''}
-                                        ${d.invoice.dueDate ? `<p><strong>Due</strong> ${d.invoice.dueDate}</p>` : ''}
-                                        ${isReceipt && d.paidDate ? `<p><strong>Paid</strong> ${d.paidDate}</p>` : ''}
-                                        ${!d.invoice.number && !d.invoice.date && !d.invoice.dueDate && !(isReceipt && d.paidDate) ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                    </div>
-                                `;
-
-            return `
-                            <div class="invoice-preview${isReceipt ? ' receipt' : ''}" id="invoiceToPdf">
-                                ${invHeader}
-
-                                <div class="inv-parties">
-                                    <div class="party">
-                                        <h4>Bill to</h4>
-                                        ${d.client.name ? `<p class="name">${escapeHtml(d.client.name)}</p>` : ''}
-                                        ${d.client.address ? `<p>${escapeHtml(d.client.address)}</p>` : ''}
-                                        ${d.client.email ? `<p>${escapeHtml(d.client.email)}</p>` : ''}
-                                        ${d.client.phone ? `<p>${escapeHtml(d.client.phone)}</p>` : ''}
-                                        ${!d.client.name && !d.client.address && !d.client.email && !d.client.phone ? '<p style="color:#94a3b8;">—</p>' : ''}
-                                    </div>
-                                    ${detailsBlock}
-                                </div>
-
-                                <table class="inv-items">
-                                    <thead>
-                                        <tr>
-                                            <th>Description</th>
-                                            <th style="text-align:left;">Qty</th>
-                                            <th style="text-align:left;">Rate</th>
-                                            <th style="text-align:right;">Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${itemsRows || `<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:24px 0;">No items</td></tr>`}
-                                    </tbody>
-                                </table>
-
-                                <div class="inv-summary">
-                                    ${summaryLines}
-                                </div>
-
-                                ${isReceipt ? `
-                                        <div class="receipt-thanks">
-                                            <i class="fas fa-check-circle fa-icon"></i>
-                                            <span>Payment received with thanks. This receipt confirms that the balance above has been settled in full.</span>
-                                        </div>
-                                    ` : ''}
-
-                                ${d.notes ? `
-                                        <div class="inv-notes">
-                                            <strong>Notes</strong>
-                                            <p>${escapeHtml(d.notes)}</p>
-                                        </div>
-                                    ` : ''}
+            if (!hasCompany && !hasClient && !hasItems && !data.logo.data) {
+                previewContainer.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon"><i class="fas fa-file-invoice fa-icon"></i></div>
+                                <p>Your invoice preview will appear here.</p>
+                                <p style="font-size:13px;margin-top:4px;color:#cbd5e1;">Start filling out details in the Edit tab.</p>
                             </div>
                         `;
-        }
-
-        // ─── PDF download ─────────────────────────────────────
-
-        function setupDownload() {
-            downloadBtn.addEventListener('click', async () => {
-                const element = document.getElementById('invoiceToPdf');
-                if (!element) {
-                    showToast('Please add some items to generate a PDF.', 'error');
-                    return;
-                }
-
-                const originalText = downloadBtn.innerHTML;
-                downloadBtn.innerHTML = '⏳ Generating…';
-                downloadBtn.disabled = true;
-
-                try {
-                    const clone = element.cloneNode(true);
-                    clone.style.padding = '48px 48px 40px';
-                    clone.style.backgroundColor = '#ffffff';
-                    clone.style.borderRadius = '0';
-                    clone.style.border = 'none';
-                    clone.style.boxShadow = 'none';
-                    clone.style.margin = '0';
-                    clone.style.width = '100%';
-                    clone.style.maxWidth = '100%';
-                    clone.style.boxSizing = 'border-box';
-                    clone.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-                    clone.style.color = '#1e293b';
-                    clone.style.fontSize = '14px';
-                    clone.style.lineHeight = '1.6';
-
-                    const imgs = clone.querySelectorAll('img');
-                    await Promise.all(Array.from(imgs).map(img => {
-                        return new Promise((resolve) => {
-                            if (img.complete && img.naturalWidth > 0) resolve();
-                            else {
-                                img.onload = resolve;
-                                img.onerror = resolve;
-                            }
-                            if (img.src && !img.complete) {
-                                // already loading
-                            } else if (img.src) {
-                                resolve();
-                            } else {
-                                resolve();
-                            }
-                        });
-                    }));
-
-                    const container = document.createElement('div');
-                    container.style.position = 'fixed';
-                    container.style.left = '-9999px';
-                    container.style.top = '0';
-                    container.style.width = '794px';
-                    container.style.backgroundColor = '#ffffff';
-                    container.style.padding = '0';
-                    container.style.margin = '0';
-                    container.style.boxSizing = 'border-box';
-                    container.appendChild(clone);
-                    document.body.appendChild(container);
-
-                    await new Promise(r => requestAnimationFrame(r));
-                    await new Promise(r => setTimeout(r, 150));
-
-                    const height = Math.max(clone.scrollHeight + 30, 400);
-                    const width = 794;
-
-                    const filePrefix = state.isPaid ? 'receipt' : 'invoice';
-
-                    const opt = {
-                        margin: [0, 0, 0, 0],
-                        filename: `${filePrefix}-${invNumber.value || 'draft'}.pdf`,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: {
-                            scale: 2,
-                            useCORS: true,
-                            logging: false,
-                            width: width,
-                            height: height,
-                            windowHeight: height,
-                            scrollY: 0,
-                            scrollX: 0,
-                            windowWidth: width,
-                        },
-                        jsPDF: {
-                            unit: 'px',
-                            format: [width, height],
-                            orientation: 'portrait',
-                            compress: true,
-                        },
-                        pagebreak: { mode: 'avoid-all' }
-                    };
-
-                    await html2pdf().set(opt).from(clone).save();
-                    document.body.removeChild(container);
-                    showToast(state.isPaid ? 'Receipt PDF downloaded ✓' : 'PDF downloaded ✓', 'success');
-
-                } catch (err) {
-                    console.error(err);
-                    showToast('Could not generate PDF. Please try again.', 'error');
-                } finally {
-                    downloadBtn.innerHTML = originalText;
-                    downloadBtn.disabled = false;
-                }
-            });
-        }
-
-        // ─── tabs ─────────────────────────────────────────────
-
-        function switchTab(tabId) {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const contents = {
-                'edit-tab': document.getElementById('edit-tab'),
-                'preview-tab': document.getElementById('preview-tab'),
-                'history-tab': document.getElementById('history-tab'),
-                'backup-tab': document.getElementById('backup-tab'),
-            };
-
-            tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
-            Object.keys(contents).forEach(key => {
-                contents[key].classList.toggle('active', key === tabId);
-            });
-
-            if (tabId === 'preview-tab') renderPreview();
-            if (tabId === 'history-tab') renderHistory();
-        }
-
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    switchTab(btn.dataset.tab);
-                });
-            });
-        }
-
-        // ─── plus / reset ──────────────────────────────────────
-
-        function handlePlus() {
-            const hasContent = state.items.length > 0 ||
-                companyName.value.trim() ||
-                clientName.value.trim() ||
-                invNumber.value.trim();
-
-            if (hasContent) {
-                const saved = saveToHistory();
-                if (!saved) return;
-            } else {
-                showToast('Nothing to save — invoice is empty.', 'info');
                 return;
             }
 
-            resetInvoiceData(true);
-            showToast('New invoice created ✓', 'success');
+            let logoHtml = '';
+            if (data.logo.data) {
+                let imgStyle = 'max-height:90px; width:auto; display:block;';
+                if (data.logo.aspect === 'square') {
+                    imgStyle = 'width:80px; height:80px; object-fit:cover; display:block;';
+                } else if (data.logo.aspect === 'circle') {
+                    imgStyle = 'width:80px; height:80px; object-fit:cover; border-radius:50%; display:block;';
+                }
+                if (data.logo.scale !== 100) {
+                    const factor = data.logo.scale / 100;
+                    imgStyle += ` transform: scale(${factor}); transform-origin: left center;`;
+                }
+                logoHtml = `<div class="logo-wrap"><img src="${data.logo.data}" alt="Logo" style="${imgStyle}" /></div>`;
+            }
+
+            let itemsRowsHtml = '';
+            if (data.items.length === 0) {
+                itemsRowsHtml = `<tr><td colspan="4" style="color:#94a3b8;text-align:center;padding:16px;">No items added yet.</td></tr>`;
+            } else {
+                data.items.forEach(item => {
+                    const itemAmount = item.qty * item.rate;
+                    itemsRowsHtml += `
+                                <tr>
+                                    <td>${escapeHtml(item.description) || '—'}</td>
+                                    <td style="text-align:center;">${item.qty}</td>
+                                    <td style="text-align:right;">${formatMoney(item.rate)}</td>
+                                    <td>${formatMoney(item.amount || itemAmount)}</td>
+                                </tr>
+                            `;
+                });
+            }
+
+            const boxBgColor = isReceipt ? '#059669' : data.styling.balanceBoxColor;
+            const boxTextColor = getContrastColor(boxBgColor);
+
+            const displayBalance = isReceipt ? 0 : data.totals.balance;
+            const displayPaid = isReceipt ? data.totals.total : data.totals.paid;
+
+            let paidStampHtml = '';
+            if (isReceipt) {
+                const paidDateFormatted = data.invoice.paidDate ? formatDate(data.invoice.paidDate) : formatDate(todayISO());
+                paidStampHtml = `<div class="paid-stamp"><i class="fas fa-check-circle fa-icon"></i> Paid · ${paidDateFormatted}</div>`;
+            }
+
+            let thanksHtml = '';
+            if (isReceipt) {
+                thanksHtml = `
+                            <div class="receipt-thanks">
+                                <i class="fas fa-heart fa-icon"></i>
+                                <span>Thank you for your business! Payment has been received in full.</span>
+                            </div>
+                        `;
+            }
+
+            const html = `
+                        <div class="invoice-preview ${isReceipt ? 'receipt' : ''}" id="invoiceDocument">
+
+                            <div class="inv-header">
+                                <div class="inv-row-top">
+                                    <div class="inv-logo-area">
+                                        ${logoHtml}
+                                    </div>
+                                    <div class="inv-title-wrap">
+                                        <div class="inv-title">${docTitle}</div>
+                                        ${paidStampHtml}
+                                    </div>
+                                </div>
+
+                                <div class="inv-row-bottom">
+                                    <div class="brand-text">
+                                        <h2>${escapeHtml(data.company.name) || 'Your Company Name'}</h2>
+                                        ${data.company.address ? `<div class="sub">${escapeHtml(data.company.address)}</div>` : ''}
+                                        ${data.company.email ? `<div class="sub">${escapeHtml(data.company.email)}</div>` : ''}
+                                        ${data.company.phone ? `<div class="sub">${escapeHtml(data.company.phone)}</div>` : ''}
+                                    </div>
+
+                                    <div class="balance-box" style="background:${boxBgColor}; color:${boxTextColor};">
+                                        <div class="balance-label" style="color:${boxTextColor}; opacity:0.85;">
+                                            ${isReceipt ? 'Total Paid' : 'Balance Due'}
+                                        </div>
+                                        <div class="balance-amount">
+                                            ${isReceipt ? formatMoney(data.totals.total) : formatMoney(displayBalance)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="inv-parties">
+                                <div class="party">
+                                    <h4>Bill To</h4>
+                                    <p class="name">${escapeHtml(data.client.name) || 'Client Name'}</p>
+                                    ${data.client.address ? `<p>${escapeHtml(data.client.address)}</p>` : ''}
+                                    ${data.client.email ? `<p>${escapeHtml(data.client.email)}</p>` : ''}
+                                    ${data.client.phone ? `<p>${escapeHtml(data.client.phone)}</p>` : ''}
+                                </div>
+
+                                <div class="party" style="text-align:right;">
+                                    <h4>Invoice Details</h4>
+                                    <p><strong>${isReceipt ? 'Receipt #' : 'Invoice #'}:</strong> ${escapeHtml(data.invoice.number) || '—'}</p>
+                                    <p><strong>Date:</strong> ${formatDate(data.invoice.date) || '—'}</p>
+                                    ${!isReceipt && data.invoice.dueDate ? `<p><strong>Due Date:</strong> ${formatDate(data.invoice.dueDate)}</p>` : ''}
+                                    ${isReceipt && data.invoice.paidDate ? `<p><strong>Paid Date:</strong> ${formatDate(data.invoice.paidDate)}</p>` : ''}
+                                </div>
+                            </div>
+
+                            <table class="inv-items">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th style="text-align:center;width:60px;">Qty</th>
+                                        <th style="text-align:right;width:110px;">Rate</th>
+                                        <th style="text-align:right;width:110px;">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemsRowsHtml}
+                                </tbody>
+                            </table>
+
+                            <div class="inv-summary">
+                                <div class="sum-line">
+                                    <span>Subtotal</span>
+                                    <span>${formatMoney(data.totals.subtotal)}</span>
+                                </div>
+                                ${data.totals.taxVal > 0 ? `
+                                    <div class="sum-line">
+                                        <span>Tax (${taxRate.value}%)</span>
+                                        <span>${formatMoney(data.totals.taxVal)}</span>
+                                    </div>
+                                ` : ''}
+                                ${data.totals.discountVal > 0 ? `
+                                    <div class="sum-line">
+                                        <span>Discount (${discountRate.value}%)</span>
+                                        <span>-${formatMoney(data.totals.discountVal)}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="sum-line total">
+                                    <span>Total</span>
+                                    <span>${formatMoney(data.totals.total)}</span>
+                                </div>
+
+                                ${!isReceipt ? `
+                                    <div class="sum-line paid">
+                                        <span>Amount Paid</span>
+                                        <span>${formatMoney(displayPaid)}</span>
+                                    </div>
+                                    <div class="sum-line balance">
+                                        <span>Balance Due</span>
+                                        <span>${formatMoney(displayBalance)}</span>
+                                    </div>
+                                ` : `
+                                    <div class="sum-line balance" style="border-top-color:#059669;color:#065f46;">
+                                        <span>Amount Paid</span>
+                                        <span>${formatMoney(data.totals.total)}</span>
+                                    </div>
+                                `}
+                            </div>
+
+                            ${data.invoice.notes ? `
+                                <div class="inv-notes">
+                                    <strong>Notes / Terms</strong>
+                                    <p>${escapeHtml(data.invoice.notes).replace(/\n/g, '<br>')}</p>
+                                </div>
+                            ` : ''}
+
+                            ${thanksHtml}
+
+                        </div>
+                    `;
+
+            previewContainer.innerHTML = html;
         }
 
-        function resetInvoiceData(silent = false) {
+        // ─── PDF Export ───────────────────────────────────────
+
+        function generatePdf() {
+            const element = document.getElementById('invoiceDocument');
+            if (!element) {
+                showToast('Please switch to Preview tab first.', 'error');
+                return;
+            }
+
+            const data = collectData();
+            const invNum = data.invoice.number || 'INV';
+            const client = data.client.name ? '_' + data.client.name.replace(/[^a-zA-Z0-9]/g, '_') : '';
+            const docType = data.invoice.isPaid ? 'Receipt' : 'Invoice';
+            const filename = `${docType}_${invNum}${client}.pdf`;
+
+            showToast('Generating PDF…', 'info', 2000);
+
+            // Create a dedicated container off-screen to normalize PDF rendering across all devices & orientations
+            const container = document.createElement('div');
+            container.style.position = 'absolute';
+            container.style.left = '-9999px';
+            container.style.top = '0';
+            container.style.width = '800px'; // Lock layout width precisely to standard desktop view
+            
+            const clone = element.cloneNode(true);
+            clone.style.width = '800px';
+            clone.style.maxWidth = 'none';
+            clone.style.margin = '0';
+            
+            container.appendChild(clone);
+            document.body.appendChild(container);
+
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    windowWidth: 800,
+                    width: 800
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+
+            html2pdf().set(opt).from(clone).save().then(() => {
+                document.body.removeChild(container);
+                showToast('PDF downloaded ✓', 'success');
+            }).catch(err => {
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
+                console.error('PDF error:', err);
+                showToast('PDF generation failed.', 'error');
+            });
+        }
+
+        // ─── Reset ─────────────────────────────────────────────
+
+        function resetInvoice() {
+            if (!confirm('Start a new invoice? Unsaved changes in current draft will be reset.')) return;
+
+            invoiceNameInput.value = '';
+            companyName.value = '';
+            companyAddress.value = '';
+            companyEmail.value = '';
+            companyPhone.value = '';
+            clientName.value = '';
+            clientAddress.value = '';
+            clientEmail.value = '';
+            clientPhone.value = '';
+            invNumber.value = 'INV-' + Math.floor(1000 + Math.random() * 9000);
+            invDate.value = todayISO();
+            invDueDate.value = '';
+            taxRate.value = '0';
+            discountRate.value = '0';
+            amountPaid.value = '0';
+            notes.value = '';
+
             state.items = [];
             state.nextId = 1;
             state.logoData = null;
@@ -3391,425 +3279,329 @@
             logoScaleLabel.textContent = '100%';
             balanceBoxColorInput.value = '#000000';
 
-            invoiceNameInput.value = '';
-            companyName.value = '';
-            companyAddress.value = '';
-            companyEmail.value = '';
-            companyPhone.value = '';
-            clientName.value = '';
-            clientAddress.value = '';
-            clientEmail.value = '';
-            clientPhone.value = '';
-            invNumber.value = '';
-            const today = new Date().toISOString().split('T')[0];
-            invDate.value = today;
-            const due = new Date();
-            due.setDate(due.getDate() + 30);
-            invDueDate.value = due.toISOString().split('T')[0];
-            taxRate.value = 0;
-            discountRate.value = 0;
-            amountPaid.value = 0;
-            notes.value = '';
-
-            addItem('', 1, 0);
             updateLogoPreview();
-            renderItems();
-            updateSummary();
+            addItem('Service / Item 1', 1, 0);
             updatePaidButton();
             renderPreview();
-            if (!silent) debounceSave();
+            saveState();
+
+            switchTab('edit-tab');
+            showToast('Invoice reset to blank template ✓', 'info');
         }
 
-        function resetInvoice() {
-            if (!confirm('Reset all invoice data? Unsaved changes will be lost.')) return;
-            resetInvoiceData(false);
-            showToast('Invoice reset.', 'info');
-        }
-        window.resetInvoice = resetInvoice;
+        // ─── tab switching ─────────────────────────────────────
 
-        // ─── local backup ──────────────────────────────────────
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            if (tabId === 'preview-tab') {
+                renderPreview();
+            } else if (tabId === 'history-tab') {
+                renderHistory();
+            }
+        }
+
+        // ─── backups local ─────────────────────────────────────
 
         function downloadBackup() {
-            const data = {
-                invoiceState: localStorage.getItem('invoiceState'),
-                invoiceHistory: localStorage.getItem('invoiceHistory'),
-                version: '1.0',
-                exportedAt: new Date().toISOString(),
+            const backup = {
+                version: 1,
+                timestamp: Date.now(),
+                currentState: JSON.parse(localStorage.getItem('invoiceState') || '{}'),
+                history: getHistory(),
             };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+            const jsonStr = JSON.stringify(backup, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
+
             const a = document.createElement('a');
             a.href = url;
-            a.download = `invoice_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = `InvoiceGenerator_Backup_${todayISO()}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+
             showToast('Backup downloaded ✓', 'success');
         }
 
         function restoreBackup(file) {
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.invoiceState) localStorage.setItem('invoiceState', data.invoiceState);
-                    if (data.invoiceHistory) localStorage.setItem('invoiceHistory', data.invoiceHistory);
-                    showToast('Backup restored ✓ Reloading...', 'success');
-                    setTimeout(() => location.reload(), 1200);
+                    const backup = JSON.parse(e.target.result);
+                    if (!backup || !backup.version) {
+                        throw new Error('Invalid backup file format');
+                    }
+
+                    if (backup.currentState) {
+                        localStorage.setItem('invoiceState', JSON.stringify(backup.currentState));
+                    }
+                    if (backup.history && Array.isArray(backup.history)) {
+                        localStorage.setItem('invoiceHistory', JSON.stringify(backup.history));
+                    }
+
+                    loadState();
+                    renderHistory();
+                    showToast('Backup restored successfully ✓', 'success');
                 } catch (err) {
-                    showToast('Invalid backup file.', 'error');
+                    console.error('Restore error:', err);
+                    showToast('Failed to restore backup: Invalid file.', 'error');
                 }
             };
             reader.readAsText(file);
         }
 
-        // ─── CLOUD BACKUP (Supabase) ──────────────────────────
+        // ─── cloud backup (Supabase) ───────────────────────────
 
-        let cloudModalMode = 'upload'; // 'upload' | 'load'
+        const cloudModal = $('cloudModal');
+        const cloudModalTitle = $('cloudModalTitle');
+        const cloudModalSub = $('cloudModalSub');
+        const cloudUsernameInput = $('cloudUsernameInput');
+        const cloudAccessCodeInput = $('cloudAccessCodeInput');
+        const cloudAccessCodeGroup = $('cloudAccessCodeGroup');
+        const cloudModalStatus = $('cloudModalStatus');
+        const cloudModalActionBtn = $('cloudModalActionBtn');
+        const cloudModalCancelBtn = $('cloudModalCancelBtn');
 
-        function openCloudModal(mode) {
+        let cloudModalMode = 'upload'; // 'upload' or 'load'
+
+        function showCloudModal(mode) {
+            if (!supabaseReady) {
+                showToast('Supabase is not configured. Please add SUPABASE_URL and SUPABASE_ANON_KEY.', 'error');
+                return;
+            }
+
             cloudModalMode = mode;
-            const modal = $('cloudModal');
-            const title = $('cloudModalTitle');
-            const sub = $('cloudModalSub');
-            const actionBtn = $('cloudModalActionBtn');
-            const accessGroup = $('cloudAccessCodeGroup');
-            const status = $('cloudModalStatus');
+            cloudModalStatus.className = 'modal-status';
+            cloudModalStatus.textContent = '';
 
-            status.className = 'modal-status';
-            status.textContent = '';
-            status.style.display = 'none';
+            const savedUser = localStorage.getItem('cloudUsername') || '';
+            const savedCode = localStorage.getItem('cloudAccessCode') || '';
+            cloudUsernameInput.value = savedUser;
+            cloudAccessCodeInput.value = savedCode;
 
             if (mode === 'upload') {
-                title.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload to Cloud';
-                sub.textContent = 'Enter your username and access code to save this invoice to the cloud.';
-                actionBtn.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload';
-                accessGroup.style.display = 'block';
+                cloudModalTitle.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload to Cloud';
+                cloudModalSub.textContent = 'Save current invoice draft and history to cloud database.';
+                cloudAccessCodeGroup.style.display = 'block';
+                cloudModalActionBtn.innerHTML = '<i class="fas fa-cloud-upload-alt fa-icon"></i> Upload';
             } else {
-                title.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load from Cloud';
-                sub.textContent = 'Enter your username to restore your invoices from the cloud.';
-                actionBtn.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load';
-                accessGroup.style.display = 'none';
+                cloudModalTitle.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load from Cloud';
+                cloudModalSub.textContent = 'Fetch invoice data from cloud using username.';
+                cloudAccessCodeGroup.style.display = 'none';
+                cloudModalActionBtn.innerHTML = '<i class="fas fa-cloud-download-alt fa-icon"></i> Load Data';
             }
 
-            $('cloudUsernameInput').value = '';
-            $('cloudAccessCodeInput').value = '';
-            modal.classList.add('active');
-            setTimeout(() => $('cloudUsernameInput').focus(), 100);
+            cloudModal.classList.add('active');
         }
 
-        function closeCloudModal() {
-            $('cloudModal').classList.remove('active');
+        function hideCloudModal() {
+            cloudModal.classList.remove('active');
         }
 
-        function setCloudModalStatus(message, type = 'info') {
-            const status = $('cloudModalStatus');
-            status.textContent = message;
-            status.className = 'modal-status show ' + type;
-            status.style.display = 'block';
+        function setModalStatus(msg, type) {
+            cloudModalStatus.textContent = msg;
+            cloudModalStatus.className = `modal-status show ${type}`;
         }
 
-        function clearCloudModalStatus() {
-            const status = $('cloudModalStatus');
-            status.className = 'modal-status';
-            status.textContent = '';
-            status.style.display = 'none';
-        }
+        async function handleCloudAction() {
+            const username = cloudUsernameInput.value.trim().toLowerCase();
+            const accessCode = cloudAccessCodeInput.value.trim();
 
-        function updateCloudStatusBadge(connected, message) {
-            const el = $('cloudStatus');
-            const dot = $('cloudStatusDot');
-            const text = $('cloudStatusText');
-            if (connected) {
-                el.style.display = 'inline-flex';
-                dot.className = 'dot green';
-                text.textContent = message || 'Connected to Supabase';
-            } else if (connected === false) {
-                el.style.display = 'inline-flex';
-                dot.className = 'dot red';
-                text.textContent = message || 'Not connected';
-            } else {
-                el.style.display = 'none';
-            }
-        }
-
-        // ─── cloud upload ──────────────────────────────────────
-
-        async function cloudUpload(username, accessCode) {
-            if (!supabaseReady || !supabaseClient) {
-                setCloudModalStatus('❌ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error');
-                return false;
+            if (!username) {
+                setModalStatus('Please enter a username.', 'error');
+                return;
             }
 
-            if (!username.trim()) {
-                setCloudModalStatus('❌ Please enter a username.', 'error');
-                return false;
-            }
-            if (!accessCode.trim()) {
-                setCloudModalStatus('❌ Please enter your access code.', 'error');
-                return false;
-            }
+            localStorage.setItem('cloudUsername', username);
 
-            // Build the data payload
-            const invoiceState = localStorage.getItem('invoiceState') || '{}';
-            const invoiceHistory = localStorage.getItem('invoiceHistory') || '[]';
-
-            const payload = {
-                username: username.trim(),
-                access_code: accessCode.trim(),
-                data: {
-                    invoiceState: invoiceState,
-                    invoiceHistory: invoiceHistory,
-                },
-                updated_at: new Date().toISOString(),
-            };
-
-            setCloudModalStatus('⏳ Uploading to cloud...', 'info');
-
-            try {
-                // Check if username exists
-                const { data: existing, error: findError } = await supabaseClient
-                    .from('invoice_backups')
-                    .select('username, access_code')
-                    .eq('username', username.trim())
-                    .maybeSingle();
-
-                if (findError && findError.code !== 'PGRST116') {
-                    throw findError;
+            if (cloudModalMode === 'upload') {
+                if (!accessCode) {
+                    setModalStatus('Please enter an access code.', 'error');
+                    return;
                 }
+                localStorage.setItem('cloudAccessCode', accessCode);
 
-                let result;
-                if (existing) {
-                    // Update existing record — verify access code
-                    if (existing.access_code !== accessCode.trim()) {
-                        setCloudModalStatus('❌ Access code does not match. Please use the correct code for this username.', 'error');
-                        return false;
-                    }
-                    const { data, error } = await supabaseClient
-                        .from('invoice_backups')
-                        .update({
-                            data: payload.data,
-                            updated_at: payload.updated_at,
-                        })
-                        .eq('username', username.trim())
-                        .select();
-                    if (error) throw error;
-                    result = data;
-                    setCloudModalStatus('✅ Cloud backup updated successfully!', 'success');
-                    showToast('Cloud backup updated ✓', 'success');
-                } else {
-                    // Insert new record
-                    const { data, error } = await supabaseClient
-                        .from('invoice_backups')
-                        .insert({
-                            username: username.trim(),
-                            access_code: accessCode.trim(),
-                            data: payload.data,
-                            updated_at: payload.updated_at,
-                        })
-                        .select();
-                    if (error) throw error;
-                    result = data;
-                    setCloudModalStatus('✅ Cloud backup uploaded successfully!', 'success');
-                    showToast('Cloud backup uploaded ✓', 'success');
-                }
-
-                return true;
-
-            } catch (err) {
-                console.error('Cloud upload error:', err);
-                let msg = '❌ Upload failed: ';
-                if (err.code === '42P01') {
-                    msg +=
-                    'Table "invoice_backups" does not exist. Please create it in your Supabase database.';
-                } else if (err.message) {
-                    msg += err.message;
-                } else {
-                    msg += 'Unknown error. Check console for details.';
-                }
-                setCloudModalStatus(msg, 'error');
-                return false;
-            }
-        }
-
-        // ─── cloud load ───────────────────────────────────────
-
-        async function cloudLoad(username) {
-            if (!supabaseReady || !supabaseClient) {
-                setCloudModalStatus('❌ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error');
-                return false;
-            }
-
-            if (!username.trim()) {
-                setCloudModalStatus('❌ Please enter a username.', 'error');
-                return false;
-            }
-
-            setCloudModalStatus('⏳ Loading from cloud...', 'info');
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('invoice_backups')
-                    .select('data, updated_at')
-                    .eq('username', username.trim())
-                    .order('updated_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-
-                if (error) throw error;
-
-                if (!data) {
-                    setCloudModalStatus(`❌ No backup found for username "${username.trim()}".`, 'error');
-                    return false;
-                }
-
-                const backupData = data.data;
-                if (backupData.invoiceState) {
-                    localStorage.setItem('invoiceState', backupData.invoiceState);
-                }
-                if (backupData.invoiceHistory) {
-                    localStorage.setItem('invoiceHistory', backupData.invoiceHistory);
-                }
-
-                const dateStr = data.updated_at ? new Date(data.updated_at).toLocaleString() : 'unknown date';
-                setCloudModalStatus(`✅ Backup loaded successfully! (from ${dateStr})`, 'success');
-                showToast('Cloud backup loaded ✓ Reloading...', 'success');
-
-                setTimeout(() => location.reload(), 1200);
-                return true;
-
-            } catch (err) {
-                console.error('Cloud load error:', err);
-                let msg = '❌ Load failed: ';
-                if (err.code === '42P01') {
-                    msg +=
-                        'Table "invoice_backups" does not exist. Please create it in your Supabase database.';
-                } else if (err.message) {
-                    msg += err.message;
-                } else {
-                    msg += 'Unknown error. Check console for details.';
-                }
-                setCloudModalStatus(msg, 'error');
-                return false;
-            }
-        }
-
-        // ─── cloud modal event handlers ──────────────────────
-
-        function setupCloudModal() {
-            const modal = $('cloudModal');
-            const cancelBtn = $('cloudModalCancelBtn');
-            const actionBtn = $('cloudModalActionBtn');
-            const usernameInput = $('cloudUsernameInput');
-            const accessInput = $('cloudAccessCodeInput');
-
-            // Close on overlay click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeCloudModal();
-            });
-
-            // Close on Escape
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && modal.classList.contains('active')) {
-                    closeCloudModal();
-                }
-            });
-
-            cancelBtn.addEventListener('click', closeCloudModal);
-
-            actionBtn.addEventListener('click', async () => {
-                const username = usernameInput.value;
-                const accessCode = accessInput.value;
-
-                // Disable button during action
-                actionBtn.disabled = true;
-                const originalHtml = actionBtn.innerHTML;
+                setModalStatus('Uploading to cloud…', 'info');
+                cloudModalActionBtn.disabled = true;
 
                 try {
-                    if (cloudModalMode === 'upload') {
-                        await cloudUpload(username, accessCode);
+                    const backupData = {
+                        version: 1,
+                        timestamp: Date.now(),
+                        currentState: JSON.parse(localStorage.getItem('invoiceState') || '{}'),
+                        history: getHistory(),
+                    };
+
+                    const { data: existing, error: fetchErr } = await supabaseClient
+                        .from('invoices')
+                        .select('id, access_code')
+                        .eq('username', username)
+                        .maybeSingle();
+
+                    if (fetchErr) throw fetchErr;
+
+                    if (existing) {
+                        if (existing.access_code && existing.access_code !== accessCode) {
+                            setModalStatus('Incorrect access code for this username.', 'error');
+                            cloudModalActionBtn.disabled = false;
+                            return;
+                        }
+
+                        const { error: updateErr } = await supabaseClient
+                            .from('invoices')
+                            .update({
+                                data: backupData,
+                                access_code: accessCode,
+                                updated_at: new Date().toISOString(),
+                            })
+                            .eq('username', username);
+
+                        if (updateErr) throw updateErr;
                     } else {
-                        await cloudLoad(username);
+                        const { error: insertErr } = await supabaseClient
+                            .from('invoices')
+                            .insert({
+                                username: username,
+                                access_code: accessCode,
+                                data: backupData,
+                                updated_at: new Date().toISOString(),
+                            });
+
+                        if (insertErr) throw insertErr;
                     }
-                } finally {
-                    actionBtn.disabled = false;
-                    actionBtn.innerHTML = originalHtml;
-                }
-            });
 
-            // Enter key in inputs triggers action
-            usernameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    if (cloudModalMode === 'load') {
-                        actionBtn.click();
-                    } else {
-                        accessInput.focus();
+                    setModalStatus('Uploaded successfully ✓', 'success');
+                    showToast('Cloud backup saved ✓', 'success');
+                    updateCloudStatusBadge(true, `Synced as ${username}`);
+
+                    setTimeout(() => {
+                        hideCloudModal();
+                        cloudModalActionBtn.disabled = false;
+                    }, 1200);
+
+                } catch (err) {
+                    console.error('Cloud upload error:', err);
+                    setModalStatus('Upload failed: ' + (err.message || 'Unknown error'), 'error');
+                    cloudModalActionBtn.disabled = false;
+                }
+
+            } else {
+                setModalStatus('Fetching from cloud…', 'info');
+                cloudModalActionBtn.disabled = true;
+
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('invoices')
+                        .select('data, updated_at')
+                        .eq('username', username)
+                        .maybeSingle();
+
+                    if (error) throw error;
+
+                    if (!data || !data.data) {
+                        setModalStatus(`No backup found for username "${username}".`, 'error');
+                        cloudModalActionBtn.disabled = false;
+                        return;
                     }
-                }
-            });
 
-            accessInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    actionBtn.click();
-                }
-            });
+                    const backup = data.data;
 
-            // Open upload
-            $('cloudUploadBtn').addEventListener('click', () => {
-                if (!supabaseReady) {
-                    showToast('⚠️ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error', 5000);
-                    return;
-                }
-                openCloudModal('upload');
-            });
+                    if (backup.currentState) {
+                        localStorage.setItem('invoiceState', JSON.stringify(backup.currentState));
+                    }
+                    if (backup.history && Array.isArray(backup.history)) {
+                        localStorage.setItem('invoiceHistory', JSON.stringify(backup.history));
+                    }
 
-            // Open load
-            $('cloudLoadBtn').addEventListener('click', () => {
-                if (!supabaseReady) {
-                    showToast('⚠️ Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.', 'error', 5000);
-                    return;
+                    loadState();
+                    renderHistory();
+
+                    setModalStatus('Data loaded successfully ✓', 'success');
+                    showToast(`Cloud data loaded for ${username} ✓`, 'success');
+                    updateCloudStatusBadge(true, `Loaded from ${username}`);
+
+                    setTimeout(() => {
+                        hideCloudModal();
+                        cloudModalActionBtn.disabled = false;
+                    }, 1200);
+
+                } catch (err) {
+                    console.error('Cloud load error:', err);
+                    setModalStatus('Load failed: ' + (err.message || 'Unknown error'), 'error');
+                    cloudModalActionBtn.disabled = false;
                 }
-                openCloudModal('load');
-            });
+            }
         }
 
-        // ─── attach input listeners ──────────────────────────
+        function updateCloudStatusBadge(online, text) {
+            const badge = $('cloudStatus');
+            const dot = $('cloudStatusDot');
+            const label = $('cloudStatusText');
 
-        function attachInputListeners() {
-            const fields = [
-                invoiceNameInput,
-                companyName, companyAddress, companyEmail, companyPhone,
-                clientName, clientAddress, clientEmail, clientPhone,
-                invNumber, invDate, invDueDate, notes,
+            if (!badge) return;
+            badge.style.display = 'inline-flex';
+
+            if (online) {
+                dot.className = 'dot green';
+                label.textContent = text || 'Cloud Active';
+            } else {
+                dot.className = 'dot red';
+                label.textContent = text || 'Cloud Offline';
+            }
+        }
+
+        // ─── init & event listeners ───────────────────────────
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Tab navigation
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Plus button
+            $('plusBtn').addEventListener('click', () => {
+                const saved = saveToHistory();
+                if (saved) {
+                    resetInvoice();
+                }
+            });
+
+            // Form inputs debounce save & update
+            const bindInputs = [
+                invoiceNameInput, companyName, companyAddress, companyEmail, companyPhone,
+                clientName, clientAddress, clientEmail, clientPhone, invNumber, invDate, invDueDate,
+                taxRate, discountRate, amountPaid, notes
             ];
-            fields.forEach(field => {
-                field.addEventListener('input', () => {
-                    renderPreview();
-                    if (field === notes) updateSummary();
-                    debounceSave();
-                });
-                field.addEventListener('change', () => {
-                    renderPreview();
-                    debounceSave();
-                });
-            });
 
-            taxRate.addEventListener('input', () => {
-                updateSummary();
-                renderPreview();
-                debounceSave();
-            });
-            discountRate.addEventListener('input', () => {
-                updateSummary();
-                renderPreview();
-                debounceSave();
-            });
-            amountPaid.addEventListener('input', () => {
-                updateSummary();
-                renderPreview();
-                debounceSave();
+            bindInputs.forEach(input => {
+                if (!input) return;
+                input.addEventListener('input', () => {
+                    updateSummary();
+                    renderPreview();
+                    debounceSave();
+                });
             });
 
             balanceBoxColorInput.addEventListener('input', () => {
@@ -3818,14 +3610,16 @@
                 debounceSave();
             });
 
+            // Add item button
             addItemBtn.addEventListener('click', () => {
                 addItem('', 1, 0);
             });
 
+            // Logo controls
             logoUpload.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) handleLogoUpload(file);
-                logoUpload.value = '';
+                if (e.target.files && e.target.files[0]) {
+                    handleLogoUpload(e.target.files[0]);
+                }
             });
 
             removeLogoBtn.addEventListener('click', removeLogo);
@@ -3838,84 +3632,59 @@
 
             logoScale.addEventListener('input', () => {
                 const val = parseInt(logoScale.value, 10);
-                logoScaleLabel.textContent = val + '%';
                 state.logoScale = val;
+                logoScaleLabel.textContent = val + '%';
                 renderPreview();
                 debounceSave();
             });
 
-            invDate.addEventListener('change', () => { renderPreview();
-                debounceSave(); });
-            invDueDate.addEventListener('change', () => { renderPreview();
-                debounceSave(); });
+            // Paid buttons
+            $('paidToggleBtnEdit').addEventListener('click', togglePaid);
+            $('paidToggleBtnPreview').addEventListener('click', togglePaid);
 
-            $('plusBtn').addEventListener('click', handlePlus);
+            // PDF Download
+            downloadBtn.addEventListener('click', generatePdf);
 
-            // ── PAID toggle buttons ──
-            document.querySelectorAll('.btn-paid-toggle').forEach(btn => {
-                btn.addEventListener('click', togglePaid);
-            });
-
+            // Backup buttons
             $('downloadBackupBtn').addEventListener('click', downloadBackup);
             $('restoreBackupInput').addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) restoreBackup(file);
-                e.target.value = '';
+                if (e.target.files && e.target.files[0]) {
+                    restoreBackup(e.target.files[0]);
+                }
             });
-        }
 
-        // ─── init ─────────────────────────────────────────────
+            // Cloud modal buttons
+            $('cloudUploadBtn').addEventListener('click', () => showCloudModal('upload'));
+            $('cloudLoadBtn').addEventListener('click', () => showCloudModal('load'));
+            cloudModalCancelBtn.addEventListener('click', hideCloudModal);
+            cloudModalActionBtn.addEventListener('click', handleCloudAction);
 
-        function init() {
-            const today = new Date().toISOString().split('T')[0];
-            if (!invDate.value) invDate.value = today;
-            const due = new Date();
-            due.setDate(due.getDate() + 30);
-            if (!invDueDate.value) invDueDate.value = due.toISOString().split('T')[0];
+            cloudModal.addEventListener('click', (e) => {
+                if (e.target === cloudModal) hideCloudModal();
+            });
 
+            // Load saved state or default init
             const loaded = loadState();
-
             if (!loaded) {
-                addItem('Web design service', 1, 450);
-                addItem('Consultation', 2, 120);
-                companyName.value = 'Studio Nine';
-                debounceSave();
+                invNumber.value = 'INV-' + Math.floor(1000 + Math.random() * 9000);
+                invDate.value = todayISO();
+                addItem('Service / Item 1', 1, 0);
+                saveState();
             }
 
-            attachInputListeners();
-            setupTabs();
-            setupDownload();
-            setupCloudModal();
-            updatePaidButton();
             renderHistory();
-            renderPreview();
 
-            // Show Supabase status
             if (supabaseReady) {
-                updateCloudStatusBadge(true, 'Connected');
+                const savedUser = localStorage.getItem('cloudUsername');
+                if (savedUser) {
+                    updateCloudStatusBadge(true, `Connected as ${savedUser}`);
+                } else {
+                    updateCloudStatusBadge(true, 'Cloud Ready');
+                }
             } else {
-                updateCloudStatusBadge(false, 'Not configured');
+                updateCloudStatusBadge(false, 'Cloud Disconnected');
             }
-
-            setTimeout(() => {
-                saveIndicator.classList.remove('visible');
-            }, 1000);
-        }
-
-        // ─── expose globals ───────────────────────────────────
-
-        window.loadFromHistory = loadFromHistory;
-        window.duplicateHistory = duplicateHistory;
-        window.deleteHistory = deleteHistory;
-        window.clearAllHistory = clearAllHistory;
-        window.switchTab = switchTab;
-        window.startRename = startRename;
-        window.renameHistory = renameHistory;
-        window.resetInvoice = resetInvoice;
-        window.togglePaid = togglePaid;
-
-        document.addEventListener('DOMContentLoaded', init);
+        });
     </script>
-
 </body>
 </html>
