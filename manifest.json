@@ -1,0 +1,37 @@
+{
+  "id": "./",
+  "name": "Invoice Generator — ₦",
+  "short_name": "Invoice ₦",
+  "description": "Offline-ready Naira (₦) invoice & receipt generator with PDF export, history, and local/cloud backups.",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f8fa",
+  "theme_color": "#1e293b",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Invoice history",
+      "short_name": "History",
+      "description": "Open your saved invoices",
+      "url": "./index.html?tab=history",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "New invoice",
+      "short_name": "New",
+      "description": "Jump straight into editing an invoice",
+      "url": "./index.html?tab=edit",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}
