@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <clipPath id="rr"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#rr)">
+    <rect width="512" height="512" fill="url(#g)"/>
+    <!-- invoice sheet -->
+    <path d="M150 96 h150 l62 62 v258 a24 24 0 0 1 -24 24 H150 a24 24 0 0 1 -24 -24 V120 a24 24 0 0 1 24 -24 z" fill="#f8fafc"/>
+    <path d="M300 96 l62 62 h-62 z" fill="#e2e8f0"/>
+    <!-- line items -->
+    <rect x="168" y="150" width="110" height="14" rx="7" fill="#cbd5e1"/>
+    <rect x="168" y="186" width="64" height="14" rx="7" fill="#cbd5e1"/>
+    <rect x="168" y="222" width="64" height="14" rx="7" fill="#cbd5e1"/>
+    <!-- naira glyph -->
+    <text x="244" y="392" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" font-size="150" font-weight="bold" fill="#4f46e5" text-anchor="middle">&#x20A6;</text>
+    <!-- paid badge -->
+    <circle cx="352" cy="368" r="58" fill="#ffffff"/>
+    <circle cx="352" cy="368" r="50" fill="#22c55e"/>
+    <path d="M326 368 l20 22 l38 -44" stroke="#ffffff" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

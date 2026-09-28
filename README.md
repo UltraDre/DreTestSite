@@ -1,88 +1,141 @@
-# Invoice Generator ₦ — PWA
+# Invoice Generator — PWA
 
-Your invoice generator, converted into a fully installable, offline-capable
-**Progressive Web App**. Same app, same data — now it works with no internet,
-installs to your phone/desktop home screen, and updates itself silently.
+Your **Invoice Generator ₦** app converted into an installable, offline-capable
+Progressive Web App. Everything is plain static files — no build step, no
+server code. Drop the folder on any static host (or open it from any local
+server) and it works.
 
----
-
-## What was added
-
-| File | Purpose |
-|---|---|
-| `manifest.json` | App identity: name, icons, colors, standalone display, shortcuts (long-press the app icon on Android). |
-| `sw.js` | Service worker — precaches the entire app shell for offline use; network-first for pages, stale-while-revalidate for assets. |
-| `icons/` | Full icon set: 192/512 px, **maskable** variants (proper safe zone), Apple touch icon, favicon. |
-| `lib/` | All CDN dependencies are now **self-hosted**: html2pdf.js, Supabase JS, Font Awesome (woff2), Inter font. No external requests — the app works 100% offline. |
-| `index.html` | PWA meta tags, manifest link, service-worker registration, an **Install** button (appears in the header when the browser allows install), offline/online toasts, and `?tab=…` deep-link support for app shortcuts. |
-
-Your Supabase config, localStorage keys (`invoiceState`, `invoiceHistory`),
-and all existing logic are **unchanged** — data saved in the browser before
-the conversion is still there (as long as the app is served from the same
-origin).
-
-## Run it locally
-
-Service workers require **HTTPS or localhost** — opening `index.html`
-directly from the file system won't register one.
-
-```bash
-cd invoice-pwa
-python3 -m http.server 8080
-# → open http://localhost:8080
-```
-
-(or `npx serve .`)
-
-## Deploy
-
-Upload the whole `invoice-pwa` folder to any static host:
-
-- **Netlify** — drag & drop the folder at app.netlify.com/drop
-- **Vercel** — `vercel` in this folder
-- **GitHub Pages** — push the folder contents to a repo, enable Pages
-- Cloudflare Pages, Firebase Hosting, your own Nginx/Apache…
-
-Every host serving files over HTTPS will make the app installable.
-
-## Installing on a device
-
-- **Android / Chrome** — open the site → “Install app” banner, or the
-  **Install** button in the app header, or menu → *Add to Home screen*.
-- **iOS Safari** — Share → **Add to Home Screen** (the Install button
-  doesn't appear on iOS; that's a platform limitation).
-- **Desktop Chrome/Edge** — install icon in the address bar or the header
-  button. Opens in its own window.
-
-## Offline behaviour
-
-- Everything (editing, preview, history, PDF generation, local backup) works
-  offline — all libraries and fonts are cached locally.
-- **Cloud backup (Supabase)** needs a connection; uploads/loads simply show
-  an error while offline, everything else keeps working.
-- Data keeps saving to `localStorage` as you type.
-
-## Shipping updates
-
-Whenever you change any file in this folder, bump `VERSION` at the top of
-`sw.js` (e.g. `v1.0.1`). Installed clients detect the new service worker,
-activate it, and refresh once — no manual uninstall needed.
-
-## Folder structure
+## What's in the box
 
 ```
 invoice-pwa/
-├── index.html                  # the app (PWA-ready)
-├── manifest.json               # PWA manifest
-├── sw.js                       # service worker (offline cache)
-├── icons/                      # app icons (any + maskable + iOS)
-└── lib/                        # self-hosted dependencies
-    ├── html2pdf.bundle.min.js
-    ├── supabase.min.js
-    ├── fontawesome/            # css + woff2 fonts
-    └── fonts/                  # Inter (woff2, subsetted)
+├── index.html          ← your app, now PWA-wired (manifest, theme color,
+│                          icons, service-worker registration, install prompt)
+├── manifest.webmanifest← install metadata: name, colors, icons, display mode
+├── sw.js               ← service worker: offline shell + asset caching
+├── README.md           ← this file
+├── icons/
+│   ├── icon.svg              (scalable favicon / any-size icon)
+│   ├── icon-192.png          (Android install icon)
+│   ├── icon-512.png          (Android install + splash icon)
+│   ├── icon-maskable-192.png (Android adaptive icon, safe-zone aware)
+│   ├── icon-maskable-512.png
+│   ├── apple-touch-icon.png  (iOS home-screen icon, 180×180)
+│   ├── favicon-16.png
+│   └── favicon-32.png
+├── vendor/             ← local copies of html2pdf + supabase-js so PDF export
+│   ├── html2pdf.bundle.min.js   and cloud backup keep working OFFLINE
+│   └── supabase.min.js
+└── tools/              ← optional dev utilities (safe to delete)
+    ├── make_icons.py   regenerates the PNG icon set (needs Pillow)
+    ├── serve.py        local server with correct PWA MIME types
+    └── pwa_test.py     headless-Chromium offline smoke test (needs Playwright)
 ```
 
-> **Supabase note:** `SUPABASE_URL` / `SUPABASE_ANON_KEY` are still defined at
-> the top of the `<script>` in `index.html` — edit them there if you change
-> projects.
+> `vendor/` and `tools/` are bonuses beyond the five items you asked for —
+> `vendor/` exists purely so the two big JS libraries don't vanish when the
+> network does. If you'd rather keep the CDN `<script>` tags, delete the folder
+> and restore the two original `<script src="https://…">` lines in `index.html`
+> (the service worker will simply runtime-cache the CDN copies instead).
+
+## What changed in `index.html`
+
+Your app code is untouched; only the shell around it was wired for PWA:
+
+1. **`<head>`** — added `theme-color`, `description`, `manifest` link, favicon /
+   `apple-touch-icon` links, iOS web-app meta tags; the two CDN `<script>` tags
+   now point at the local `vendor/` copies; removed the
+   `user-scalable=no / maximum-scale` zoom lock (better accessibility, and
+   Chrome flags it in PWA audits).
+2. **Bottom of `<body>`** — one small bootstrap `<script>` that registers
+   `sw.js`, captures `beforeinstallprompt` (exposes a global `installPwa()`
+   you can bind to an "Install app" button, plus a `pwa-installable` event),
+   and shows toasts when the device goes offline/online and when an update
+   activates. It guards everything with `typeof` checks, so removing the block
+   leaves the original app fully intact.
+
+## Quick start
+
+A service worker needs a secure context, so serve over HTTPS or `localhost`
+(double-clicking the file with `file://` will **not** register it):
+
+```bash
+cd invoice-pwa
+python3 tools/serve.py 8080        # or: npx serve, nginx, netlify, gh-pages…
+# → http://localhost:8080
+```
+
+(`tools/serve.py` is just `http.server` with the correct
+`application/manifest+json` MIME type; most production hosts already send it.)
+
+Then:
+
+1. Open the app once while online — the service worker installs and pre-caches
+   the shell, icons and vendor scripts.
+2. **Install it**: Chrome/Edge shows the install icon in the address bar; on
+   Android use *Menu → Add to Home screen / Install app*; the page also exposes
+   `installPwa()` you can bind to any "Install app" button, and listens for the
+   `pwa-installable` event.
+3. Go offline (DevTools → Network → Offline, or airplane mode) and reload: the
+   app still opens, invoices/history still load (they live in `localStorage`),
+   and PDF export still works because html2pdf is cached locally. A toast tells
+   you when you go offline/online.
+
+## How offline works
+
+| Resource                          | Strategy                                   |
+| --------------------------------- | ------------------------------------------ |
+| `index.html`, manifest, icons, `vendor/*.js` | Pre-cached on install; cache-first |
+| Page navigations                  | Network-first, falls back to cached shell  |
+| Font Awesome + Google Fonts (CDN) | Stale-while-revalidate (cached after 1st visit; icons/fonts degrade gracefully until then) |
+| Supabase API (`*.supabase.co`)    | Never intercepted — sync is always live    |
+| Invoice data & history            | Untouched — the app's own `localStorage`   |
+
+Cloud backup/restore requires a connection by design; everything local keeps
+working without one.
+
+## Shipping an update
+
+1. Edit your files as usual.
+2. Bump `const VERSION = 'v1.0.0'` at the top of `sw.js`.
+3. Deploy. Returning visitors get the new worker on their next visit; it
+   `skipWaiting()`s, purges the old caches, and the page shows an
+   "App updated" toast once the new worker takes control.
+
+## Rebranding the icons
+
+The PNG set is generated from code — tweak colors/design in
+`tools/make_icons.py` (needs `pip install pillow`) and run:
+
+```bash
+python3 tools/make_icons.py
+```
+
+or simply overwrite the files in `icons/` with your own artwork, keeping the
+same filenames/sizes (192 & 512 regular + maskable, 180 apple-touch, 16/32
+favicons). `icons/icon.svg` is hand-editable text.
+
+## Customising
+
+- **App name / description** → `manifest.webmanifest` (`name`, `short_name`,
+  `description`) and the `apple-mobile-web-app-title` meta tag in `index.html`.
+- **Colors** → `theme_color`/`background_color` in the manifest, the
+  `theme-color` meta tag, and the gradient stops in `tools/make_icons.py` /
+  `icons/icon.svg`.
+- **Supabase** → your `SUPABASE_URL` / `SUPABASE_ANON_KEY` constants inside
+  `index.html` are unchanged; nothing else to configure.
+
+## iOS notes
+
+Safari ignores `manifest` install prompts; *Share → Add to Home Screen* uses
+`apple-touch-icon.png` and the `apple-mobile-web-app-*` meta tags already set
+in `index.html`. iOS also caps service-worker caches, but this app's footprint
+(~1.2 MB) is well within it.
+
+## Deploy checklist
+
+- [ ] Serve over HTTPS (Netlify/Vercel/GitHub Pages/Cloudflare Pages all do).
+- [ ] Whole folder deployed at a stable path (scope = folder it lives in).
+- [ ] `index.html`, `manifest.webmanifest`, `sw.js` and `icons/` all reachable
+      (quick check: DevTools → Application → Manifest shows no errors and
+      Service Workers shows "activated and running").
