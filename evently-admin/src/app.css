@@ -1,0 +1,250 @@
+/* Evently Admin — thin layer over the shared design system.
+   Same tokens, denser tables, admin-only chrome. */
+
+:root {
+	--rail-w: 232px;
+}
+
+html[data-app='admin'] body {
+	background: var(--bg);
+}
+
+/* denser admin tables */
+.tbl {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+}
+.tbl th {
+	text-align: left;
+	font-size: 11px;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--text-3);
+	font-weight: 700;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--line);
+	white-space: nowrap;
+}
+.tbl td {
+	padding: 11px 10px;
+	border-bottom: 1px solid var(--line);
+	vertical-align: middle;
+}
+.tbl tr:last-child td {
+	border-bottom: 0;
+}
+.tbl tbody tr:hover {
+	background: var(--surface);
+}
+
+/* admin shell */
+.admin-rail {
+	width: var(--rail-w);
+	flex: 0 0 var(--rail-w);
+	border-right: 1px solid var(--line);
+	position: sticky;
+	top: 0;
+	height: 100dvh;
+	padding: 20px 12px;
+	display: none;
+	flex-direction: column;
+	gap: 4px;
+	background: var(--bg);
+}
+@media (min-width: 900px) {
+	.admin-rail {
+		display: flex;
+	}
+}
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 0 8px 16px;
+	font-weight: 700;
+	letter-spacing: -0.03em;
+}
+.brand .mark {
+	width: 28px;
+	height: 28px;
+	border-radius: 9px;
+	background: var(--text);
+	color: var(--bg);
+	display: grid;
+	place-items: center;
+}
+.brand small {
+	display: block;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-3);
+}
+.admin-tabs {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 60;
+	display: flex;
+	overflow-x: auto;
+	background: color-mix(in srgb, var(--bg) 90%, transparent);
+	backdrop-filter: blur(14px);
+	border-top: 1px solid var(--line);
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+	scrollbar-width: none;
+}
+.admin-tabs::-webkit-scrollbar {
+	display: none;
+}
+.admin-tabs a {
+	flex: 1 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	padding: 8px 14px;
+	height: 58px;
+	justify-content: center;
+	color: var(--text-3);
+	font-size: 10.5px;
+	font-weight: 600;
+	position: relative;
+}
+.admin-tabs a.active {
+	color: var(--text);
+}
+.admin-tabs a .n {
+	position: absolute;
+	top: 6px;
+	right: 12px;
+	min-width: 16px;
+	height: 16px;
+	padding: 0 4px;
+	border-radius: 99px;
+	background: var(--bad);
+	color: #fff;
+	font-size: 10px;
+	font-weight: 700;
+	display: grid;
+	place-items: center;
+}
+
+.kpis {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+@media (min-width: 900px) {
+	.kpis {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+.kpi {
+	background: var(--surface);
+	border-radius: var(--r-lg);
+	padding: 13px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.kpi .k {
+	font-size: 11.5px;
+	color: var(--text-3);
+	font-weight: 600;
+}
+.kpi .v {
+	font-size: 21px;
+	font-weight: 720;
+	letter-spacing: -0.03em;
+}
+.kpi .d {
+	font-size: 11.5px;
+	font-weight: 600;
+}
+
+.risk {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-weight: 700;
+	font-size: 11.5px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.risk.high {
+	color: var(--bad);
+}
+.risk.medium {
+	color: var(--warn);
+}
+.risk.low {
+	color: var(--good);
+}
+.score {
+	display: inline-grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 10px;
+	font-weight: 750;
+	font-size: 13px;
+	background: var(--surface-2);
+}
+.score.high {
+	background: var(--bad-soft);
+	color: var(--bad);
+}
+.score.medium {
+	background: var(--warn-soft);
+	color: var(--warn);
+}
+.score.low {
+	background: var(--good-soft);
+	color: var(--good);
+}
+
+.sev {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 11.5px;
+	font-weight: 650;
+	padding: 3px 9px;
+	border-radius: 7px;
+}
+.sev.high {
+	background: var(--bad-soft);
+	color: var(--bad);
+}
+.sev.medium {
+	background: var(--warn-soft);
+	color: var(--warn);
+}
+.sev.low {
+	background: var(--surface-2);
+	color: var(--text-2);
+}
+
+.stack {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.toolbar {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+.toolbar .search {
+	flex: 1 1 220px;
+}
+.empty-admin {
+	padding: 48px 20px;
+	text-align: center;
+	color: var(--text-3);
+}

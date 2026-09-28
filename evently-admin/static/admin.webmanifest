@@ -1,0 +1,23 @@
+{
+	"name": "Evently Admin — Moderation & Payouts",
+	"short_name": "Evently Admin",
+	"description": "Internal console: event approvals, moderation, disputes, KYC and payouts.",
+	"start_url": "/console",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "portrait-primary",
+	"background_color": "#0B0B0C",
+	"theme_color": "#0B0B0C",
+	"categories": ["business", "productivity"],
+	"icons": [
+		{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+		{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+		{ "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+	],
+	"shortcuts": [
+		{ "name": "Approvals", "url": "/console/approvals" },
+		{ "name": "Reports", "url": "/console/reports" },
+		{ "name": "Payouts", "url": "/console/payouts" }
+	]
+}

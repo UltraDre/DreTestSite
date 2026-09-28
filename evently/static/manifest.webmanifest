@@ -1,0 +1,56 @@
+{
+  "name": "Evently — Events, Tickets & Check-in",
+  "short_name": "Evently",
+  "description": "Discover events, buy tickets, check in with QR, and run your own events.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#0B0B0C",
+  "categories": [
+    "events",
+    "productivity",
+    "social"
+  ],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My tickets",
+      "url": "/tickets"
+    },
+    {
+      "name": "Scan tickets",
+      "url": "/organizer/scan"
+    },
+    {
+      "name": "Create event",
+      "url": "/organizer/create"
+    }
+  ]
+}
